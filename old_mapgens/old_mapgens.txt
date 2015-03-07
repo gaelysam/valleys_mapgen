@@ -1,0 +1,4 @@
+This is the first version of Valleys Mapgen.
+In next versions there will be the old mapgen.lua files here,
+So if you have this mod, you create a new world, and you update the mod, the mapgen will not change for this world.
+Otherwise you will see huge cliffs in your world if the mapgen changes.
