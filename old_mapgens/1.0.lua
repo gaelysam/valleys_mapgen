@@ -1,5 +1,5 @@
--- Mapgen 1.1
--- Sunday March 8, 2015
+-- Mapgen 1.0
+-- Friday March 6, 2015
 
 vmg.noises = {
 
@@ -24,21 +24,10 @@ vmg.noises = {
 -- Noise 7 : Dirt thickness						2D
 {offset = 1.75, scale = 3.25, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 1, persist = 1},
 
--- Noise 8 : Caves I
-{offset = 0, scale = 1, seed = -4640, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5},
-
--- Noise 9 : Caves II
-{offset = 0, scale = 1, seed = 8804, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5},
-
--- Noise 10 : Caves III
-{offset = 0, scale = 1, seed = -4780, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5},
-
--- Noise 11 : Caves IV
-{offset = 0, scale = 1, seed = -9969, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5},
-
 }
 
 function vmg.generate(minp, maxp, seed)
+	print("Generating map ...")
 	local c_dirt = minetest.get_content_id("default:dirt")
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_lawn = minetest.get_content_id("default:dirt_with_grass")
@@ -60,14 +49,9 @@ function vmg.generate(minp, maxp, seed)
 	local n5 = minetest.get_perlin_map(vmg.noises[5], chulens):get2dMap_flat(minp2d)
 	local n6 = minetest.get_perlin_map(vmg.noises[6], chulens_sup):get3dMap_flat(minp)
 	local n7 = minetest.get_perlin_map(vmg.noises[7], chulens):get2dMap_flat(minp2d)
-	local n8 = minetest.get_perlin_map(vmg.noises[8], chulens):get3dMap_flat(minp)
-	local n9 = minetest.get_perlin_map(vmg.noises[9], chulens):get3dMap_flat(minp)
-	local n10 = minetest.get_perlin_map(vmg.noises[10], chulens):get3dMap_flat(minp)
-	local n11 = minetest.get_perlin_map(vmg.noises[11], chulens):get3dMap_flat(minp)
 
 	local i2d = 1 -- index for 2D noises
-	local i3d_a = 1 -- index for noise 6 which has a special size
-	local i3d_b = 1 -- index for 3D noises
+	local i3d = 1 -- index for 3D noises
 	for x = minp.x, maxp.x do -- for each east-west and bottom-top plane
 		for z = minp.z, maxp.z do -- for each vertical row in this plane
 			local v1, v2, v3, v4, v5, v7 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d] -- n for noise, v for value
@@ -83,42 +67,36 @@ function vmg.generate(minp, maxp, seed)
 			end
 			for y = minp.y, maxp.y do -- for each node in vertical row
 				local ivm = a:index(x, y, z)
-				local v6, v8, v9, v10, v11 = n6[i3d_a], n8[i3d_b], n9[i3d_b], n10[i3d_b], n11[i3d_b]
-				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < 0.07
+				local v6 = n6[i3d]
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
-					if not is_cave then
-						local above = math.ceil(v7 + math.random())
-						if above <= 0 then
-							data[ivm] = c_stone
-						elseif y > 0 and n6[i3d_a+80] * slopes <= y + 1 - mountain_ground and not river then
-							data[ivm] = c_lawn -- if node above is not in the ground, place lawn
-						elseif n6[i3d_a+above*80] * slopes <= y + above - mountain_ground then
-							data[ivm] = c_dirt
-						else
-							data[ivm] = c_stone
-						end
+					local above = math.ceil(v7 + math.random())
+					if above <= 0 then
+						data[ivm] = c_stone
+					elseif y > 0 and n6[i3d+80] * slopes <= y + 1 - mountain_ground and not river then
+						data[ivm] = c_lawn -- if node above is not in the ground, place lawn
+					elseif n6[i3d+above*80] * slopes <= y + above - mountain_ground then
+						data[ivm] = c_dirt
+					else
+						data[ivm] = c_stone
 					end
 				elseif y <= 1 or river and y - 2 <= mountain_ground then
 					data[ivm] = c_water
 				end
 				
-				i3d_a = i3d_a + 80 -- increase i3d_a by one row
-				i3d_b = i3d_b + 80 -- increase i3d_b by one row
+				i3d = i3d + 80 -- increase i3d by one row
 			end
 			i2d = i2d + 80 -- increase i2d by one row
-			i3d_a = i3d_a + 480 -- avoid the 6 supplemental lines
+			i3d = i3d + 480 -- avoid the 6 supplemental lines
 		end
 		i2d = i2d - 6399 -- i2d = 6401 after the first execution of this loop, it must be 2 before the second.
-		i3d_a = i3d_a - 550399 -- i3d_a = 550401 after the first execution of this loop, it must be 2 before the second.
-		i3d_b = i3d_b - 511999 -- i3d_b = 512001 after the first execution of this loop, it must be 2 before the second.
+		i3d = i3d - 550399 -- i3d = 550401 after the first execution of this loop, it must be 2 before the second.
 	end
 
 	-- execute voxelmanip boring stuff to write to the map
 	vm:set_data(data)
-	vm:set_lighting({day = 0, night = 0})
 	vm:calc_lighting()
 	vm:update_liquids()
-	minetest.generate_ores(vm, minp, maxp) -- Thank you kwolekr ! I can generate the ores in 1 line ! And so it's compatible with moreores and other mods which add ores.
+	minetest.generate_ores(vm) -- Thank you kwolekr ! I can generate the ores in 1 line ! And so it's compatible with moreores and other mods which add ores.
 	vm:write_to_map()
 end
 
