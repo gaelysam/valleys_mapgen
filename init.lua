@@ -1,5 +1,5 @@
 vmg = {}
-vmg.version = "1.0"
+vmg.version = "1.1"
 
 local path = minetest.get_modpath("valleys_mapgen")
 
@@ -39,17 +39,15 @@ end
 
 vmg.settings = Settings(minetest.get_worldpath() .. "/vmg.conf")
 
--- mapgen versions manager is useless before the second version
-
---local version = vmg.settings:get("version")
---if not version then
+local version = vmg.settings:get("version")
+if not version then
 	vmg.settings:set("version", vmg.version)
 	dofile(path .. "/mapgen.lua")
---elseif version == vmg.version then
-	--dofile(path .. "/mapgen.lua")
---else
-	--dofile(path .. "/old_mapgens/" .. vmg.version .. ".lua")
---end
+elseif version == vmg.version then
+	dofile(path .. "/mapgen.lua")
+else
+	dofile(path .. "/old_mapgens/" .. version .. ".lua")
+end
 
 vmg.settings:write()
 
