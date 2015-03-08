@@ -22,7 +22,7 @@ vmg.noises = {
 {offset = 0, scale = 1, seed = 1993, spread = {x = 256, y = 512, z = 256}, octaves = 6, persist = 0.8},
 
 -- Noise 7 : Dirt thickness						2D
-{offset = 1.75, scale = 3.25, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 1, persist = 1},
+{offset = 3, scale = 2, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5},
 
 -- Noise 8 : Caves I
 {offset = 0, scale = 1, seed = -4640, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5},
@@ -87,7 +87,7 @@ function vmg.generate(minp, maxp, seed)
 				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < 0.07
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
 					if not is_cave then
-						local above = math.ceil(v7 + math.random())
+						local above = math.ceil(v7 + math.random() - math.sqrt(math.abs(y)) / 3.5)
 						if above <= 0 then
 							data[ivm] = c_stone
 						elseif y > 0 and n6[i3d_a+80] * slopes <= y + 1 - mountain_ground and not river then
