@@ -118,7 +118,11 @@ function vmg.generate(minp, maxp, seed)
 	vm:set_lighting({day = 0, night = 0})
 	vm:calc_lighting()
 	vm:update_liquids()
-	minetest.generate_ores(vm, minp, maxp) -- Thank you kwolekr ! I can generate the ores in 1 line ! And so it's compatible with moreores and other mods which add ores.
+	vm:write_to_map()
+
+	vm = minetest.get_voxel_manip()
+	vm:read_from_map(minp, maxp)
+	minetest.generate_ores(vm) -- Thank you kwolekr ! I can generate the ores in 1 line ! And so it's compatible with moreores and other mods which add ores.
 	vm:write_to_map()
 end
 
