@@ -177,7 +177,7 @@ function vmg.spawnplayer(player)
 	local angle = math.random() * math.pi * 2
 	local p_angle = {x = math.cos(angle), y = math.sin(angle)}
 	local elevation = vmg.get_elevation(pos)
-	while elevation < 2 do
+	while elevation < 3 or math.abs(vmg.get_noise(pos, 2)) < 0.06 do
 		pos.x = pos.x + p_angle.x
 		pos.y = pos.y + p_angle.y
 		elevation = vmg.get_elevation({x = round(pos.x), y = round(pos.y)})
