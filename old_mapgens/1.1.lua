@@ -1,46 +1,42 @@
--- Mapgen 1.2
--- Monday March 9, 2015
+-- Mapgen 1.1
+-- Sunday March 8, 2015
 
 vmg.noises = {
 
 -- Noise 1 : Base Ground Height						2D
-{offset = -10, scale = 50, seed = 5202, spread = {x = 1024, y = 1024, z = 1024}, octaves = 6, persist = 0.4, lacunarity = 2},
+{offset = -10, scale = 50, seed = 5202, spread = {x = 1024, y = 1024, z = 1024}, octaves = 6, persist = 0.4},
 
 -- Noise 2 : Valleys (River where around zero)				2D
-{offset = 0, scale = 1, seed = -6050, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.6, lacunarity = 2},
+{offset = 0, scale = 1, seed = -6050, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.6},
 
 -- Noise 3 : Valleys Depth						2D
-{offset = 5, scale = 4, seed = -1914, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1, lacunarity = 2},
+{offset = 5, scale = 4, seed = -1914, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1},
 
 -- Noise 4 : Valleys Profile (Higher values = Larger valleys)		2D
-{offset = 0.5, scale = 0.5, seed = 777, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1, lacunarity = 2},
+{offset = 0.5, scale = 0.5, seed = 777, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1},
 
 -- Noise 5 : Inter-valleys slopes					2D
-{offset = 0.5, scale = 0.5, seed = 746, spread = {x = 128, y = 128, z = 128}, octaves = 1, persist = 1, lacunarity = 2},
+{offset = 0.5, scale = 0.5, seed = 746, spread = {x = 128, y = 128, z = 128}, octaves = 1, persist = 1},
 
 -- Noise 6 : Inter-valleys filling					3D
-{offset = 0, scale = 1, seed = 1993, spread = {x = 256, y = 512, z = 256}, octaves = 6, persist = 0.8, lacunarity = 2},
+{offset = 0, scale = 1, seed = 1993, spread = {x = 256, y = 512, z = 256}, octaves = 6, persist = 0.8},
 
 -- Noise 7 : Dirt thickness						2D
-{offset = 3, scale = 2, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5, lacunarity = 2},
+{offset = 3, scale = 2, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5},
 
 -- Noise 8 : Caves I
-{offset = 0, scale = 1, seed = -4640, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
+{offset = 0, scale = 1, seed = -4640, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5},
 
 -- Noise 9 : Caves II
-{offset = 0, scale = 1, seed = 8804, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
+{offset = 0, scale = 1, seed = 8804, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5},
 
 -- Noise 10 : Caves III
-{offset = 0, scale = 1, seed = -4780, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
+{offset = 0, scale = 1, seed = -4780, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5},
 
 -- Noise 11 : Caves IV
-{offset = 0, scale = 1, seed = -9969, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
+{offset = 0, scale = 1, seed = -9969, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5},
 
 }
-
-for i, n in ipairs(vmg.noises) do
-	vmg.noises[i] = vmg.string_to_noise(vmg.define("noise_" .. i, vmg.noise_to_string(n)))
-end
 
 function vmg.generate(minp, maxp, seed)
 	local c_dirt = minetest.get_content_id("default:dirt")
@@ -181,7 +177,7 @@ function vmg.spawnplayer(player)
 	local angle = math.random() * math.pi * 2
 	local p_angle = {x = math.cos(angle), y = math.sin(angle)}
 	local elevation = vmg.get_elevation(pos)
-	while elevation < 3 or math.abs(vmg.get_noise(pos, 2)) < 0.06 do
+	while elevation < 2 do
 		pos.x = pos.x + p_angle.x
 		pos.y = pos.y + p_angle.y
 		elevation = vmg.get_elevation({x = round(pos.x), y = round(pos.y)})

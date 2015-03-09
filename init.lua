@@ -1,7 +1,7 @@
 vmg = {}
-vmg.version = "1.1"
+vmg.version = "1.2"
 
-local path = minetest.get_modpath("valleys_mapgen")
+vmg.path = minetest.get_modpath("valleys_mapgen")
 
 minetest.register_on_mapgen_init(function(mgparams)
 	minetest.set_mapgen_params({mgname="singlenode", flags="nolight"})
@@ -37,19 +37,7 @@ function pos3d(pos, alt)
 	end
 end
 
-vmg.settings = Settings(minetest.get_worldpath() .. "/vmg.conf")
-
-local version = vmg.settings:get("version")
-if not version then
-	vmg.settings:set("version", vmg.version)
-	dofile(path .. "/mapgen.lua")
-elseif version == vmg.version then
-	dofile(path .. "/mapgen.lua")
-else
-	dofile(path .. "/old_mapgens/" .. version .. ".lua")
-end
-
-vmg.settings:write()
+dofile(vmg.path .. "/settings.lua")
 
 minetest.register_on_generated(vmg.generate)
 minetest.register_on_newplayer(vmg.spawnplayer)
