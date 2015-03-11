@@ -1,0 +1,33 @@
+#    format : FLAG = VALUE
+
+#    Settings are presents twice :
+#    - In every world :
+#      world_directory/vmg.conf
+
+#    - In the main directory :
+#      usually main_directory/minetest.conf
+
+#    /!\ IMPORTANT : In minetest.conf, flags have to be preceded by "vmg_" like "vmg_average_stone_level".
+
+
+
+#version = 1.2
+#    mapgen version used.
+
+#average_stone_level = 150
+#    height at which the half of the surface at this height is made solely of stone.
+
+#    NOISES : offset, scale, (spread), seed, octaves, persist, lacunarity
+#    (see mapgen.lua to see what is the role of each noise)
+
+#noise_1 = -10, 50, (1024,1024,1024), 5202, 6, 0.4, 2
+#noise_2 = 0, 1, (256,256,256), -6050, 5, 0.6, 2
+#noise_3 = 5, 4, (512,512,512), -1914, 1, 1, 2
+#noise_4 = 0.5, 0.5, (512,512,512), 777, 1, 1, 2
+#noise_5 = 0.5, 0.5, (128,128,128), 746, 1, 1, 2
+#noise_6 = 0, 1, (256,512,256), 1993, 6, 0.8, 2
+#noise_7 = 3, 2, (256,256,256), 1605, 3, 0.5, 2
+#noise_8 = 0, 1, (32,32,32), -4640, 4, 0.5, 2
+#noise_9 = 0, 1, (32,32,32), 8804, 4, 0.5, 2
+#noise_10 = 0, 1, (32,32,32), -4780, 4, 0.5, 2
+#noise_11 = 0, 1, (32,32,32), -9969, 4, 0.5, 2
