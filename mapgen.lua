@@ -42,6 +42,9 @@ for i, n in ipairs(vmg.noises) do
 	vmg.noises[i] = vmg.string_to_noise(vmg.define("noise_" .. i, vmg.noise_to_string(n)))
 end
 
+local average_stone_level = vmg.define("average_stone_level", 150)
+local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 0.5)
+
 function vmg.generate(minp, maxp, seed)
 	local c_dirt = minetest.get_content_id("default:dirt")
 	local c_stone = minetest.get_content_id("default:stone")
@@ -91,7 +94,9 @@ function vmg.generate(minp, maxp, seed)
 				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < 0.07
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
 					if not is_cave then
-						local above = math.ceil(v7 + math.random() - math.sqrt(math.abs(y)) / 3.5)
+						local above = math.ceil(
+							v7 + math.random() - math.sqrt(math.abs(y)) / dirt_thickness
+						)
 						if above <= 0 then
 							data[ivm] = c_stone
 						elseif y > 0 and n6[i3d_a+80] * slopes <= y + 1 - mountain_ground and not river then
