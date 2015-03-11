@@ -1,12 +1,21 @@
 vmg.settings = Settings(minetest.get_worldpath() .. "/vmg.conf")
 
-function vmg.define(flag, default)
+function vmg.define(flag, default, write_to_config)
 	local value = vmg.settings:get(flag)
 	if value then
 		return value, true
 	else
-		vmg.settings:set(flag, default)
-		return default, false
+		local on_config = minetest.setting_get("vmg_" .. flag)
+		if on_config then
+			vmg.settings:set(flag, on_config)
+			return on_config, false
+		else
+			if write_to_config then
+				minetest.setting_set("vmg_" .. flag, default)
+			end
+			vmg.settings:set(flag, default)
+			return default, false
+		end
 	end
 end
 
@@ -22,7 +31,7 @@ end
 
 function vmg.string_to_noise(str)
 	local t = {}
-	for line in str:gmatch("[%d%.%-]+") do
+	for line in str:gmatch("[%d%.%-e]+") do
 		table.insert(t, tonumber(line))
 	end
 	return {
