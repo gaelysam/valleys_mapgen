@@ -16,6 +16,8 @@
 
 #average_stone_level = 150
 #    height at which the half of the surface at this height is made solely of stone.
+#river_size = 5
+#caves_size = 7
 
 #    NOISES : offset, scale, (spread), seed, octaves, persist, lacunarity
 #    (see mapgen.lua to see what is the role of each noise)

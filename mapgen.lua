@@ -45,6 +45,9 @@ end
 local average_stone_level = vmg.define("average_stone_level", 150)
 local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 0.5)
 
+local river_size = vmg.define("river_size", 5) / 100
+local caves_size = vmg.define("caves_size", 7) / 100
+
 function vmg.generate(minp, maxp, seed)
 	local c_dirt = minetest.get_content_id("default:dirt")
 	local c_stone = minetest.get_content_id("default:stone")
@@ -80,7 +83,7 @@ function vmg.generate(minp, maxp, seed)
 			local v1, v2, v3, v4, v5, v7 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d] -- n for noise, v for value
 			v3 = v3 ^ 2 -- v3 must be > 0 and by the square there are high mountains but the median valleys depth is small.
 			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher when valleys are deep (mountains)
-			local river = math.abs(v2) < 0.05
+			local river = math.abs(v2) < river_size
 			local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 will change the shape of the valleys. v2 = x and v4 = a.
 			local mountain_ground = base_ground + valleys
 			local slopes = v5 * valleys
@@ -91,7 +94,7 @@ function vmg.generate(minp, maxp, seed)
 			for y = minp.y, maxp.y do -- for each node in vertical row
 				local ivm = a:index(x, y, z)
 				local v6, v8, v9, v10, v11 = n6[i3d_a], n8[i3d_b], n9[i3d_b], n10[i3d_b], n11[i3d_b]
-				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < 0.07
+				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
 					if not is_cave then
 						local above = math.ceil(
@@ -186,7 +189,7 @@ function vmg.spawnplayer(player)
 	local angle = math.random() * math.pi * 2
 	local p_angle = {x = math.cos(angle), y = math.sin(angle)}
 	local elevation = vmg.get_elevation(pos)
-	while elevation < 3 or math.abs(vmg.get_noise(pos, 2)) < 0.06 do
+	while elevation < 3 or math.abs(vmg.get_noise(pos, 2)) < river_size do
 		pos.x = pos.x + p_angle.x
 		pos.y = pos.y + p_angle.y
 		elevation = vmg.get_elevation({x = round(pos.x), y = round(pos.y)})
