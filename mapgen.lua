@@ -22,7 +22,7 @@ vmg.noises = {
 {offset = 0, scale = 1, seed = 1993, spread = {x = 256, y = 512, z = 256}, octaves = 6, persist = 0.8, lacunarity = 2},
 
 -- Noise 7 : Dirt thickness						2D
-{offset = 3, scale = 2, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5, lacunarity = 2},
+{offset = 3, scale = 1.75, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5, lacunarity = 2},
 
 -- Noise 8 : Caves I							3D
 {offset = 0, scale = 1, seed = -4640, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
@@ -42,7 +42,7 @@ for i, n in ipairs(vmg.noises) do
 	vmg.noises[i] = vmg.string_to_noise(vmg.define("noise_" .. i, vmg.noise_to_string(n)))
 end
 
-local average_stone_level = vmg.define("average_stone_level", 150)
+local average_stone_level = vmg.define("average_stone_level", 180)
 local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 0.5)
 
 local river_size = vmg.define("river_size", 5) / 100
