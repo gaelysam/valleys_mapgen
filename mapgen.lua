@@ -48,6 +48,8 @@ local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 
 local river_size = vmg.define("river_size", 5) / 100
 local caves_size = vmg.define("caves_size", 7) / 100
 
+local player_max_distance = vmg.define("player_max_distance", 450)
+
 function vmg.generate(minp, maxp, seed)
 	local c_dirt = minetest.get_content_id("default:dirt")
 	local c_stone = minetest.get_content_id("default:stone")
@@ -181,9 +183,10 @@ function vmg.get_elevation(pos)
 end
 
 function vmg.spawnplayer(player)
-	local pos = {x = 0, y = 0}
 	local angle = math.random() * math.pi * 2
+	local distance = math.random() * player_max_distance
 	local p_angle = {x = math.cos(angle), y = math.sin(angle)}
+	local pos = {x = -p_angle.x * distance, y = -p_angle.y * distance}
 	local elevation = vmg.get_elevation(pos)
 	while elevation < 3 or math.abs(vmg.get_noise(pos, 2)) < river_size do
 		pos.x = pos.x + p_angle.x
