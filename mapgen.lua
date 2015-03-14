@@ -13,7 +13,7 @@ vmg.noises = {
 {offset = 5, scale = 4, seed = -1914, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1, lacunarity = 2},
 
 -- Noise 4 : Valleys Profile (Higher values = Larger valleys)		2D
-{offset = 0.5, scale = 0.5, seed = 777, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1, lacunarity = 2},
+{offset = 0.6, scale = 0.5, seed = 777, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1, lacunarity = 2},
 
 -- Noise 5 : Inter-valleys slopes					2D
 {offset = 0.5, scale = 0.5, seed = 746, spread = {x = 128, y = 128, z = 128}, octaves = 1, persist = 1, lacunarity = 2},
@@ -24,16 +24,16 @@ vmg.noises = {
 -- Noise 7 : Dirt thickness						2D
 {offset = 3, scale = 2, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5, lacunarity = 2},
 
--- Noise 8 : Caves I
+-- Noise 8 : Caves I							3D
 {offset = 0, scale = 1, seed = -4640, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
 
--- Noise 9 : Caves II
+-- Noise 9 : Caves II							3D
 {offset = 0, scale = 1, seed = 8804, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
 
--- Noise 10 : Caves III
+-- Noise 10 : Caves III							3D
 {offset = 0, scale = 1, seed = -4780, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
 
--- Noise 11 : Caves IV
+-- Noise 11 : Caves IV							3D
 {offset = 0, scale = 1, seed = -9969, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
 
 }
