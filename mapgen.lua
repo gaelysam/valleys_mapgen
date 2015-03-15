@@ -38,6 +38,15 @@ vmg.noises = {
 
 }
 
+function vmg.noisemap(i, minp, chulens)
+	local obj = minetest.get_perlin_map(vmg.noises[i], chulens)
+	if minp.z then
+		return obj:get3dMap_flat(minp)
+	else
+		return obj:get2dMap_flat(minp)
+	end
+end
+
 for i, n in ipairs(vmg.noises) do
 	vmg.noises[i] = vmg.string_to_noise(vmg.define("noise_" .. i, vmg.noise_to_string(n)))
 end
@@ -65,17 +74,17 @@ function vmg.generate(minp, maxp, seed)
 	local chulens_sup = {x = chulens.x, y = chulens.y + 6, z = chulens.z}
 	local minp2d = pos2d(minp)
 
-	local n1 = minetest.get_perlin_map(vmg.noises[1], chulens):get2dMap_flat(minp2d)
-	local n2 = minetest.get_perlin_map(vmg.noises[2], chulens):get2dMap_flat(minp2d)
-	local n3 = minetest.get_perlin_map(vmg.noises[3], chulens):get2dMap_flat(minp2d)
-	local n4 = minetest.get_perlin_map(vmg.noises[4], chulens):get2dMap_flat(minp2d)
-	local n5 = minetest.get_perlin_map(vmg.noises[5], chulens):get2dMap_flat(minp2d)
-	local n6 = minetest.get_perlin_map(vmg.noises[6], chulens_sup):get3dMap_flat(minp)
-	local n7 = minetest.get_perlin_map(vmg.noises[7], chulens):get2dMap_flat(minp2d)
-	local n8 = minetest.get_perlin_map(vmg.noises[8], chulens):get3dMap_flat(minp)
-	local n9 = minetest.get_perlin_map(vmg.noises[9], chulens):get3dMap_flat(minp)
-	local n10 = minetest.get_perlin_map(vmg.noises[10], chulens):get3dMap_flat(minp)
-	local n11 = minetest.get_perlin_map(vmg.noises[11], chulens):get3dMap_flat(minp)
+	local n1 = vmg.noisemap(1, minp2d, chulens)
+	local n2 = vmg.noisemap(2, minp2d, chulens)
+	local n3 = vmg.noisemap(3, minp2d, chulens)
+	local n4 = vmg.noisemap(4, minp2d, chulens)
+	local n5 = vmg.noisemap(5, minp2d, chulens)
+	local n6 = vmg.noisemap(6, minp, chulens_sup)
+	local n7 = vmg.noisemap(7, minp2d, chulens)
+	local n8 = vmg.noisemap(8, minp, chulens)
+	local n9 = vmg.noisemap(9, minp, chulens)
+	local n10 = vmg.noisemap(10, minp, chulens)
+	local n11 = vmg.noisemap(11, minp, chulens)
 
 	local i2d = 1 -- index for 2D noises
 	local i3d_a = 1 -- index for noise 6 which has a special size
