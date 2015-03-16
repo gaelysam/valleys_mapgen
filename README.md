@@ -15,6 +15,7 @@ Mapgen mod for Minetest 0.4.12+. Still not finished.
     * Bare stone is rarer
     * Valleys are slightly larger
     * Ores are generated properly, according to [Paramat's changes](https://github.com/minetest/minetest/commit/b2b6bbf3e80f0ab06d62c43567122871ae560534) in `minetest.generate_ores`. **I advise you to update your MT version to a recent build (03/11 or later) or the ores overlapping problem will reappear.**
+
 ### 1.0 ~> 1.1
 * Added caves: they are modelised by 4 3D noises.
 * Corrected ores generation: There was too many ores because it was sometimes generated twice or even more.
