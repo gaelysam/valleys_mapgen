@@ -7,6 +7,7 @@ Mapgen mod for Minetest 0.4.12+. Still not finished.
 
 ## Changelog
 ### 1.1 ~> lastest
+* Added lava underground
 * Settings in minetest.conf : see file vmg.conf.example
 * Now the player can't spawn in rivers
 * Player spawn location is randomized : you can set the maximal distance from (0;0) at which the player will appear. (If it's in a big ocean, it may be farther)
