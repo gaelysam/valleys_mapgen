@@ -33,8 +33,11 @@ vmg.noises = {
 -- Noise 10 : Caves III							3D
 {offset = 0, scale = 1, seed = -4780, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
 
--- Noise 11 : Caves IV							3D
+-- Noise 11 : Caves IV and Lava I					3D
 {offset = 0, scale = 1, seed = -9969, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
+
+-- Noise 12 : Lava II							3D
+{offset = 0, scale = 1, seed = 3314, spread = {x = 64, y = 64, z = 64}, octaves = 4, persist = 0.5, lacunarity = 2},
 
 }
 
@@ -56,6 +59,7 @@ local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 
 
 local river_size = vmg.define("river_size", 5) / 100
 local caves_size = vmg.define("caves_size", 7) / 100
+local lava_depth = vmg.define("lava_depth", 2000)
 
 local player_max_distance = vmg.define("player_max_distance", 450)
 
@@ -64,6 +68,7 @@ function vmg.generate(minp, maxp, seed)
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_lawn = minetest.get_content_id("default:dirt_with_grass")
 	local c_water = minetest.get_content_id("default:water_source")
+	local c_lava = minetest.get_content_id("default:lava_source")
 	local c_air = minetest.get_content_id("air")
 
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
@@ -85,6 +90,7 @@ function vmg.generate(minp, maxp, seed)
 	local n9 = vmg.noisemap(9, minp, chulens)
 	local n10 = vmg.noisemap(10, minp, chulens)
 	local n11 = vmg.noisemap(11, minp, chulens)
+	local n12 = vmg.noisemap(12, minp, chulens)
 
 	local i2d = 1 -- index for 2D noises
 	local i3d_a = 1 -- index for noise 6 which has a special size
@@ -104,7 +110,7 @@ function vmg.generate(minp, maxp, seed)
 			end
 			for y = minp.y, maxp.y do -- for each node in vertical row
 				local ivm = a:index(x, y, z)
-				local v6, v8, v9, v10, v11 = n6[i3d_a], n8[i3d_b], n9[i3d_b], n10[i3d_b], n11[i3d_b]
+				local v6, v8, v9, v10, v11, v12 = n6[i3d_a], n8[i3d_b], n9[i3d_b], n10[i3d_b], n11[i3d_b], n12[i3d_b]
 				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
 					if not is_cave then
@@ -120,6 +126,8 @@ function vmg.generate(minp, maxp, seed)
 						else
 							data[ivm] = c_stone
 						end
+					elseif v11 + v12 > 2 ^ (y / lava_depth) then
+						data[ivm] = c_lava
 					end
 				elseif y <= 1 or river and y - 2 <= mountain_ground then
 					data[ivm] = c_water
