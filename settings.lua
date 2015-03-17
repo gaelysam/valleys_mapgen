@@ -25,14 +25,14 @@ local function define_bool(flag, default, write_to_config)
 		return value, true
 	else
 		local on_config = minetest.setting_getbool("vmg_" .. flag)
-		if on_config then
-			vmg.settings:set(flag, on_config)
+		if on_config ~= nil then
+			vmg.settings:set(flag, tostring(on_config))
 			return on_config, false
 		else
 			if write_to_config then
 				minetest.setting_setbool("vmg_" .. flag, default)
 			end
-			vmg.settings:set(flag, default)
+			vmg.settings:set(flag, tostring(default))
 			return default, false
 		end
 	end
