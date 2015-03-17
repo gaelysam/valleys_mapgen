@@ -51,7 +51,7 @@ function vmg.noisemap(i, minp, chulens)
 end
 
 for i, n in ipairs(vmg.noises) do
-	vmg.noises[i] = vmg.string_to_noise(vmg.define("noise_" .. i, vmg.noise_to_string(n)))
+	vmg.noises[i] = vmg.define("noise_" .. i, n)
 end
 
 local average_stone_level = vmg.define("average_stone_level", 180)

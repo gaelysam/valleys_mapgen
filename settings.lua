@@ -1,6 +1,6 @@
 vmg.settings = Settings(minetest.get_worldpath() .. "/vmg.conf")
 
-function vmg.define(flag, default, write_to_config)
+local function define_str_num(flag, default, write_to_config)
 	local value = vmg.settings:get(flag)
 	if value then
 		return value, true
@@ -16,6 +16,56 @@ function vmg.define(flag, default, write_to_config)
 			vmg.settings:set(flag, default)
 			return default, false
 		end
+	end
+end
+
+local function define_bool(flag, default, write_to_config)
+	local value = vmg.settings:get_bool(flag)
+	if value ~= nil then
+		return value, true
+	else
+		local on_config = minetest.setting_getbool("vmg_" .. flag)
+		if on_config then
+			vmg.settings:set(flag, on_config)
+			return on_config, false
+		else
+			if write_to_config then
+				minetest.setting_setbool("vmg_" .. flag, default)
+			end
+			vmg.settings:set(flag, default)
+			return default, false
+		end
+	end
+end
+
+local function define_noise(flag, default, write_to_config)
+	local value = vmg.settings:get(flag)
+	if value then
+		return vmg.string_to_noise(value), true
+	else
+		local on_config = minetest.setting_get("vmg_" .. flag)
+		if on_config then
+			vmg.settings:set(flag, on_config)
+			return vmg.string_to_noise(on_config), false
+		else
+			local str_default = vmg.noise_to_string(default)
+			if write_to_config then
+				minetest.setting_set("vmg_" .. flag, str_default)
+			end
+			vmg.settings:set(flag, str_default)
+			return default, false
+		end
+	end
+end
+
+function vmg.define(flag, default, write_to_config)
+	local typeval = type(default)
+	if typeval == "string" or typeval == "number" then
+		return define_str_num(flag, default, write_to_config)
+	elseif typeval == "boolean" then
+		return define_bool(flag, default, write_to_config)
+	elseif typeval == "table" then
+		return define_noise(flag, default, write_to_config)
 	end
 end
 
