@@ -1,5 +1,5 @@
--- Mapgen 1.3
--- Friday March 20, 2015
+-- Mapgen 1.2
+-- Monday March 9, 2015
 
 vmg.noises = {
 

@@ -6,7 +6,7 @@ Mapgen mod for Minetest 0.4.12+. Still not finished.
 [Discussion on Minetest Forums](https://forum.minetest.net/viewtopic.php?f=9&t=11430)
 
 ## Changelog
-### 1.1 ~> lastest
+### 1.1 ~> 1.2
 * Added lava underground
 * Settings in minetest.conf : see file vmg.conf.example
 * Now the player can't spawn in rivers
