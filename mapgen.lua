@@ -39,6 +39,15 @@ vmg.noises = {
 -- Noise 12 : Lava II							3D
 {offset = 0, scale = 1, seed = 3314, spread = {x = 64, y = 64, z = 64}, octaves = 4, persist = 0.5, lacunarity = 2},
 
+-- Noise 13 : Clayey dirt noise						2D
+{offset = 0, scale = 1, seed = 2835, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.375, lacunarity = 4},
+
+-- Noise 14 : Silty dirt noise						2D
+{offset = 0, scale = 1, seed = 6674, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.375, lacunarity = 4},
+
+-- Noise 15 : Sandy dirt noise						2D
+{offset = 0, scale = 1, seed = 6940, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.375, lacunarity = 4},
+
 }
 
 function vmg.noisemap(i, minp, chulens)
@@ -64,10 +73,22 @@ local surface_lava = vmg.define("surface_lava", false)
 
 local player_max_distance = vmg.define("player_max_distance", 450)
 
+local biomeblend = vmg.define("biomeblend", 10) / 100
+
 function vmg.generate(minp, maxp, seed)
-	local c_dirt = minetest.get_content_id("default:dirt")
 	local c_stone = minetest.get_content_id("default:stone")
+	local c_dirt = minetest.get_content_id("default:dirt")
 	local c_lawn = minetest.get_content_id("default:dirt_with_grass")
+	local c_dirt_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey")
+	local c_lawn_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_grass")
+	local c_dirt_silt = minetest.get_content_id("valleys_mapgen:dirt_silty")
+	local c_lawn_silt = minetest.get_content_id("valleys_mapgen:dirt_silty_with_grass")
+	local c_dirt_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy")
+	local c_lawn_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_grass")
+	local c_desert_sand = minetest.get_content_id("default:desert_sand")
+	local c_gravel = minetest.get_content_id("default:gravel")
+	local c_silt = minetest.get_content_id("valleys_mapgen:silt")
+	local c_clay = minetest.get_content_id("default:clay")
 	local c_water = minetest.get_content_id("default:water_source")
 	local c_lava = minetest.get_content_id("default:lava_source")
 	local c_air = minetest.get_content_id("air")
@@ -92,23 +113,59 @@ function vmg.generate(minp, maxp, seed)
 	local n10 = vmg.noisemap(10, minp, chulens)
 	local n11 = vmg.noisemap(11, minp, chulens)
 	local n12 = vmg.noisemap(12, minp, chulens)
+	local n13 = vmg.noisemap(13, minp2d, chulens)
+	local n14 = vmg.noisemap(14, minp2d, chulens)
+	local n15 = vmg.noisemap(15, minp2d, chulens)
 
 	local i2d = 1 -- index for 2D noises
 	local i3d_a = 1 -- index for noise 6 which has a special size
 	local i3d_b = 1 -- index for 3D noises
 	for x = minp.x, maxp.x do -- for each east-west and bottom-top plane
 		for z = minp.z, maxp.z do -- for each vertical row in this plane
-			local v1, v2, v3, v4, v5, v7 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d] -- n for noise, v for value
+			local v1, v2, v3, v4, v5, v7, v13, v14, v15 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d] -- n for noise, v for value
 			v3 = v3 ^ 2 -- v3 must be > 0 and by the square there are high mountains but the median valleys depth is small.
 			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher when valleys are deep (mountains)
 			local river = math.abs(v2) < river_size
 			local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 will change the shape of the valleys. v2 = x and v4 = a.
 			local mountain_ground = base_ground + valleys
 			local slopes = v5 * valleys
+
 			if river then
 				mountain_ground = math.min(math.max(base_ground - 3, -5), mountain_ground)
 				slopes = 0
 			end
+
+			local dirt = c_dirt
+			local lawn = c_lawn
+			local max = math.max(v13, v14, v15)
+			if max > 0.5 then
+				if v13 == max then
+					if v13 > 1 then
+						dirt = c_clay
+						lawn = c_clay
+					else
+						dirt = c_dirt_clay
+						lawn = c_lawn_clay
+					end
+				elseif v14 == max then
+					if v14 > 1 then
+						dirt = c_silt
+						lawn = c_silt
+					else
+						dirt = c_dirt_silt
+						lawn = c_lawn_silt
+					end
+				else
+					if v15 > 0.75 then
+						dirt = c_desert_sand
+						lawn = c_desert_sand
+					else
+						dirt = c_dirt_sand
+						lawn = c_lawn_sand
+					end
+				end
+			end
+
 			for y = minp.y, maxp.y do -- for each node in vertical row
 				local ivm = a:index(x, y, z)
 				local v6, v8, v9, v10, v11, v12 = n6[i3d_a], n8[i3d_b], n9[i3d_b], n10[i3d_b], n11[i3d_b], n12[i3d_b]
@@ -121,9 +178,9 @@ function vmg.generate(minp, maxp, seed)
 						if above <= 0 then
 							data[ivm] = c_stone
 						elseif y > 0 and n6[i3d_a+80] * slopes <= y + 1 - mountain_ground and not river then
-							data[ivm] = c_lawn -- if node above is not in the ground, place lawn
+							data[ivm] = lawn -- if node above is not in the ground, place lawn
 						elseif n6[i3d_a+above*80] * slopes <= y + above - mountain_ground then
-							data[ivm] = c_dirt
+							data[ivm] = dirt
 						else
 							data[ivm] = c_stone
 						end
