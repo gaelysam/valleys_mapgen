@@ -73,8 +73,6 @@ local surface_lava = vmg.define("surface_lava", false)
 
 local player_max_distance = vmg.define("player_max_distance", 450)
 
-local biomeblend = vmg.define("biomeblend", 10) / 100
-
 function vmg.generate(minp, maxp, seed)
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_dirt = minetest.get_content_id("default:dirt")
