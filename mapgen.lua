@@ -73,6 +73,11 @@ local surface_lava = vmg.define("surface_lava", false)
 
 local player_max_distance = vmg.define("player_max_distance", 450)
 
+local clay_threshold = vmg.define("clay_threshold", 1)
+local silt_threshold = vmg.define("silt_threshold", 1)
+local sand_threshold = vmg.define("sand_threshold", 0.75)
+local dirt_threshold = vmg.define("dirt_threshold", 0.5)
+
 function vmg.generate(minp, maxp, seed)
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_dirt = minetest.get_content_id("default:dirt")
@@ -136,9 +141,9 @@ function vmg.generate(minp, maxp, seed)
 			local dirt = c_dirt
 			local lawn = c_lawn
 			local max = math.max(v13, v14, v15)
-			if max > 0.5 then
+			if max > dirt_threshold then
 				if v13 == max then
-					if v13 > 1 then
+					if v13 > clay_threshold then
 						dirt = c_clay
 						lawn = c_clay
 					else
@@ -146,7 +151,7 @@ function vmg.generate(minp, maxp, seed)
 						lawn = c_lawn_clay
 					end
 				elseif v14 == max then
-					if v14 > 1 then
+					if v14 > silt_threshold then
 						dirt = c_silt
 						lawn = c_silt
 					else
@@ -154,7 +159,7 @@ function vmg.generate(minp, maxp, seed)
 						lawn = c_lawn_silt
 					end
 				else
-					if v15 > 0.75 then
+					if v15 > sand_threshold then
 						dirt = c_desert_sand
 						lawn = c_desert_sand
 					else

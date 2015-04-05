@@ -11,7 +11,7 @@
 
 
 
-#version = 1.2
+#version = 1.3
 #    mapgen version used.
 
 #player_max_distance = 400
@@ -19,6 +19,14 @@
 
 #average_stone_level = 150
 #    height at which the half of the surface at this height is made solely of stone.
+#clay_threshold = 1
+#    if noise 13 is above this value, make pure clay instead of clayey dirt.
+#silt_threshold = 1
+#    if noise 14 is above this value, make pure silt instead of silty dirt.
+#sand_threshold = 0.75
+#    if noise 15 is above this value, make desert sand instead of sandy dirt.
+#dirt_threshold = 0.5
+#    if not any of noises 13, 14 and 15 is above this value, make normal dirt. Else make special dirt.
 #river_size = 5
 #caves_size = 7
 #lava_depth = 2000
