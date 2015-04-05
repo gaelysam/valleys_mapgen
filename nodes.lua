@@ -6,6 +6,16 @@ minetest.register_node("valleys_mapgen:silt", {
 	sounds = default.node_sound_dirt_defaults(),
 })
 
+minetest.register_node("valleys_mapgen:red_clay", {
+	description = "Red Clay",
+	tiles = {"vmg_red_clay.png"},
+	is_ground_content = true,
+	groups = {crumbly=3},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.override_item("default:clay", {description = "White Clay"})
+
 local function register_dirts(readname)
 	local name = readname:lower()
 	local itemstr_dirt = "valleys_mapgen:dirt_" .. name
