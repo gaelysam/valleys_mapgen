@@ -42,7 +42,4 @@ dofile(vmg.path .. "/settings.lua")
 minetest.register_on_generated(vmg.generate)
 minetest.register_on_newplayer(vmg.spawnplayer)
 
-minetest.override_item("default:water_source", {liquid_renewable = false})
-minetest.override_item("default:water_flowing", {liquid_renewable = false})
-
 dofile(vmg.path .. "/nodes.lua")

@@ -1,3 +1,6 @@
+minetest.override_item("default:water_source", {liquid_renewable = false})
+minetest.override_item("default:water_flowing", {liquid_renewable = false})
+
 minetest.register_node("valleys_mapgen:silt", {
 	description = "Silt",
 	tiles = {"vmg_silt.png"},
