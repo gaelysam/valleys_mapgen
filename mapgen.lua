@@ -48,6 +48,9 @@ vmg.noises = {
 -- Noise 15 : Sandy dirt noise						2D
 {offset = 0, scale = 1, seed = 6940, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.5, lacunarity = 4},
 
+-- Noise 16 : Beaches							2D
+{offset = 2, scale = 8, seed = 2349, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5, lacunarity = 2},
+
 }
 
 function vmg.noisemap(i, minp, chulens)
@@ -89,6 +92,7 @@ function vmg.generate(minp, maxp, seed)
 	local c_dirt_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy")
 	local c_lawn_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_grass")
 	local c_desert_sand = minetest.get_content_id("default:desert_sand")
+	local c_sand = minetest.get_content_id("default:sand")
 	local c_gravel = minetest.get_content_id("default:gravel")
 	local c_silt = minetest.get_content_id("valleys_mapgen:silt")
 	local c_clay = minetest.get_content_id("valleys_mapgen:red_clay")
@@ -119,13 +123,14 @@ function vmg.generate(minp, maxp, seed)
 	local n13 = vmg.noisemap(13, minp2d, chulens)
 	local n14 = vmg.noisemap(14, minp2d, chulens)
 	local n15 = vmg.noisemap(15, minp2d, chulens)
+	local n16 = vmg.noisemap(16, minp2d, chulens)
 
 	local i2d = 1 -- index for 2D noises
 	local i3d_a = 1 -- index for noise 6 which has a special size
 	local i3d_b = 1 -- index for 3D noises
 	for x = minp.x, maxp.x do -- for each east-west and bottom-top plane
 		for z = minp.z, maxp.z do -- for each vertical row in this plane
-			local v1, v2, v3, v4, v5, v7, v13, v14, v15 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d] -- n for noise, v for value
+			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d] -- n for noise, v for value
 			v3 = v3 ^ 2 -- v3 must be > 0 and by the square there are high mountains but the median valleys depth is small.
 			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher when valleys are deep (mountains)
 			local river = math.abs(v2) < river_size
@@ -168,6 +173,8 @@ function vmg.generate(minp, maxp, seed)
 					end
 				end
 			end
+			local is_beach = v15 > 0 and v16 > 0
+			local beach = v15 * v16 + 1
 
 			for y = minp.y, maxp.y do -- for each node in vertical row
 				local ivm = a:index(x, y, z)
@@ -181,9 +188,17 @@ function vmg.generate(minp, maxp, seed)
 						if above <= 0 then
 							data[ivm] = c_stone
 						elseif y > 0 and n6[i3d_a+80] * slopes <= y + 1 - mountain_ground and not river then
-							data[ivm] = lawn -- if node above is not in the ground, place lawn
+							if is_beach and y < beach then
+								data[ivm] = c_sand
+							else
+								data[ivm] = lawn -- if node above is not in the ground, place lawn
+							end
 						elseif n6[i3d_a+above*80] * slopes <= y + above - mountain_ground then
-							data[ivm] = dirt
+							if is_beach and y < beach then
+								data[ivm] = c_sand
+							else
+								data[ivm] = dirt
+							end
 						else
 							data[ivm] = c_stone
 						end
