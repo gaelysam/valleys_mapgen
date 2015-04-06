@@ -8,6 +8,9 @@ Mapgen mod for Minetest 0.4.12+. Still not finished.
 ## Changelog
 ### 1.2 ~> lastest
 * Added differents types of dirts (the aim is to make real biomes in the future)
+* Added beaches
+* Added setting `water_level` to set water level (default is 1)
+* Fixed fatal error with number settings
 
 ### 1.1 ~> 1.2
 * Added lava underground
