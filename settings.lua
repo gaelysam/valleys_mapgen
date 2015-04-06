@@ -1,6 +1,6 @@
 vmg.settings = Settings(minetest.get_worldpath() .. "/vmg.conf")
 
-local function define_str_num(flag, default, write_to_config)
+local function define_str(flag, default, write_to_config)
 	local value = vmg.settings:get(flag)
 	if value then
 		return value, true
@@ -9,6 +9,25 @@ local function define_str_num(flag, default, write_to_config)
 		if on_config then
 			vmg.settings:set(flag, on_config)
 			return on_config, false
+		else
+			if write_to_config then
+				minetest.setting_set("vmg_" .. flag, default)
+			end
+			vmg.settings:set(flag, default)
+			return default, false
+		end
+	end
+end
+
+local function define_num(flag, default, write_to_config)
+	local value = vmg.settings:get(flag)
+	if value then
+		return tonumber(value), true
+	else
+		local on_config = minetest.setting_get("vmg_" .. flag)
+		if on_config then
+			vmg.settings:set(flag, on_config)
+			return tonumber(on_config), false
 		else
 			if write_to_config then
 				minetest.setting_set("vmg_" .. flag, default)
@@ -60,8 +79,10 @@ end
 
 function vmg.define(flag, default, write_to_config)
 	local typeval = type(default)
-	if typeval == "string" or typeval == "number" then
-		return define_str_num(flag, default, write_to_config)
+	if typeval == "string" then
+		return define_str(flag, default, write_to_config)
+	elseif typeval == "number" then
+		return define_num(flag, default, write_to_config)
 	elseif typeval == "boolean" then
 		return define_bool(flag, default, write_to_config)
 	elseif typeval == "table" then
