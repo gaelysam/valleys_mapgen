@@ -81,6 +81,8 @@ local silt_threshold = vmg.define("silt_threshold", 1)
 local sand_threshold = vmg.define("sand_threshold", 0.75)
 local dirt_threshold = vmg.define("dirt_threshold", 0.5)
 
+local water_level = vmg.define("water_level", 1)
+
 function vmg.generate(minp, maxp, seed)
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_dirt = minetest.get_content_id("default:dirt")
@@ -139,7 +141,7 @@ function vmg.generate(minp, maxp, seed)
 			local slopes = v5 * valleys
 
 			if river then
-				mountain_ground = math.min(math.max(base_ground - 3, -5), mountain_ground)
+				mountain_ground = math.min(math.max(base_ground - 3, water_level - 6), mountain_ground)
 				slopes = 0
 			end
 
@@ -174,7 +176,7 @@ function vmg.generate(minp, maxp, seed)
 				end
 			end
 			local is_beach = v15 > 0 and v16 > 0
-			local beach = v15 * v16 + 1
+			local beach = v15 * v16 + water_level
 
 			for y = minp.y, maxp.y do -- for each node in vertical row
 				local ivm = a:index(x, y, z)
@@ -187,7 +189,7 @@ function vmg.generate(minp, maxp, seed)
 						)
 						if above <= 0 then
 							data[ivm] = c_stone
-						elseif y > 0 and n6[i3d_a+80] * slopes <= y + 1 - mountain_ground and not river then
+						elseif y >= water_level and n6[i3d_a+80] * slopes <= y + 1 - mountain_ground and not river then
 							if is_beach and y < beach then
 								data[ivm] = c_sand
 							else
@@ -202,10 +204,10 @@ function vmg.generate(minp, maxp, seed)
 						else
 							data[ivm] = c_stone
 						end
-					elseif v11 + v12 > 2 ^ (y / lava_depth) and (surface_lava or y < 0) then
+					elseif v11 + v12 > 2 ^ (y / lava_depth) and (surface_lava or y < water_level - 1) then
 						data[ivm] = c_lava
 					end
-				elseif y <= 1 or river and y - 2 <= mountain_ground then
+				elseif y <= water_level or river and y - 2 <= mountain_ground then
 					data[ivm] = c_water
 				end
 				
@@ -281,7 +283,7 @@ function vmg.spawnplayer(player)
 	local p_angle = {x = math.cos(angle), y = math.sin(angle)}
 	local pos = {x = -p_angle.x * distance, y = -p_angle.y * distance}
 	local elevation = vmg.get_elevation(pos)
-	while elevation < 3 or math.abs(vmg.get_noise(pos, 2)) < river_size do
+	while elevation < water_level + 2 or math.abs(vmg.get_noise(pos, 2)) < river_size do
 		pos.x = pos.x + p_angle.x
 		pos.y = pos.y + p_angle.y
 		elevation = vmg.get_elevation({x = round(pos.x), y = round(pos.y)})

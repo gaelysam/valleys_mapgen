@@ -17,6 +17,8 @@
 #player_max_distance = 400
 #    maximal distance from (0;0) at which the player will appear. (If it's in a big ocean, it may be farther)
 
+#water_level = 1
+
 #average_stone_level = 150
 #    height at which the half of the surface at this height is made solely of stone.
 #clay_threshold = 1
