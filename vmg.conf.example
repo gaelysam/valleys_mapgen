@@ -34,6 +34,9 @@
 #lava_depth = 2000
 #    to manage lava amount increasing by going deep underground : lower values = bigger increasing.
 #surface_lava = false
+#    DEPRECATED. No longer supported since mapgen version 2.0. Use lava_max_height instead.
+#lava_max_height = -1
+#    Lava can't be generated above this height. Use 31000 to disable this restriction, or -31000 to fully disable lava.
 
 #    NOISES : offset, scale, (spread), seed, octaves, persist, lacunarity
 #    (see mapgen.lua to see what is the role of each noise)

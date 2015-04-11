@@ -72,7 +72,7 @@ local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 
 local river_size = vmg.define("river_size", 5) / 100
 local caves_size = vmg.define("caves_size", 7) / 100
 local lava_depth = vmg.define("lava_depth", 2000)
-local surface_lava = vmg.define("surface_lava", false)
+local lava_max_height = vmg.define("lava_max_height", -1)
 
 local player_max_distance = vmg.define("player_max_distance", 450)
 
@@ -204,7 +204,7 @@ function vmg.generate(minp, maxp, seed)
 						else
 							data[ivm] = c_stone
 						end
-					elseif v11 + v12 > 2 ^ (y / lava_depth) and (surface_lava or y < water_level - 1) then
+					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
 						data[ivm] = c_lava
 					end
 				elseif y <= water_level or river and y - 2 <= mountain_ground then
