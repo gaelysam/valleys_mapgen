@@ -79,6 +79,7 @@ local river_size = vmg.define("river_size", 5) / 100
 local caves_size = vmg.define("caves_size", 7) / 100
 local lava_depth = vmg.define("lava_depth", 2000)
 local lava_max_height = vmg.define("lava_max_height", -1)
+local altitude_chill = vmg.define("altitude_chill", 90)
 
 local player_max_distance = vmg.define("player_max_distance", 450)
 
@@ -269,9 +270,9 @@ function vmg.get_temperature(pos)
 	local v17 = vmg.get_noise(pos, 17)
 	local y = pos.y
 	if y > 0 then
-		return v17 * 0.5 ^ (y / 50)
+		return v17 * 0.5 ^ (y / altitude_chill)
 	else
-		return v17 * 0.5 ^ (-y / 50) + 20 * v12 * (1 - 2 ^ (y / lava_depth))
+		return v17 * 0.5 ^ (-y / altitude_chill) + 20 * v12 * (1 - 2 ^ (y / lava_depth))
 	end
 end
 
