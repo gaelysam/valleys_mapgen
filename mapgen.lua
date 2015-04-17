@@ -36,7 +36,7 @@ vmg.noises = {
 -- Noise 11 : Caves IV and Lava I					3D
 {offset = 0, scale = 1, seed = -9969, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
 
--- Noise 12 : Lava II							3D
+-- Noise 12 : Lava II (Geologic heat)					3D
 {offset = 0, scale = 1, seed = 3314, spread = {x = 64, y = 64, z = 64}, octaves = 4, persist = 0.5, lacunarity = 2},
 
 -- Noise 13 : Clayey dirt noise						2D
@@ -50,6 +50,12 @@ vmg.noises = {
 
 -- Noise 16 : Beaches							2D
 {offset = 2, scale = 8, seed = 2349, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5, lacunarity = 2},
+
+-- Noise 17 : Temperature (not in maps)					3D
+{offset = 2, scale = 1, seed = -1805, spread = {x = 768, y = 256, z = 768}, octaves = 4, persist = 0.5, lacunarity = 4},
+
+-- Noise 18 : Humidity (not in maps)					2D
+{offset = 0, scale = 1, seed = -5787, spread = {x = 243, y = 243, z = 243}, octaves = 4, persist = 0.5, lacunarity = 3},
 
 }
 
@@ -235,6 +241,38 @@ vmg.noises_obj = {}
 
 for i, n in ipairs(vmg.noises) do
 	vmg.noises_obj[i] = minetest.get_perlin(n.seed, n.octaves, n.persist, 1)
+end
+
+function vmg.get_humidity_raw(pos)
+	local v13 = vmg.get_noise(pos, 13)
+	local v15 = vmg.get_noise(pos, 15)
+	local v18 = vmg.get_noise(pos, 18)
+	return 2 ^ (v13 - v15 + v18 * 2)
+end
+
+function vmg.get_humidity(pos)
+	local y = pos.y
+	local flatpos = pos2d(pos)
+	local hraw = vmg.get_humidity_raw(flatpos)
+
+	local v1 = vmg.get_noise(flatpos, 1)
+	local v3 = vmg.get_noise(flatpos, 3) ^ 2
+	local base_ground = v1 + v3
+	local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
+	local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0)
+	local water = sea_water + (1 - sea_water) * river_water
+	return hraw + water
+end
+
+function vmg.get_temperature(pos)
+	local v12 = vmg.get_noise(pos, 12) + 1
+	local v17 = vmg.get_noise(pos, 17)
+	local y = pos.y
+	if y > 0 then
+		return v17 * 0.5 ^ (y / 50)
+	else
+		return v17 * 0.5 ^ (-y / 50) + 20 * v12 * (1 - 2 ^ (y / lava_depth))
+	end
 end
 
 function vmg.get_noise(pos, i)
