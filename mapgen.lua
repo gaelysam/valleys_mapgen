@@ -238,12 +238,6 @@ function vmg.generate(minp, maxp, seed)
 	vm:write_to_map()
 end
 
-vmg.noises_obj = {}
-
-for i, n in ipairs(vmg.noises) do
-	vmg.noises_obj[i] = minetest.get_perlin(n.seed, n.octaves, n.persist, 1)
-end
-
 function vmg.get_humidity_raw(pos)
 	local v13 = vmg.get_noise(pos, 13)
 	local v15 = vmg.get_noise(pos, 15)
