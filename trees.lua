@@ -22,6 +22,9 @@ function default.grow_tree(pos, is_apple_tree)
 end
 
 function vmg.grow_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
+	if vmg.loglevel >= 3 then
+		print("[Valleys Mapgen] Generating tree at " .. minetest.pos_to_string(pos) .. " ...")
+	end
 	local ystride = area.ystride
 	local iv = area:indexp(pos)
 	data[iv] = air
@@ -37,6 +40,9 @@ function vmg.grow_tree(pos, data, area, height, radius, trunk, leaves, air, igno
 end
 
 function vmg.grow_apple_tree(pos, data, area, height, radius, trunk, leaves, fruit, air, ignore)
+	if vmg.loglevel >= 3 then
+		print("[Valleys Mapgen] Generating apple tree at " .. minetest.pos_to_string(pos) .. " ...")
+	end
 	local ystride = area.ystride
 	local iv = area:indexp(pos)
 	data[iv] = air

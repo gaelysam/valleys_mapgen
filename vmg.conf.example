@@ -60,3 +60,11 @@
 #noise_16 = 2, 8, (256,256,256), 2349, 3, 0.5, 2
 #noise_17 = 0, 1, (768,256,768), -1805, 5, 0.5, 2
 #noise_18 = 0, 1, (243,243,243), -5787, 4, 0.5, 3
+
+#    Flags that are ONLY available in minetest.conf :
+
+#vmg_log_level = 0
+#    0 = Not any log from Valleys Mapgen
+#    1 = Total mapgen time
+#    2 = Detailed mapgen time (step by step)
+#    3 = Detailed mapgen time + trees

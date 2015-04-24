@@ -84,6 +84,14 @@ local dirt_threshold = vmg.define("dirt_threshold", 0.5)
 local water_level = vmg.define("water_level", 1)
 
 function vmg.generate(minp, maxp, seed)
+	local minps, maxps = minetest.pos_to_string(minp), minetest.pos_to_string(maxp)
+	if vmg.loglevel >= 2 then
+		print("[Valleys Mapgen] Preparing to generate map from " .. minps .. " to " .. maxps .. " ...")
+	elseif vmg.loglevel == 1 then
+		print("[Valleys Mapgen] Generating map from " .. minps .. " to " .. maxps .. " ...")
+	end
+	local t0 = os.clock()
+
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_dirt = minetest.get_content_id("default:dirt")
 	local c_lawn = minetest.get_content_id("default:dirt_with_grass")
@@ -110,6 +118,12 @@ function vmg.generate(minp, maxp, seed)
 	local chulens_sup = {x = chulens.x, y = chulens.y + 6, z = chulens.z}
 	local minp2d = pos2d(minp)
 
+	local t1 = os.clock()
+	if vmg.loglevel >= 2 then
+		print("[Valleys Mapgen] Mapgen preparation finished in " .. t1 - t0 .. " s")
+		print("[Valleys Mapgen] Calculating noises ...")
+	end
+
 	local n1 = vmg.noisemap(1, minp2d, chulens)
 	local n2 = vmg.noisemap(2, minp2d, chulens)
 	local n3 = vmg.noisemap(3, minp2d, chulens)
@@ -126,6 +140,12 @@ function vmg.generate(minp, maxp, seed)
 	local n14 = vmg.noisemap(14, minp2d, chulens)
 	local n15 = vmg.noisemap(15, minp2d, chulens)
 	local n16 = vmg.noisemap(16, minp2d, chulens)
+
+	local t2 = os.clock()
+	if vmg.loglevel >= 2 then
+		print("[Valleys Mapgen] Noises calculation finished in " .. t2 - t1 .. " s")
+		print("[Valleys Mapgen] Collecting data ...")
+	end
 
 	local i2d = 1 -- index for 2D noises
 	local i3d_a = 1 -- index for noise 6 which has a special size
@@ -222,6 +242,12 @@ function vmg.generate(minp, maxp, seed)
 		i3d_b = i3d_b - 511999 -- i3d_b = 512001 after the first execution of this loop, it must be 2 before the second.
 	end
 
+	local t3 = os.clock()
+	if vmg.loglevel >= 2 then
+		print("[Valleys Mapgen] Data collecting finished in " .. t3 - t2 .. " s")
+		print("[Valleys Mapgen] Writing data ...")
+	end
+
 	-- execute voxelmanip boring stuff to write to the map
 	vm:set_data(data)
 	minetest.generate_ores(vm, minp, maxp)
@@ -229,6 +255,14 @@ function vmg.generate(minp, maxp, seed)
 	vm:calc_lighting()
 	vm:update_liquids()
 	vm:write_to_map()
+
+	local t4 = os.clock()
+	if vmg.loglevel >= 2 then
+		print("[Valleys Mapgen] Data writing finished in " .. t4 - t2 .. " s")
+	end
+	if vmg.loglevel >= 1 then
+		print("[Valleys Mapgen] Mapgen finished in " .. t4 - t0 .. " s") 
+	end
 end
 
 vmg.noises_obj = {}

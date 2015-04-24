@@ -3,6 +3,12 @@ vmg.version = "2.0"
 
 vmg.path = minetest.get_modpath("valleys_mapgen")
 
+vmg.loglevel = tonumber(minetest.setting_get("vmg_log_level") or 0)
+
+if vmg.loglevel >= 2 then
+	print("[Valleys Mapgen] Loading basic functions ...")
+end
+
 minetest.register_on_mapgen_init(function(mgparams)
 	minetest.set_mapgen_params({mgname="singlenode", flags="nolight"})
 end)
@@ -54,9 +60,21 @@ function minetest.add_group(node, groups)
 	return true
 end
 
+if vmg.loglevel >= 2 then
+	print("[Valleys Mapgen] Loading settings API ...")
+end
+
 dofile(vmg.path .. "/settings.lua")
 
 minetest.register_on_generated(vmg.generate)
 minetest.register_on_newplayer(vmg.spawnplayer)
 
+if vmg.loglevel >= 2 then
+	print("[Valleys Mapgen] Loading nodes ...")
+end
+
 dofile(vmg.path .. "/nodes.lua")
+
+if vmg.loglevel >= 1 then
+	print("[Valleys Mapgen] Loaded !")
+end

@@ -116,6 +116,10 @@ function vmg.string_to_noise(str)
 	}
 end
 
+if vmg.loglevel >= 2 then
+	print("[Valleys Mapgen] Loading mapgen ...")
+end
+
 -- Choose the appropriate mapgen version
 
 local version = vmg.define("version", vmg.version)

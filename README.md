@@ -6,6 +6,11 @@ Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 [Discussion on Minetest Forums](https://forum.minetest.net/viewtopic.php?f=9&t=11430)
 
 ## Changelog
+### 1.3 ~> Lastest (pre-2.0)
+* Added trees (1 specie for now)
+* Added logs : see vmg.conf.example
+* Added temperature and humidity noises, used by trees
+
 ### 1.2 ~> 1.3 (Wednesday April 8, 2015)
 * Added differents types of dirts (the aim is to make real biomes in the future)
 * Added beaches
