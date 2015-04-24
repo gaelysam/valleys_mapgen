@@ -1,5 +1,5 @@
 -- Mapgen 2.0
--- Saturday April 11, 2015
+-- Thursday April 23, 2015
 
 vmg.noises = {
 
@@ -237,6 +237,8 @@ function vmg.generate(minp, maxp, seed)
 	vm:update_liquids()
 	vm:write_to_map()
 end
+
+dofile(vmg.path .. "/trees.lua")
 
 function vmg.get_humidity_raw(pos)
 	local v13 = vmg.get_noise(pos, 13)

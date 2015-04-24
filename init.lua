@@ -37,6 +37,23 @@ function pos3d(pos, alt)
 	end
 end
 
+function minetest.add_group(node, groups)
+	local def = minetest.registered_items[node]
+	if not def then
+		return false
+	end
+	local def_groups = def.groups or {}
+	for group, value in pairs(groups) do
+		if value ~= 0 then
+			def_groups[group] = value
+		else
+			def_groups[group] = nil
+		end
+	end
+	minetest.override_item(node, {groups = def_groups})
+	return true
+end
+
 dofile(vmg.path .. "/settings.lua")
 
 minetest.register_on_generated(vmg.generate)

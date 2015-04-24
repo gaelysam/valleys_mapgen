@@ -96,3 +96,5 @@ end
 register_dirts("Clayey")
 register_dirts("Silty")
 register_dirts("Sandy")
+
+minetest.add_group("default:leaves", {leafdecay = 5})
