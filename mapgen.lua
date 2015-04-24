@@ -107,7 +107,13 @@ function vmg.generate(minp, maxp, seed)
 	local c_clay = minetest.get_content_id("valleys_mapgen:red_clay")
 	local c_water = minetest.get_content_id("default:water_source")
 	local c_lava = minetest.get_content_id("default:lava_source")
+
+	local c_tree = minetest.get_content_id("default:tree")
+	local c_leaves = minetest.get_content_id("default:leaves")
+	local c_apple = minetest.get_content_id("default:apple")
+
 	local c_air = minetest.get_content_id("air")
+	local c_ignore = minetest.get_content_id("ignore")
 
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	local data = vm:get_data()
@@ -201,6 +207,38 @@ function vmg.generate(minp, maxp, seed)
 								data[ivm] = c_sand
 							else
 								data[ivm] = lawn -- if node above is not in the ground, place lawn
+								if math.random(100) == 1 then -- make a tree
+									y = y + 1
+									local pos = {x = x, y = y, z = z}
+									local v17 = vmg.get_noise(pos, 17)
+									local v18 = vmg.get_noise(pos, 18)
+
+									local temp -- calculate_temperature
+									if y > 0 then
+										temp = v17 * 0.5 ^ (y / altitude_chill)
+									else
+										temp = v17 * 0.5 ^ (-y / altitude_chill) + 20 * (v12 + 1) * (1 - 2 ^ (y / lava_depth))
+									end
+
+									local humidity -- calculate humidity
+									local hraw = 2 ^ (v13 - v15 + v18 * 2)
+									local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
+									local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0)
+									local water = sea_water + (1 - sea_water) * river_water
+									humidity = hraw + water
+
+									if v15 < 0.6 and temp >= 0.5 and temp < 2.3 and humidity < 3 and v16 < 0 and v14 > 0 and v13 < 0.8 then
+										local rand = math.random()
+										local height = math.floor(4 + 2.5 * rand)
+										local radius = 3 + rand
+										if math.random(1, 4) == 1 then
+											vmg.grow_apple_tree(pos, data, a, height, radius, c_tree, c_leaves, c_apple, c_air, c_ignore)
+										else
+											vmg.grow_tree(pos, data, a, height, radius, c_tree, c_leaves, c_air, c_ignore)
+										end
+									end
+									y = y - 1
+								end
 							end
 						elseif n6[i3d_a+above*80] * slopes <= y + above - mountain_ground then
 							if is_beach and y < beach then

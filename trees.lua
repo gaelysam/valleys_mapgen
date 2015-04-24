@@ -6,51 +6,52 @@ function default.grow_tree(pos, is_apple_tree)
 	local leaves = minetest.get_content_id("default:leaves")
 	local trunk = minetest.get_content_id("default:tree")
 	local air = minetest.get_content_id("air")
+	local ignore = minetest.get_content_id("ignore")
 	local vm = minetest.get_voxel_manip()
 	local emin, emax = vm:read_from_map({x = pos.x - 3, y = pos.y, z = pos.z - 3}, {x = pos.x + 3, y = pos.y + height + 3, z = pos.z + 3})
 	local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
 	local data = vm:get_data()
 	if is_apple_tree then
-		vmg.grow_apple_tree(pos, data, area, height, radius, trunk, leaves, minetest.get_content_id("default:apple"), air)
+		vmg.grow_apple_tree(pos, data, area, height, radius, trunk, leaves, minetest.get_content_id("default:apple"), air, ignore)
 	else
-		vmg.grow_tree(pos, data, area, height, radius, trunk, leaves, air)
+		vmg.grow_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
 	end
 	vm:set_data(data)
 	vm:write_to_map()
 	vm:update_map()
 end
 
-function vmg.grow_tree(pos, data, area, height, radius, trunk, leaves, air)
+function vmg.grow_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
 	local ystride = area.ystride
 	local iv = area:indexp(pos)
 	data[iv] = air
 	for i = 1, height do
-		if data[iv] == air then
+		if data[iv] == air or data[iv] == ignore then
 			data[iv] = trunk
 		end
 		iv = iv + ystride
 	end
 	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.5}
 	pos.y = pos.y + height - 1
-	vmg.make_leavesblob(pos, data, area, leaves, air, {x = radius, y = radius, z = radius}, np)
+	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius, z = radius}, np)
 end
 
-function vmg.grow_apple_tree(pos, data, area, height, radius, trunk, leaves, fruit, air)
+function vmg.grow_apple_tree(pos, data, area, height, radius, trunk, leaves, fruit, air, ignore)
 	local ystride = area.ystride
 	local iv = area:indexp(pos)
 	data[iv] = air
 	for i = 1, height do
-		if data[iv] == air then
+		if data[iv] == air or data[iv] == ignore then
 			data[iv] = trunk
 		end
 		iv = iv + ystride
 	end
 	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.5}
 	pos.y = pos.y + height - 1
-	vmg.make_leavesblob(pos, data, area, leaves, air, {x = radius, y = radius, z = radius}, np, 0.06, fruit)
+	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius, z = radius}, np, 0.06, fruit)
 end
 
-function vmg.make_leavesblob(pos, data, area, leaves, air, radius, np, fruit_chance, fruit)
+function vmg.make_leavesblob(pos, data, area, leaves, air, ignore, radius, np, fruit_chance, fruit)
 	local count = 0
 	fruit_chance = fruit_chance or 0
 
@@ -74,7 +75,7 @@ function vmg.make_leavesblob(pos, data, area, leaves, air, radius, np, fruit_cha
 				local nval = pmap[i]
 				if nval > dist then
 					local iv = area:index(x, y, z)
-					if data[iv] == air then
+					if data[iv] == air or data[iv] == ignore then
 						count = count + 1
 						if math.random() < fruit_chance then
 							data[iv] = fruit
