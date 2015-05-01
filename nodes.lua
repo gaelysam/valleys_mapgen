@@ -98,3 +98,4 @@ register_dirts("Silty")
 register_dirts("Sandy")
 
 minetest.add_group("default:leaves", {leafdecay = 5})
+minetest.add_group("default:jungleleaves", {leafdecay = 8})

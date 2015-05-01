@@ -72,6 +72,19 @@ for i, n in ipairs(vmg.noises) do
 	vmg.noises[i] = vmg.define("noise_" .. i, n)
 end
 
+vmg.after_mapgen = {}
+
+function vmg.register_after_mapgen(f, ...)
+	table.insert(vmg.after_mapgen, {f = f, ...})
+end
+
+function vmg.execute_after_mapgen()
+	for i, params in ipairs(vmg.after_mapgen) do
+		params.f(unpack(params))
+	end
+	vmg.after_mapgen = {}
+end	
+
 local average_stone_level = vmg.define("average_stone_level", 180)
 local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 0.5)
 
@@ -119,6 +132,8 @@ function vmg.generate(minp, maxp, seed)
 	local c_tree = minetest.get_content_id("default:tree")
 	local c_leaves = minetest.get_content_id("default:leaves")
 	local c_apple = minetest.get_content_id("default:apple")
+	local c_jungletree = minetest.get_content_id("default:jungletree")
+	local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
 
 	local c_air = minetest.get_content_id("air")
 	local c_ignore = minetest.get_content_id("ignore")
@@ -257,6 +272,11 @@ function vmg.generate(minp, maxp, seed)
 										else
 											vmg.grow_tree(pos, data, a, height, radius, c_tree, c_leaves, c_air, c_ignore)
 										end
+									elseif v15 < 0.7 and temp >= 2.5 and humidity > 2 and v16 > -0.1 then
+										local rand = math.random()
+										local height = math.floor(8 + 4 * rand)
+										local radius = 5 + 3 * rand
+										vmg.grow_jungle_tree(pos, data, a, height, radius, c_jungletree, c_jungleleaves, c_air, c_ignore)
 									end
 									y = y - 1
 								end
@@ -287,6 +307,7 @@ function vmg.generate(minp, maxp, seed)
 		i3d_a = i3d_a - 550399 -- i3d_a = 550401 after the first execution of this loop, it must be 2 before the second.
 		i3d_b = i3d_b - 511999 -- i3d_b = 512001 after the first execution of this loop, it must be 2 before the second.
 	end
+	vmg.execute_after_mapgen()
 
 	local t3 = os.clock()
 	if vmg.loglevel >= 2 then
