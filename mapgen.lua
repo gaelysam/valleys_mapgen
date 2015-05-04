@@ -176,16 +176,24 @@ function vmg.generate(minp, maxp, seed)
 	end
 
 	local i2d = 1 -- index for 2D noises
-	local i3d_a = 1 -- index for noise 6 which has a special size
-	local i3d_b = 1 -- index for 3D noises
+	local i3d_sup = 1 -- index for noise 6 which has a special size
+	local i3d = 1 -- index for 3D noises
 
-	for x = minp.x, maxp.x do -- for each east-west and bottom-top plane
-		for z = minp.z, maxp.z do -- for each vertical row in this plane
+	-- Calculate increments
+	local i2d_incrZ = chulens.z
+	local i2d_decrX = chulens.x * chulens.z - 1
+	local i3d_incrY = chulens.y
+	local i3d_sup_incrZ = 6 * chulens.y
+	local i3d_decrX = chulens.x * chulens.y * chulens.z - 1
+	local i3d_sup_decrX = chulens.x * (chulens.y + 6) * chulens.z - 1
+
+	for x = minp.x, maxp.x do -- for each YZ plane
+		for z = minp.z, maxp.z do -- for each vertical line in this plane
 			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d] -- n for noise, v for value
 			v3 = v3 ^ 2 -- v3 must be > 0 and by the square there are high mountains but the median valleys depth is small.
 			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher when valleys are deep (mountains)
 			local river = math.abs(v2) < river_size
-			local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 will change the shape of the valleys. v2 = x and v4 = a.
+			local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 will change the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4)
 			local mountain_ground = base_ground + valleys
 			local slopes = v5 * valleys
 
@@ -194,9 +202,10 @@ function vmg.generate(minp, maxp, seed)
 				slopes = 0
 			end
 
+			-- Choose biome
 			local dirt = c_dirt
 			local lawn = c_lawn
-			local max = math.max(v13, v14, v15)
+			local max = math.max(v13, v14, v15) -- the biome is the maximal of these 3 values, if bigger than 0.5. Else, make normal dirt.
 			if max > dirt_threshold then
 				if v13 == max then
 					if v13 > clay_threshold then
@@ -225,20 +234,20 @@ function vmg.generate(minp, maxp, seed)
 				end
 			end
 			local is_beach = v15 > 0 and v16 > 0
-			local beach = v15 * v16 + water_level
+			local beach = v15 * v16 + water_level -- the y coordinate below which dirt is replaced by beach sand
 
-			for y = minp.y, maxp.y do -- for each node in vertical row
+			for y = minp.y, maxp.y do -- for each node in vertical line
 				local ivm = a:index(x, y, z)
-				local v6, v8, v9, v10, v11, v12 = n6[i3d_a], n8[i3d_b], n9[i3d_b], n10[i3d_b], n11[i3d_b], n12[i3d_b]
+				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d]
 				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
 					if not is_cave then
 						local above = math.ceil(
-							v7 + math.random() - math.sqrt(math.abs(y)) / dirt_thickness
+							v7 + math.random() - math.sqrt(math.abs(y)) / dirt_thickness -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness.
 						)
 						if above <= 0 then
 							data[ivm] = c_stone
-						elseif y >= water_level and n6[i3d_a+80] * slopes <= y + 1 - mountain_ground and not river then
+						elseif y >= water_level and n6[i3d_sup+i3d_incrY] * slopes <= y + 1 - mountain_ground and not river then
 							if is_beach and y < beach then
 								data[ivm] = c_sand
 							else
@@ -263,6 +272,7 @@ function vmg.generate(minp, maxp, seed)
 									local water = sea_water + (1 - sea_water) * river_water
 									humidity = hraw + water
 
+									-- choose a tree from climatic and geological conditions
 									if v15 < 0.6 and temp >= 0.5 and temp < 2.3 and humidity < 3 and v16 < 0 and v14 > 0 and v13 < 0.8 then
 										local rand = math.random()
 										local height = math.floor(4 + 2.5 * rand)
@@ -281,7 +291,7 @@ function vmg.generate(minp, maxp, seed)
 									y = y - 1
 								end
 							end
-						elseif n6[i3d_a+above*80] * slopes <= y + above - mountain_ground then
+						elseif n6[i3d_sup+above*i3d_incrY] * slopes <= y + above - mountain_ground then -- if node at "above" nodes up is not in the ground, make dirt
 							if is_beach and y < beach then
 								data[ivm] = c_sand
 							else
@@ -293,21 +303,22 @@ function vmg.generate(minp, maxp, seed)
 					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
 						data[ivm] = c_lava
 					end
-				elseif y <= water_level or river and y - 2 <= mountain_ground then
+				elseif y <= water_level or river and y - 2 <= mountain_ground then -- if pos is not in the ground, and below water_level, it's an ocean
 					data[ivm] = c_water
 				end
 				
-				i3d_a = i3d_a + 80 -- increase i3d_a by one row
-				i3d_b = i3d_b + 80 -- increase i3d_b by one row
+				i3d = i3d + i3d_incrY -- increment i3d by one line
+				i3d_sup = i3d_sup + i3d_incrY -- idem
 			end
-			i2d = i2d + 80 -- increase i2d by one row
-			i3d_a = i3d_a + 480 -- avoid the 6 supplemental lines
+			i2d = i2d + i2d_incrZ -- increment i2d by one Z
+			-- useless to increment i3d, because increment would be 0 !
+			i3d_sup = i3d_sup + i3d_sup_incrZ -- for i3d_sup, just avoid the 6 supplemental lines
 		end
-		i2d = i2d - 6399 -- i2d = 6401 after the first execution of this loop, it must be 2 before the second.
-		i3d_a = i3d_a - 550399 -- i3d_a = 550401 after the first execution of this loop, it must be 2 before the second.
-		i3d_b = i3d_b - 511999 -- i3d_b = 512001 after the first execution of this loop, it must be 2 before the second.
+		i2d = i2d - i2d_decrX -- decrement the Z line previously incremented and increment by one X (1)
+		i3d = i3d - i3d_decrX -- decrement the YZ plane previously incremented and increment by one X (1)
+		i3d_sup = i3d_sup - i3d_sup_decrX -- idem, including the supplemental lines
 	end
-	vmg.execute_after_mapgen()
+	vmg.execute_after_mapgen() -- needed for jungletree roots
 
 	local t3 = os.clock()
 	if vmg.loglevel >= 2 then
