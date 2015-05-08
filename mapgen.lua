@@ -252,7 +252,7 @@ function vmg.generate(minp, maxp, seed)
 								data[ivm] = c_sand
 							else
 								data[ivm] = lawn -- if node above is not in the ground, place lawn
-								if math.random(100) == 1 then -- make a tree
+								if math.random(20) == 1 then -- make a tree
 									y = y + 1
 									local pos = {x = x, y = y, z = z}
 									local v17 = vmg.get_noise(pos, 17)
@@ -273,7 +273,7 @@ function vmg.generate(minp, maxp, seed)
 									humidity = hraw + water
 
 									-- choose a tree from climatic and geological conditions
-									if v15 < 0.6 and temp >= 0.5 and temp < 2.3 and humidity < 3 and v16 < 0 and v14 > 0 and v13 < 0.8 then
+									if v15 < 0.6 and temp >= 0.5 and temp < 2.3 and humidity < 3 and v16 < 0 and v14 > -0.5 and v13 < 0.8 then
 										local rand = math.random()
 										local height = math.floor(4 + 2.5 * rand)
 										local radius = 3 + rand
