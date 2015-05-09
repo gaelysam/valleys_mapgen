@@ -39,6 +39,9 @@
 #    Lava can't be generated above this height. Use 31000 to disable this restriction, or -31000 to fully disable lava.
 #altitude_chill = 90
 
+#tree_density = 5
+#    Percent of the lawn nodes that are covered by trees.
+
 #    NOISES : offset, scale, (spread), seed, octaves, persist, lacunarity
 #    (see mapgen.lua to see what is the role of each noise)
 
