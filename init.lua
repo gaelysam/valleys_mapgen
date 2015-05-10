@@ -66,8 +66,15 @@ end
 
 dofile(vmg.path .. "/settings.lua")
 
+if vmg.define("spawn", true) then
+	minetest.register_on_newplayer(vmg.spawnplayer)
+end
+
+if vmg.define("respawn", true) then
+	minetest.register_on_respawnplayer(vmg.spawnplayer)
+end
+
 minetest.register_on_generated(vmg.generate)
-minetest.register_on_newplayer(vmg.spawnplayer)
 
 if vmg.loglevel >= 2 then
 	print("[Valleys Mapgen] Loading nodes ...")

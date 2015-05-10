@@ -324,4 +324,5 @@ function vmg.spawnplayer(player)
 	end
 	pos = {x = round(pos.x), y = round(elevation + 1), z = round(pos.y)}
 	player:setpos(pos)
+	return true
 end

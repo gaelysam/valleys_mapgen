@@ -16,6 +16,10 @@
 
 #player_max_distance = 400
 #    maximal distance from (0;0) at which the player will appear. (If it's in a big ocean, it may be farther)
+#spawn = true
+#    New players are randomely spawned by the mod. Disable it to spawn the player another way.
+#respawn = true
+#    After death, players are respawned by the mod. Disable it to respawn the player another way.
 
 #water_level = 1
 
