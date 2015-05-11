@@ -102,6 +102,7 @@ local sand_threshold = vmg.define("sand_threshold", 0.75)
 local dirt_threshold = vmg.define("dirt_threshold", 0.5)
 
 local tree_density = vmg.define("tree_density", 5) / 100
+local trees = vmg.define("trees", true)
 
 local water_level = vmg.define("water_level", 1)
 
@@ -254,7 +255,7 @@ function vmg.generate(minp, maxp, seed)
 								data[ivm] = c_sand
 							else
 								data[ivm] = lawn -- if node above is not in the ground, place lawn
-								if math.random() < tree_density then -- make a tree
+								if math.random() < tree_density and trees then -- make a tree
 									y = y + 1
 									local pos = {x = x, y = y, z = z}
 									local v17 = vmg.get_noise(pos, 17)
