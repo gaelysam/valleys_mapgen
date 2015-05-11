@@ -1,7 +1,7 @@
 # Valleys Mapgen
 Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 
-![Screenshot](http://i.imgur.com/W8HSYus.png)
+![Screenshot](http://i.imgur.com/EYxKIPv.png)
 
 [Discussion on Minetest Forums](https://forum.minetest.net/viewtopic.php?f=9&t=11430)
 
