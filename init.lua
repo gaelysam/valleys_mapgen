@@ -60,6 +60,10 @@ function minetest.add_group(node, groups)
 	return true
 end
 
+function displaytime(time)
+	return math.floor(time * 1000000 + 0.5) / 1000 .. " ms"
+end
+
 if vmg.loglevel >= 2 then
 	print("[Valleys Mapgen] Loading settings API ...")
 end

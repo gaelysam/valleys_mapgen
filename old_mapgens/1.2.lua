@@ -90,7 +90,7 @@ function vmg.generate(minp, maxp, seed)
 
 	local t1 = os.clock()
 	if vmg.loglevel >= 2 then
-		print("[Valleys Mapgen] Mapgen preparation finished in " .. t1 - t0 .. " s")
+		print("[Valleys Mapgen] Mapgen preparation finished in " .. displaytime(t1-t0))
 		print("[Valleys Mapgen] Calculating noises ...")
 	end
 
@@ -109,7 +109,7 @@ function vmg.generate(minp, maxp, seed)
 
 	local t2 = os.clock()
 	if vmg.loglevel >= 2 then
-		print("[Valleys Mapgen] Noises calculation finished in " .. t2 - t1 .. " s")
+		print("[Valleys Mapgen] Noises calculation finished in " .. displaytime(t2-t1))
 		print("[Valleys Mapgen] Collecting data ...")
 	end
 
@@ -167,7 +167,7 @@ function vmg.generate(minp, maxp, seed)
 
 	local t3 = os.clock()
 	if vmg.loglevel >= 2 then
-		print("[Valleys Mapgen] Data collecting finished in " .. t3 - t2 .. " s")
+		print("[Valleys Mapgen] Data collecting finished in " .. displaytime(t3-t2))
 		print("[Valleys Mapgen] Writing data ...")
 	end
 
@@ -181,10 +181,10 @@ function vmg.generate(minp, maxp, seed)
 
 	local t4 = os.clock()
 	if vmg.loglevel >= 2 then
-		print("[Valleys Mapgen] Data writing finished in " .. t4 - t2 .. " s")
+		print("[Valleys Mapgen] Data writing finished in " .. displaytime(t4-t3))
 	end
 	if vmg.loglevel >= 1 then
-		print("[Valleys Mapgen] Mapgen finished in " .. t4 - t0 .. " s") 
+		print("[Valleys Mapgen] Mapgen finished in " .. displaytime(t4-t0)) 
 	end
 end
 
