@@ -102,7 +102,6 @@ local clay_threshold = vmg.define("clay_threshold", 1)
 local silt_threshold = vmg.define("silt_threshold", 1)
 local sand_threshold = vmg.define("sand_threshold", 0.75)
 local dirt_threshold = vmg.define("dirt_threshold", 0.5)
-local snow_threshold = vmg.define("snow_threshold", 0.7)
 
 local tree_density = vmg.define("tree_density", 5) / 100
 local trees = vmg.define("trees", true)
