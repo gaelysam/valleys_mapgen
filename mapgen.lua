@@ -305,7 +305,7 @@ function vmg.generate(minp, maxp, seed)
 									humidity = hraw + water
 
 									-- choose a tree from climatic and geological conditions
-									if v15 < 0.6 and temp >= 0.5 and temp < 2.3 and humidity < 3 and v16 < 0 and v14 > -0.5 and v13 < 0.8 then
+									if v15 < 0.6 and temp >= 0.85 and temp < 2.3 and humidity < 3 and v16 < 0 and v14 > -0.5 and v13 < 0.8 then
 										local rand = math.random()
 										local height = math.floor(4 + 2.5 * rand)
 										local radius = 3 + rand
@@ -314,7 +314,7 @@ function vmg.generate(minp, maxp, seed)
 										else
 											vmg.grow_tree(pos, data, a, height, radius, c_tree, c_leaves, c_air, c_ignore)
 										end
-									elseif v15 < 0.7 and temp >= 1.5 and humidity > 2 and v16 > -0.1 then
+									elseif v15 < 0.7 and temp >= 1.9 and humidity > 2 and v16 > 0 then
 										local rand = math.random()
 										local height = math.floor(8 + 4 * rand)
 										local radius = 5 + 3 * rand
