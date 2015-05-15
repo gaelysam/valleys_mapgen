@@ -85,14 +85,16 @@ function vmg.execute_after_mapgen()
 	vmg.after_mapgen = {}
 end	
 
-local average_stone_level = vmg.define("average_stone_level", 180)
-local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 0.5)
-
 local river_size = vmg.define("river_size", 5) / 100
 local caves_size = vmg.define("caves_size", 7) / 100
 local lava_depth = vmg.define("lava_depth", 2000)
 local lava_max_height = vmg.define("lava_max_height", -1)
 local altitude_chill = vmg.define("altitude_chill", 90)
+
+local average_stone_level = vmg.define("average_stone_level", 180)
+local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 0.5)
+local average_snow_level = vmg.define("average_snow_level", 100)
+local snow_threshold = vmg.noises[17].offset * 0.5 ^ (average_snow_level / altitude_chill)
 
 local player_max_distance = vmg.define("player_max_distance", 450)
 
@@ -100,6 +102,7 @@ local clay_threshold = vmg.define("clay_threshold", 1)
 local silt_threshold = vmg.define("silt_threshold", 1)
 local sand_threshold = vmg.define("sand_threshold", 0.75)
 local dirt_threshold = vmg.define("dirt_threshold", 0.5)
+local snow_threshold = vmg.define("snow_threshold", 0.7)
 
 local tree_density = vmg.define("tree_density", 5) / 100
 local trees = vmg.define("trees", true)
@@ -118,12 +121,16 @@ function vmg.generate(minp, maxp, seed)
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_dirt = minetest.get_content_id("default:dirt")
 	local c_lawn = minetest.get_content_id("default:dirt_with_grass")
+	local c_snow = minetest.get_content_id("default:dirt_with_snow")
 	local c_dirt_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey")
 	local c_lawn_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_grass")
+	local c_snow_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_snow")
 	local c_dirt_silt = minetest.get_content_id("valleys_mapgen:dirt_silty")
 	local c_lawn_silt = minetest.get_content_id("valleys_mapgen:dirt_silty_with_grass")
+	local c_snow_silt = minetest.get_content_id("valleys_mapgen:dirt_silty_with_snow")
 	local c_dirt_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy")
 	local c_lawn_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_grass")
+	local c_snow_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_snow")
 	local c_desert_sand = minetest.get_content_id("default:desert_sand")
 	local c_sand = minetest.get_content_id("default:sand")
 	local c_gravel = minetest.get_content_id("default:gravel")
@@ -131,6 +138,7 @@ function vmg.generate(minp, maxp, seed)
 	local c_clay = minetest.get_content_id("valleys_mapgen:red_clay")
 	local c_water = minetest.get_content_id("default:water_source")
 	local c_lava = minetest.get_content_id("default:lava_source")
+	local c_snow_layer = minetest.get_content_id("default:snow")
 
 	local c_tree = minetest.get_content_id("default:tree")
 	local c_leaves = minetest.get_content_id("default:leaves")
@@ -144,6 +152,7 @@ function vmg.generate(minp, maxp, seed)
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	local data = vm:get_data()
 	local a = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
+	local ystride = a.ystride
 
 	local chulens = vector.add(vector.subtract(maxp, minp), 1)
 	local chulens_sup = {x = chulens.x, y = chulens.y + 6, z = chulens.z}
@@ -208,31 +217,38 @@ function vmg.generate(minp, maxp, seed)
 			-- Choose biome
 			local dirt = c_dirt
 			local lawn = c_lawn
+			local snow = c_snow
 			local max = math.max(v13, v14, v15) -- the biome is the maximal of these 3 values, if bigger than 0.5. Else, make normal dirt.
 			if max > dirt_threshold then
 				if v13 == max then
 					if v13 > clay_threshold then
 						dirt = c_clay
 						lawn = c_clay
+						snow = c_clay
 					else
 						dirt = c_dirt_clay
 						lawn = c_lawn_clay
+						snow = c_snow_clay
 					end
 				elseif v14 == max then
 					if v14 > silt_threshold then
 						dirt = c_silt
 						lawn = c_silt
+						snow = c_silt
 					else
 						dirt = c_dirt_silt
 						lawn = c_lawn_silt
+						snow = c_snow_silt
 					end
 				else
 					if v15 > sand_threshold then
 						dirt = c_desert_sand
 						lawn = c_desert_sand
+						snow = c_desert_sand
 					else
 						dirt = c_dirt_sand
 						lawn = c_lawn_sand
+						snow = c_snow_sand
 					end
 				end
 			end
@@ -248,26 +264,39 @@ function vmg.generate(minp, maxp, seed)
 						local above = math.ceil(
 							v7 + math.random() - math.sqrt(math.abs(y)) / dirt_thickness -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness.
 						)
-						if above <= 0 then
-							data[ivm] = c_stone
-						elseif y >= water_level and n6[i3d_sup+i3d_incrY] * slopes <= y + 1 - mountain_ground and not river then
+						if y >= water_level and n6[i3d_sup+i3d_incrY] * slopes <= y + 1 - mountain_ground and not river then
 							if is_beach and y < beach then
 								data[ivm] = c_sand
-							else
-								data[ivm] = lawn -- if node above is not in the ground, place lawn
-								if math.random() < tree_density and trees then -- make a tree
-									y = y + 1
-									local pos = {x = x, y = y, z = z}
-									local v17 = vmg.get_noise(pos, 17)
-									local v18 = vmg.get_noise(pos, 18)
+							else -- if node above is not in the ground, place lawn
+								y = y + 1
+								local pos = {x = x, y = y, z = z}
 
-									local temp -- calculate_temperature
-									if y > 0 then
-										temp = v17 * 0.5 ^ (y / altitude_chill)
+								local v17 = vmg.get_noise(pos, 17)
+								local temp -- calculate_temperature
+								if y > 0 then
+									temp = v17 * 0.5 ^ (y / altitude_chill)
+								else
+									temp = v17 * 0.5 ^ (-y / altitude_chill) + 20 * (v12 + 1) * (1 - 2 ^ (y / lava_depth))
+								end
+
+								if temp > snow_threshold then
+									if above > 0 then
+										data[ivm] = lawn
 									else
-										temp = v17 * 0.5 ^ (-y / altitude_chill) + 20 * (v12 + 1) * (1 - 2 ^ (y / lava_depth))
+										data[ivm] = c_stone
 									end
+								else
+									if above > 0 then
+										data[ivm] = snow
+									else
+										data[ivm] = c_stone
+									end
+									data[ivm+ystride] = c_snow_layer -- set node above to snow
+								end
 
+								if trees and math.random() < tree_density and above > 0 then -- make a tree
+
+									local v18 = vmg.get_noise(pos2d(pos), 18)
 									local humidity -- calculate humidity
 									local hraw = 2 ^ (v13 - v15 + v18 * 2)
 									local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
@@ -291,9 +320,11 @@ function vmg.generate(minp, maxp, seed)
 										local radius = 5 + 3 * rand
 										vmg.grow_jungle_tree(pos, data, a, height, radius, c_jungletree, c_jungleleaves, c_air, c_ignore)
 									end
-									y = y - 1
 								end
+								y = y - 1
 							end
+						elseif above <= 0 then
+							data[ivm] = c_stone
 						elseif n6[i3d_sup+above*i3d_incrY] * slopes <= y + above - mountain_ground then -- if node at "above" nodes up is not in the ground, make dirt
 							if is_beach and y < beach then
 								data[ivm] = c_sand

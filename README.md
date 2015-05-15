@@ -7,6 +7,7 @@ Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 
 ## Changelog
 ### 1.3 ~> Lastest (pre-2.0)
+* Added snow
 * When a player dies, it's respawned
 * Added trees (1 specie for now), optionnal
 * Added logs : see vmg.conf.example

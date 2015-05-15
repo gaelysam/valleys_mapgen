@@ -24,7 +24,9 @@
 #water_level = 1
 
 #average_stone_level = 150
-#    height at which the half of the surface at this height is made solely of stone.
+#    height at which the half of the surface is made solely of stone.
+#average_snow_level = 100
+#    height at which the half of the surface is covered by snow.
 #clay_threshold = 1
 #    if noise 13 is above this value, make pure clay instead of clayey dirt.
 #silt_threshold = 1
