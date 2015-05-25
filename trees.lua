@@ -41,13 +41,31 @@ function default.grow_jungle_tree(pos)
 	vm:update_map()
 end
 
+function default.grow_pine_tree(pos)
+	local rand = math.random()
+	local height = math.floor(9 + 6 * rand)
+	local radius = 4 + 2 * rand
+
+	local leaves = minetest.get_content_id("default:pine_needles")
+	local trunk = minetest.get_content_id("default:pinetree")
+	local air = minetest.get_content_id("air")
+	local ignore = minetest.get_content_id("ignore")
+	local vm = minetest.get_voxel_manip()
+	local emin, emax = vm:read_from_map({x = pos.x - 6, y = pos.y - 1, z = pos.z - 6}, {x = pos.x + 6, y = pos.y + height + 2, z = pos.z + 6})
+	local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
+	local data = vm:get_data()
+	vmg.grow_pine_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
+	vm:set_data(data)
+	vm:write_to_map()
+	vm:update_map()
+end
+
 function vmg.grow_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
 	if vmg.loglevel >= 3 then
 		print("[Valleys Mapgen] Generating tree at " .. minetest.pos_to_string(pos) .. " ...")
 	end
 	local ystride = area.ystride
 	local iv = area:indexp(pos)
-	data[iv] = air
 	for i = 1, height do
 		data[iv] = trunk
 		iv = iv + ystride
@@ -63,7 +81,6 @@ function vmg.grow_apple_tree(pos, data, area, height, radius, trunk, leaves, fru
 	end
 	local ystride = area.ystride
 	local iv = area:indexp(pos)
-	data[iv] = air
 	for i = 1, height do
 		data[iv] = trunk
 		iv = iv + ystride
@@ -101,7 +118,6 @@ function vmg.grow_jungle_tree(pos, data, area, height, radius, trunk, leaves, ai
 	end
 	local ystride = area.ystride
 	local iv = area:indexp(pos)
-	data[iv] = air
 	for i = 1, height do
 		data[iv] = trunk
 		iv = iv + ystride
@@ -110,6 +126,41 @@ function vmg.grow_jungle_tree(pos, data, area, height, radius, trunk, leaves, ai
 	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.8}
 	pos.y = pos.y + height
 	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius * 0.5, z = radius}, np)
+end
+
+function vmg.grow_pine_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
+	if vmg.loglevel >= 3 then
+		print("[Valleys Mapgen] Generating pine tree at " .. minetest.pos_to_string(pos) .. " ...")
+	end
+	local ystride = area.ystride
+	local iv = area:indexp(pos)
+	for i = 1, height do
+		data[iv] = trunk
+		iv = iv + ystride
+	end
+
+	-- add leaves on the top (4% 0 ; 36% 1 ; 60% 2)
+	local rand = math.random()
+	if rand < 0.96 then
+		data[iv] = leaves
+		if rand < 0.60 then
+			iv = iv + ystride
+			data[iv] = leaves
+		end
+	end
+
+	-- make several leaves rings
+	local max_height = pos.y + height
+	local min_height = pos.y + math.floor((0.2 + 0.3 * math.random()) * height)
+	local radius_increment = (radius - 1.2) / (max_height - min_height)
+	local np = {offset = 0.8, scale = 0.4, spread = {x = 12, y = 4, z = 12}, octaves = 3, persist = 0.8}
+
+	pos.y = max_height - 1
+	while pos.y >= min_height do
+		local ring_radius = (max_height - pos.y) * radius_increment + 1.2
+		vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = ring_radius, y = 2, z = ring_radius}, np)
+		pos.y = pos.y - math.random(2, 3)
+	end
 end
 
 function vmg.make_leavesblob(pos, data, area, leaves, air, ignore, radius, np, fruit_chance, fruit)
@@ -149,31 +200,4 @@ function vmg.make_leavesblob(pos, data, area, leaves, air, ignore, radius, np, f
 			end
 		end
 	end
-end
-
-function vmg.test_conditions(conditions, values)
-	local checked = 1
-	for k, param in pairs(conditions) do
-		local value = values[k]
-		local p1, p2, p3, p4 = unpack(param)
-		if #param == 2 then
-			if value < p1 or value > p2 then
-				checked = 0
-			end
-		elseif value < p2 then
-			if p1 < p2 then
-				checked = checked * (value - p2) / (p2 - p1)
-			else
-				checked = 0
-			end
-		elseif value > p3 then
-			if p4 > p3 then
-				checked = checked * (p4 - value) / (p4 - p3)
-			else
-				checked = 0
-			end
-		end
-		checked = math.max(checked, 0)
-	end
-	return checked
 end

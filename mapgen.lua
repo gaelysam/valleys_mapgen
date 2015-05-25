@@ -144,6 +144,8 @@ function vmg.generate(minp, maxp, seed)
 	local c_apple = minetest.get_content_id("default:apple")
 	local c_jungletree = minetest.get_content_id("default:jungletree")
 	local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
+	local c_pinetree = minetest.get_content_id("default:pinetree")
+	local c_pineleaves = minetest.get_content_id("default:pine_needles")
 
 	local c_air = minetest.get_content_id("air")
 	local c_ignore = minetest.get_content_id("ignore")
@@ -318,6 +320,11 @@ function vmg.generate(minp, maxp, seed)
 										local height = math.floor(8 + 4 * rand)
 										local radius = 5 + 3 * rand
 										vmg.grow_jungle_tree(pos, data, a, height, radius, c_jungletree, c_jungleleaves, c_air, c_ignore)
+									elseif temp > 0.38 and temp < 1 and humidity > 0.9 and v15 > 0 and v15 < 0.55 then
+										local rand = math.random()
+										local height = math.floor(9 + 6 * rand)
+										local radius = 4 + 2 * rand
+										vmg.grow_pine_tree(pos, data, a, height, radius, c_pinetree, c_pineleaves, c_air, c_ignore)
 									end
 								end
 								y = y - 1
