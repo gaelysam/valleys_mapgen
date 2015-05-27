@@ -167,7 +167,7 @@ function vmg.make_leavesblob(pos, data, area, leaves, air, ignore, radius, np, f
 	local count = 0
 	fruit_chance = fruit_chance or 0
 
-	np.seed = math.random(0, 4294967295)
+	np.seed = math.random(0, 16777215)
 	local round_radius = {x = math.ceil(radius.x), y = math.ceil(radius.y), z = math.ceil(radius.z)}
 
 	local length = vector.multiply(round_radius, 2)
