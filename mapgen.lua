@@ -54,7 +54,7 @@ vmg.noises = {
 -- Noise 17 : Temperature (not in maps)					3D
 {offset = 2, scale = 1, seed = -1805, spread = {x = 768, y = 256, z = 768}, octaves = 4, persist = 0.5, lacunarity = 4},
 
--- Noise 18 : Humidity (not in maps)					2D
+-- Noise 18 : Humidity							2D
 {offset = 0, scale = 1, seed = -5787, spread = {x = 243, y = 243, z = 243}, octaves = 4, persist = 0.5, lacunarity = 3},
 
 }
@@ -105,6 +105,8 @@ local dirt_threshold = vmg.define("dirt_threshold", 0.5)
 
 local tree_density = vmg.define("tree_density", 5) / 100
 local trees = vmg.define("trees", true)
+local plant_density = vmg.define("plant_density", 32) / 100
+local plants = vmg.define("plants", true)
 
 local water_level = vmg.define("water_level", 1)
 
@@ -147,6 +149,18 @@ function vmg.generate(minp, maxp, seed)
 	local c_pinetree = minetest.get_content_id("default:pinetree")
 	local c_pineleaves = minetest.get_content_id("default:pine_needles")
 
+	local c_grass = {
+		minetest.get_content_id("default:grass_1"),
+		minetest.get_content_id("default:grass_2"),
+		minetest.get_content_id("default:grass_3"),
+		minetest.get_content_id("default:grass_4"),
+		minetest.get_content_id("default:grass_5"),
+	}
+	local c_junglegrass = minetest.get_content_id("default:junglegrass")
+	local c_dryshrub = minetest.get_content_id("default:dry_shrub")
+	local c_cactus = minetest.get_content_id("default:cactus")
+	local c_papyrus = minetest.get_content_id("default:papyrus")
+
 	local c_air = minetest.get_content_id("air")
 	local c_ignore = minetest.get_content_id("ignore")
 
@@ -181,6 +195,7 @@ function vmg.generate(minp, maxp, seed)
 	local n14 = vmg.noisemap(14, minp2d, chulens)
 	local n15 = vmg.noisemap(15, minp2d, chulens)
 	local n16 = vmg.noisemap(16, minp2d, chulens)
+	local n18 = vmg.noisemap(18, minp2d, chulens)
 
 	local t2 = os.clock()
 	if vmg.loglevel >= 2 then
@@ -202,7 +217,7 @@ function vmg.generate(minp, maxp, seed)
 
 	for x = minp.x, maxp.x do -- for each YZ plane
 		for z = minp.z, maxp.z do -- for each vertical line in this plane
-			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d] -- n for noise, v for value
+			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16, v18 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d] -- n for noise, v for value
 			v3 = v3 ^ 2 -- v3 must be > 0 and by the square there are high mountains but the median valleys depth is small.
 			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher when valleys are deep (mountains)
 			local river = math.abs(v2) < river_size
@@ -256,6 +271,9 @@ function vmg.generate(minp, maxp, seed)
 			local is_beach = v15 > 0 and v16 > 0
 			local beach = v15 * v16 + water_level -- the y coordinate below which dirt is replaced by beach sand
 
+			-- raw humidity
+			local hraw = 2 ^ (v13 - v15 + v18 * 2)
+
 			for y = minp.y, maxp.y do -- for each node in vertical line
 				local ivm = a:index(x, y, z)
 				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d]
@@ -269,11 +287,19 @@ function vmg.generate(minp, maxp, seed)
 							if is_beach and y < beach then
 								data[ivm] = c_sand
 							else -- if node above is not in the ground, place lawn
+
+								-- calculate humidity
+								local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
+								local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0)
+								local water = sea_water + (1 - sea_water) * river_water
+								local humidity = hraw + water
+
+								local ivm2 = ivm + ystride
 								y = y + 1
 								local pos = {x = x, y = y, z = z}
 
 								local v17 = vmg.get_noise(pos, 17)
-								local temp -- calculate_temperature
+								local temp -- calculate_temperature for node above
 								if y > 0 then
 									temp = v17 * 0.5 ^ (y / altitude_chill)
 								else
@@ -292,18 +318,10 @@ function vmg.generate(minp, maxp, seed)
 									else
 										data[ivm] = c_stone
 									end
-									data[ivm+ystride] = c_snow_layer -- set node above to snow
+									data[ivm2] = c_snow_layer -- set node above to snow
 								end
 
 								if trees and math.random() < tree_density and above > 0 then -- make a tree
-
-									local v18 = vmg.get_noise(pos2d(pos), 18)
-									local humidity -- calculate humidity
-									local hraw = 2 ^ (v13 - v15 + v18 * 2)
-									local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
-									local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0)
-									local water = sea_water + (1 - sea_water) * river_water
-									humidity = hraw + water
 
 									-- choose a tree from climatic and geological conditions
 									if v15 < 0.6 and temp >= 0.85 and temp < 2.3 and humidity < 3 and v16 < 0 and v14 > -0.5 and v13 < 0.8 then
@@ -325,6 +343,24 @@ function vmg.generate(minp, maxp, seed)
 										local height = math.floor(9 + 6 * rand)
 										local radius = 4 + 2 * rand
 										vmg.grow_pine_tree(pos, data, a, height, radius, c_pinetree, c_pineleaves, c_air, c_ignore)
+									end
+								elseif plants and math.random() < plant_density and above > 0 then -- make a plant
+									if temp > 1 and temp < 1.8 and water > 0.7 and v13 > -0.4 and math.random() < 0.04 then -- Papyrus
+										for i = 1, 4 do
+											data[ivm+i*ystride] = c_papyrus
+										end
+									elseif v15 < 0.65 and temp >= 0.65 and temp < 1.5 and humidity < 2.6 and v16 < -0.2 and v13 < 0.8 and math.random() < 0.7 then -- Grass
+										data[ivm2] = c_grass[math.random(1, 5)]
+									elseif v15 > -0.6 and temp >= 1.8 and humidity > 2.2 and v16 > -0.05 then -- Jungle Grass
+										data[ivm2] = c_junglegrass
+									elseif v15 > 0.6 and v15 < 0.9 and humidity < 0.5 and temp > 1.8 and math.random() < 0.2 then
+										if v16 < 0.5 and math.random() < 0.12 then -- Cactus
+											for i = 1, 4 do
+												data[ivm+i*ystride] = c_cactus
+											end
+										elseif v16 > 0.5 then -- Dry Shrub
+											data[ivm2] = c_dryshrub
+										end
 									end
 								end
 								y = y - 1

@@ -47,8 +47,10 @@
 
 #trees = true
 #    If false, no trees, of course !
+#plants = true
 #tree_density = 5
 #    Percent of the lawn nodes that are covered by trees.
+#plant_density = 32
 
 #    NOISES : offset, scale, (spread), seed, octaves, persist, lacunarity
 #    (see mapgen.lua to see what is the role of each noise)

@@ -7,6 +7,8 @@ Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 
 ## Changelog
 ### 1.3 ~> Lastest (pre-2.0)
+* Added plants
+* Corrected math.random too large interval (2³² → 2²⁴)
 * Added snow
 * When a player dies, it's respawned
 * Added trees (3 species for now), optionnal
