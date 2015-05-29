@@ -324,7 +324,7 @@ function vmg.generate(minp, maxp, seed)
 								if trees and math.random() < tree_density and above > 0 then -- make a tree
 
 									-- choose a tree from climatic and geological conditions
-									if v15 < 0.6 and temp >= 0.85 and temp < 2.3 and humidity < 3 and v16 < 0 and v14 > -0.5 and v13 < 0.8 then
+									if v15 < 0.6 and temp >= 0.85 and temp < 2.3 and humidity < 3 and v16 < 2 and v14 > -0.5 and v13 < 0.8 then -- Apple Tree
 										local rand = math.random()
 										local height = math.floor(4 + 2.5 * rand)
 										local radius = 3 + rand
@@ -333,32 +333,32 @@ function vmg.generate(minp, maxp, seed)
 										else
 											vmg.grow_tree(pos, data, a, height, radius, c_tree, c_leaves, c_air, c_ignore)
 										end
-									elseif v15 < 0.7 and temp >= 1.9 and humidity > 2 and v16 > 0 then
+									elseif v15 < 0.7 and temp >= 1.9 and humidity > 2 and v16 > 2 then -- Jungle Tree
 										local rand = math.random()
 										local height = math.floor(8 + 4 * rand)
 										local radius = 5 + 3 * rand
 										vmg.grow_jungle_tree(pos, data, a, height, radius, c_jungletree, c_jungleleaves, c_air, c_ignore)
-									elseif temp > 0.38 and temp < 1 and humidity > 0.9 and v15 > 0 and v15 < 0.55 then
+									elseif temp > 0.38 and temp < 1 and humidity > 0.9 and v15 > 0 and v15 < 0.55 then -- Pine Tree (or Fir Tree)
 										local rand = math.random()
 										local height = math.floor(9 + 6 * rand)
 										local radius = 4 + 2 * rand
 										vmg.grow_pine_tree(pos, data, a, height, radius, c_pinetree, c_pineleaves, c_air, c_ignore)
 									end
 								elseif plants and math.random() < plant_density and above > 0 then -- make a plant
-									if temp > 1 and temp < 1.8 and water > 0.7 and v13 > -0.4 and math.random() < 0.04 then -- Papyrus
+									if temp > 1 and temp < 1.8 and water > 0.7 and humidity > 3 and v13 > -0.4 and math.random() < 0.04 then -- Papyrus
 										for i = 1, 4 do
 											data[ivm+i*ystride] = c_papyrus
 										end
-									elseif v15 < 0.65 and temp >= 0.65 and temp < 1.5 and humidity < 2.6 and v16 < -0.2 and v13 < 0.8 and math.random() < 0.7 then -- Grass
+									elseif v15 < 0.65 and temp >= 0.65 and temp < 1.5 and humidity < 2.6 and v16 < 1.5 and v13 < 0.8 and math.random() < 0.7 then -- Grass
 										data[ivm2] = c_grass[math.random(1, 5)]
-									elseif v15 > -0.6 and temp >= 1.8 and humidity > 2.2 and v16 > -0.05 then -- Jungle Grass
+									elseif v15 > -0.6 and temp >= 1.8 and humidity > 2.2 and v16 > 1.8 then -- Jungle Grass
 										data[ivm2] = c_junglegrass
 									elseif v15 > 0.6 and v15 < 0.9 and humidity < 0.5 and temp > 1.8 and math.random() < 0.2 then
-										if v16 < 0.5 and math.random() < 0.12 then -- Cactus
+										if v16 < 0 and math.random() < 0.12 then -- Cactus
 											for i = 1, 4 do
 												data[ivm+i*ystride] = c_cactus
 											end
-										elseif v16 > 0.5 then -- Dry Shrub
+										else -- Dry Shrub
 											data[ivm2] = c_dryshrub
 										end
 									end
