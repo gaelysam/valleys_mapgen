@@ -1,19 +1,21 @@
 # Valleys Mapgen
 Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 
-![Screenshot](http://i.imgur.com/EYxKIPv.png)
+![Screenshot](http://i.imgur.com/VU5DRBZ.png)
 
 [Discussion on Minetest Forums](https://forum.minetest.net/viewtopic.php?f=9&t=11430)
 
 ## Changelog
-### 1.3 ~> Lastest (pre-2.0)
-* Added plants
+### 1.3 ~> 2.0 (Sunday May 31, 2015)
+* Added plants, optionnal, enabled by default
 * Corrected math.random too large interval (2³² → 2²⁴)
 * Added snow
 * When a player dies, it's respawned
-* Added trees (3 species for now), optionnal
+* Adapted to any `chunksize` (previously the mod was only working for 5)
+* Added trees (3 species for now), optionnal, enabled by default
 * Added logs : see vmg.conf.example
 * Added temperature and humidity noises, used by trees
+* Changed parameters for lava
 
 ### 1.2 ~> 1.3 (Wednesday April 8, 2015)
 * Added differents types of dirts (the aim is to make real biomes in the future)
