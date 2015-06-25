@@ -1,5 +1,5 @@
 vmg = {}
-vmg.version = "2.0"
+vmg.version = "2.1"
 
 vmg.path = minetest.get_modpath("valleys_mapgen")
 

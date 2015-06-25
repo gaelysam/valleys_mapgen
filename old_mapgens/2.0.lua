@@ -1,5 +1,5 @@
--- Mapgen 2.1
--- Thursday June 25, 2015
+-- Mapgen 2.0
+-- Sunday May 31, 2015
 
 vmg.noises = {
 
@@ -83,9 +83,8 @@ function vmg.execute_after_mapgen()
 		params.f(unpack(params))
 	end
 	vmg.after_mapgen = {}
-end
+end	
 
-local river_depth = vmg.define("river_depth", 3) + 1
 local river_size = vmg.define("river_size", 5) / 100
 local caves_size = vmg.define("caves_size", 7) / 100
 local lava_depth = vmg.define("lava_depth", 2000)
@@ -221,15 +220,13 @@ function vmg.generate(minp, maxp, seed)
 			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16, v18 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d] -- n for noise, v for value
 			v3 = v3 ^ 2 -- v3 must be > 0 and by the square there are high mountains but the median valleys depth is small.
 			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher when valleys are deep (mountains)
-			v2 = math.abs(v2) - river_size
-			local river = v2 < 0
+			local river = math.abs(v2) < river_size
 			local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 will change the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4)
 			local mountain_ground = base_ground + valleys
 			local slopes = v5 * valleys
 
 			if river then
-				local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1-x²) which modelizes a circle.
-				mountain_ground = math.min(math.max(base_ground - depth, water_level - 6), mountain_ground)
+				mountain_ground = math.min(math.max(base_ground - 3, water_level - 6), mountain_ground)
 				slopes = 0
 			end
 
@@ -382,7 +379,7 @@ function vmg.generate(minp, maxp, seed)
 					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
 						data[ivm] = c_lava
 					end
-				elseif y <= water_level or river and y + 1 < base_ground then -- if pos is not in the ground, and below water_level, it's an ocean
+				elseif y <= water_level or river and y - 2 <= mountain_ground then -- if pos is not in the ground, and below water_level, it's an ocean
 					data[ivm] = c_water
 				end
 				
@@ -422,7 +419,7 @@ function vmg.generate(minp, maxp, seed)
 	end
 end
 
-dofile(vmg.path .. "/trees.lua")
+dofile(vmg.path .. "/old_mapgens/2.0-trees.lua")
 
 function vmg.get_humidity_raw(pos)
 	local v13 = vmg.get_noise(pos, 13)
@@ -472,12 +469,8 @@ end
 
 function vmg.get_elevation(pos)
 	local v1 = vmg.get_noise(pos, 1)
-	local v2 = math.abs(vmg.get_noise(pos, 2)) - river_size
+	local v2 = vmg.get_noise(pos, 2)
 	local v3 = vmg.get_noise(pos, 3) ^ 2
-	local base_ground = v1 + v3
-	if v2 < 0 then
-		return math.ceil(base_ground), true
-	end
 	local v4 = vmg.get_noise(pos, 4)
 	local v5 = vmg.get_noise(pos, 5)
 	local base_ground = v1 + v3
@@ -490,13 +483,13 @@ function vmg.get_elevation(pos)
 		while vmg.get_noise(pos, 6) * slopes > pos.y - mountain_ground do
 			pos.y = pos.y + 1
 		end
-		return pos.y, false
+		return pos.y
 	else
 		pos.y = pos.y - 1
 		while vmg.get_noise(pos, 6) * slopes <= pos.y - mountain_ground do
 			pos.y = pos.y - 1
 		end
-		return pos.y, false
+		return pos.y
 	end
 end
 
@@ -505,11 +498,11 @@ function vmg.spawnplayer(player)
 	local distance = math.random() * player_max_distance
 	local p_angle = {x = math.cos(angle), y = math.sin(angle)}
 	local pos = {x = -p_angle.x * distance, y = -p_angle.y * distance}
-	local elevation, river = vmg.get_elevation(pos)
-	while elevation < water_level + 2 or river do
+	local elevation = vmg.get_elevation(pos)
+	while elevation < water_level + 2 or math.abs(vmg.get_noise(pos, 2)) < river_size do
 		pos.x = pos.x + p_angle.x
 		pos.y = pos.y + p_angle.y
-		elevation, river = vmg.get_elevation({x = round(pos.x), y = round(pos.y)})
+		elevation = vmg.get_elevation({x = round(pos.x), y = round(pos.y)})
 	end
 	pos = {x = round(pos.x), y = round(elevation + 1), z = round(pos.y)}
 	player:setpos(pos)

@@ -6,6 +6,10 @@ Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 [Discussion on Minetest Forums](https://forum.minetest.net/viewtopic.php?f=9&t=11430)
 
 ## Changelog
+### 2.0 ~> Latest
+* Changed valley shape a bit (no more cliffs on the sides of the rivers)
+* Changed river shape (smooth floor)
+
 ### 1.3 ~> 2.0 (Sunday May 31, 2015)
 * Added plants, optionnal, enabled by default
 * Corrected math.random too large interval (2³² → 2²⁴)
