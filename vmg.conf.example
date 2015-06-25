@@ -35,6 +35,7 @@
 #    if noise 15 is above this value, make desert sand instead of sandy dirt.
 #dirt_threshold = 0.5
 #    if not any of noises 13, 14 and 15 is above this value, make normal dirt. Else make special dirt.
+#river_depth = 3
 #river_size = 5
 #caves_size = 7
 #lava_depth = 2000

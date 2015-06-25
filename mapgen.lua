@@ -83,8 +83,9 @@ function vmg.execute_after_mapgen()
 		params.f(unpack(params))
 	end
 	vmg.after_mapgen = {}
-end	
+end
 
+local river_depth = vmg.define("river_depth", 3) + 1
 local river_size = vmg.define("river_size", 5) / 100
 local caves_size = vmg.define("caves_size", 7) / 100
 local lava_depth = vmg.define("lava_depth", 2000)
@@ -226,7 +227,8 @@ function vmg.generate(minp, maxp, seed)
 			local slopes = v5 * valleys
 
 			if river then
-				mountain_ground = math.min(math.max(base_ground - 3, water_level - 6), mountain_ground)
+				local depth = river_depth * math.sqrt(1 - (v2 / river_size) ^ 2) -- use the curve of the function −sqrt(1-x²) which modelizes a circle.
+				mountain_ground = math.min(math.max(base_ground - depth, water_level - 6), mountain_ground)
 				slopes = 0
 			end
 
@@ -379,7 +381,7 @@ function vmg.generate(minp, maxp, seed)
 					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
 						data[ivm] = c_lava
 					end
-				elseif y <= water_level or river and y - 2 <= mountain_ground then -- if pos is not in the ground, and below water_level, it's an ocean
+				elseif y <= water_level or river and y + 1 < base_ground then -- if pos is not in the ground, and below water_level, it's an ocean
 					data[ivm] = c_water
 				end
 				
