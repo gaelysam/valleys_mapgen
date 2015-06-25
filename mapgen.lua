@@ -221,13 +221,14 @@ function vmg.generate(minp, maxp, seed)
 			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16, v18 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d] -- n for noise, v for value
 			v3 = v3 ^ 2 -- v3 must be > 0 and by the square there are high mountains but the median valleys depth is small.
 			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher when valleys are deep (mountains)
-			local river = math.abs(v2) < river_size
+			v2 = math.abs(v2) - river_size
+			local river = v2 < 0
 			local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 will change the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4)
 			local mountain_ground = base_ground + valleys
 			local slopes = v5 * valleys
 
 			if river then
-				local depth = river_depth * math.sqrt(1 - (v2 / river_size) ^ 2) -- use the curve of the function −sqrt(1-x²) which modelizes a circle.
+				local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1-x²) which modelizes a circle.
 				mountain_ground = math.min(math.max(base_ground - depth, water_level - 6), mountain_ground)
 				slopes = 0
 			end
@@ -471,8 +472,12 @@ end
 
 function vmg.get_elevation(pos)
 	local v1 = vmg.get_noise(pos, 1)
-	local v2 = vmg.get_noise(pos, 2)
+	local v2 = math.abs(vmg.get_noise(pos, 2)) - river_size
 	local v3 = vmg.get_noise(pos, 3) ^ 2
+	local base_ground = v1 + v3
+	if v2 < 0 then
+		return math.ceil(base_ground), true
+	end
 	local v4 = vmg.get_noise(pos, 4)
 	local v5 = vmg.get_noise(pos, 5)
 	local base_ground = v1 + v3
@@ -485,13 +490,13 @@ function vmg.get_elevation(pos)
 		while vmg.get_noise(pos, 6) * slopes > pos.y - mountain_ground do
 			pos.y = pos.y + 1
 		end
-		return pos.y
+		return pos.y, false
 	else
 		pos.y = pos.y - 1
 		while vmg.get_noise(pos, 6) * slopes <= pos.y - mountain_ground do
 			pos.y = pos.y - 1
 		end
-		return pos.y
+		return pos.y, false
 	end
 end
 
@@ -500,11 +505,11 @@ function vmg.spawnplayer(player)
 	local distance = math.random() * player_max_distance
 	local p_angle = {x = math.cos(angle), y = math.sin(angle)}
 	local pos = {x = -p_angle.x * distance, y = -p_angle.y * distance}
-	local elevation = vmg.get_elevation(pos)
-	while elevation < water_level + 2 or math.abs(vmg.get_noise(pos, 2)) < river_size do
+	local elevation, river = vmg.get_elevation(pos)
+	while elevation < water_level + 2 or river do
 		pos.x = pos.x + p_angle.x
 		pos.y = pos.y + p_angle.y
-		elevation = vmg.get_elevation({x = round(pos.x), y = round(pos.y)})
+		elevation, river = vmg.get_elevation({x = round(pos.x), y = round(pos.y)})
 	end
 	pos = {x = round(pos.x), y = round(elevation + 1), z = round(pos.y)}
 	player:setpos(pos)
