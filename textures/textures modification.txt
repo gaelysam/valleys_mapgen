@@ -1,0 +1,40 @@
+with GIMP :
+Color ~> Hue-Saturation
+
+vmg_dirt_clayey.png
+	from default_dirt.png
+	Hue −6
+	Brightness +5
+	Saturation +40
+
+vmg_dirt_sandy.png
+	from default_dirt.png
+	Hue +5
+	Brightness +40
+	Saturation −10
+
+vmg_dirt_silty.png
+	from default_dirt.png
+	Hue +8
+	Brightness −10
+	Saturation −30
+
+vmg_red_clay.png
+	from default_dirt.png
+	Hue −5
+	Brightness +10
+	Saturation +100
+
+vmg_silt.png
+	from default_dirt.png
+	Hue +6
+	Brightness +10
+	Saturation −78
+
+vmg_fir_tree.png :
+	from default_wood.png
+	Hue +6
+	Brightness +50
+	Saturation −24
+
+And convert to indexed color.
