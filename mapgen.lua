@@ -110,6 +110,7 @@ local plant_density = vmg.define("plant_density", 32) / 100
 local plants = vmg.define("plants", true)
 
 local water_level = vmg.define("water_level", 1)
+local river_water = vmg.define("river_water", true)
 
 function vmg.generate(minp, maxp, seed)
 	local minps, maxps = minetest.pos_to_string(minp), minetest.pos_to_string(maxp)
@@ -139,6 +140,7 @@ function vmg.generate(minp, maxp, seed)
 	local c_silt = minetest.get_content_id("valleys_mapgen:silt")
 	local c_clay = minetest.get_content_id("valleys_mapgen:red_clay")
 	local c_water = minetest.get_content_id("default:water_source")
+	local c_riverwater = minetest.get_content_id("default:river_water_source")
 	local c_lava = minetest.get_content_id("default:lava_source")
 	local c_snow_layer = minetest.get_content_id("default:snow")
 
@@ -382,8 +384,14 @@ function vmg.generate(minp, maxp, seed)
 					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
 						data[ivm] = c_lava
 					end
-				elseif y <= water_level or river and y + 1 < base_ground then -- if pos is not in the ground, and below water_level, it's an ocean
+				elseif y <= water_level then -- if pos is not in the ground, and below water_level, it's an ocean
 					data[ivm] = c_water
+				elseif river and y + 1 < base_ground then
+					if river_water then
+						data[ivm] = c_riverwater
+					else
+						data[ivm] = c_water
+					end
 				end
 				
 				i3d = i3d + i3d_incrY -- increment i3d by one line

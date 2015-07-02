@@ -1,5 +1,7 @@
-minetest.override_item("default:water_source", {liquid_renewable = false})
-minetest.override_item("default:water_flowing", {liquid_renewable = false})
+local waterflow = vmg.define("waterflow", 3)
+
+minetest.override_item("default:river_water_source", {liquid_range = waterflow})
+minetest.override_item("default:river_water_flowing", {liquid_range = waterflow})
 
 minetest.register_node("valleys_mapgen:silt", {
 	description = "Silt",

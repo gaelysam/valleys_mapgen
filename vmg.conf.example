@@ -22,6 +22,10 @@
 #    After death, players are respawned by the mod. Disable it to respawn the player another way.
 
 #water_level = 1
+#river_water = true
+#    use river water instead of normal water in rivers.
+#waterflow = 3
+#    maximal length of a river water flowing.
 
 #average_stone_level = 180
 #    height at which the half of the surface is made solely of stone.

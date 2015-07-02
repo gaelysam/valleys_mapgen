@@ -7,6 +7,7 @@ Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 
 ## Changelog
 ### 2.0 ~> Latest
+* Generate special water in rivers
 * Changed valley shape a bit (no more cliffs on the sides of the rivers)
 * Changed river shape (smooth floor)
 
