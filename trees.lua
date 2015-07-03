@@ -203,18 +203,17 @@ function vmg.make_pine_tree(pos, data, area, height, radius, trunk, leaves, air,
 		end
 	end
 
-	-- make several leaves rings
+	local np = {offset = 0.8, scale = 0.3, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 1}
+	local min_height = pos.y + math.floor((0.4 + 0.2 * math.random()) * height)
 	local midradius = radius / 2
-	local max_height = pos.y + height
-	local min_height = pos.y + math.floor((0.2 + 0.3 * math.random()) * height)
-	local radius_increment = (radius - 1.2) / (max_height - min_height)
-	local np = {offset = 0.8, scale = 0.3, spread = {x = 12, y = 4, z = 12}, octaves = 3, persist = 1}
 
-	pos.y = max_height - 1
+	pos.y = pos.y + height - 1
+	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = 2, z = radius}, np)
 	while pos.y >= min_height do
 		local angle, distance = math.random() * 2 * math.pi, math.random() * midradius
-		local xoffset, zoffset = math.floor(math.cos(angle) * distance + 0.5), math.floor(math.sin(angle) * distance + 0.5)
-		vmg.make_leavesblob({x = pos.x + xoffset, y = pos.y, z = pos.z + zoffset}, data, area, leaves, air, ignore, {x = midradius, y = 2, z = midradius}, np)
+		local cos, sin = math.cos(angle) * distance, math.sin(angle) * distance
+		local bpos = vector.round({x = pos.x + cos, y = pos.y, z = pos.z + sin})
+		vmg.make_leavesblob(bpos, data, area, leaves, air, ignore, {x = midradius, y = 2, z = midradius}, np)
 		pos.y = pos.y - math.random(1, 2)
 	end
 end
