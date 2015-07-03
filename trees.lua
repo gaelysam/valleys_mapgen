@@ -223,20 +223,21 @@ function vmg.make_leavesblob(pos, data, area, leaves, air, ignore, radius, np, f
 	fruit_chance = fruit_chance or 0
 
 	np.seed = math.random(0, 16777215)
-	local round_radius = {x = math.ceil(radius.x), y = math.ceil(radius.y), z = math.ceil(radius.z)}
+	local minp = vector.subtract(pos, radius)
+	local maxp = vector.add(pos, radius)
+	local int_minp = {x = math.floor(minp.x), y = math.floor(minp.y), z = math.floor(minp.z)}
+	local int_maxp = {x = math.ceil(maxp.x), y = math.ceil(maxp.y), z = math.ceil(maxp.z)}
 
-	local length = vector.multiply(round_radius, 2)
+	local length = vector.subtract(int_maxp, int_minp)
 	local chulens = vector.add(length, 1)
-	local minp = vector.subtract(pos, round_radius)
-	local maxp = vector.add(minp, length)
 	local obj = minetest.get_perlin_map(np, chulens)
 	local pmap = obj:get3dMap_flat(minp)
 	local i = 1
-	for x = minp.x, maxp.x do
+	for x = int_minp.x, int_maxp.x do
 		local xval = ((x - pos.x) / radius.x) ^ 2
-		for y = minp.y, maxp.y do
+		for y = int_minp.y, int_maxp.y do
 			local yval = ((y - pos.y) / radius.y) ^ 2
-			for z = minp.z, maxp.z do
+			for z = int_minp.z, int_maxp.z do
 				local zval = ((z - pos.z) / radius.z) ^ 2
 				local dist = math.sqrt(xval + yval + zval)
 				local nval = pmap[i]
