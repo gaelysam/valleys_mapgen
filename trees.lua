@@ -1,3 +1,31 @@
+local function can_grow(pos) -- from default mod
+	local node_under = minetest.get_node_or_nil({x = pos.x, y = pos.y - 1, z = pos.z})
+	if not node_under then
+		return false
+	end
+	local name_under = node_under.name
+	local is_soil = minetest.get_item_group(name_under, "soil")
+	if is_soil == 0 then
+		return false
+	end
+	return true
+end
+
+minetest.register_abm({
+	nodenames = {"valleys_mapgen:fir_sapling"},
+	interval = 14,
+	chance = 50,
+	action = function(pos, node)
+		if not can_grow(pos) then
+			return
+		end
+
+		minetest.log("action", "A fir sapling grows into a tree at "..
+				minetest.pos_to_string(pos))
+		vmg.grow_fir_tree(pos)
+	end
+})
+
 function default.grow_tree(pos, is_apple_tree)
 	local rand = math.random()
 	local height = math.floor(4 + 2.5 * rand)
