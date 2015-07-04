@@ -358,12 +358,12 @@ function vmg.generate(minp, maxp, seed)
 										data[ivm2] = c_grass[math.random(1, 5)]
 									elseif v15 > -0.6 and temp >= 1.8 and humidity > 2.2 and v16 > 1.8 then -- Jungle Grass
 										data[ivm2] = c_junglegrass
-									elseif v15 > 0.6 and v15 < 0.9 and humidity < 0.5 and temp > 1.8 and math.random() < 0.2 then
-										if v16 < 0 and math.random() < 0.12 then -- Cactus
+									elseif v15 > 0.65 and humidity < 0.5 and math.random() < 0.2 then
+										if v16 > 0 and temp > 1.6 and math.random() < 0.12 then -- Cactus
 											for i = 1, 4 do
 												data[ivm+i*ystride] = c_cactus
 											end
-										else -- Dry Shrub
+										elseif temp > 1.2 then -- Dry Shrub
 											data[ivm2] = c_dryshrub
 										end
 									end
