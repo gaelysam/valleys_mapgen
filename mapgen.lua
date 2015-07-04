@@ -149,6 +149,8 @@ function vmg.generate(minp, maxp, seed)
 	local c_apple = minetest.get_content_id("default:apple")
 	local c_jungletree = minetest.get_content_id("default:jungletree")
 	local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
+	local c_pinetree = minetest.get_content_id("default:pinetree")
+	local c_pineleaves = minetest.get_content_id("default:pine_needles")
 	local c_firtree = minetest.get_content_id("valleys_mapgen:fir_tree")
 	local c_firleaves = minetest.get_content_id("valleys_mapgen:fir_needles")
 
@@ -329,7 +331,12 @@ function vmg.generate(minp, maxp, seed)
 								if trees and math.random() < tree_density and above > 0 then -- make a tree
 
 									-- choose a tree from climatic and geological conditions
-									if v15 < 0.6 and temp >= 0.85 and temp < 2.3 and humidity < 3 and v16 < 2 and v14 > -0.5 and v13 < 0.8 then -- Apple Tree
+									if v14 < 0 and temp < 1.5 and temp >= 0.90 and humidity < 1 and v15 < 0.8 and math.abs(v13) < 0.2 and math.random() < 0.3 then -- Pine Tree
+										local rand = math.random()
+										local height = math.floor(9 + 6 * rand)
+										local radius = 4 + 2 * rand
+										vmg.make_pine_tree(pos, data, a, height, radius, c_pinetree, c_pineleaves, c_air, c_ignore)
+									elseif v15 < 0.6 and temp >= 0.85 and temp < 2.3 and humidity < 3 and v16 < 2 and v14 > -0.5 and v13 < 0.8 then -- Apple Tree
 										local rand = math.random()
 										local height = math.floor(4 + 2.5 * rand)
 										local radius = 3 + rand

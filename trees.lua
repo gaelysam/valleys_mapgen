@@ -208,12 +208,12 @@ function vmg.make_pine_tree(pos, data, area, height, radius, trunk, leaves, air,
 	local midradius = radius / 2
 
 	pos.y = pos.y + height - 1
-	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = 2, z = radius}, np)
+	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = 1.5, z = radius}, np)
 	while pos.y >= min_height do
 		local angle, distance = math.random() * 2 * math.pi, math.random() * midradius
 		local cos, sin = math.cos(angle) * distance, math.sin(angle) * distance
 		local bpos = {x = pos.x + cos, y = pos.y, z = pos.z + sin}
-		vmg.make_leavesblob(bpos, data, area, leaves, air, ignore, {x = midradius, y = 2, z = midradius}, np)
+		vmg.make_leavesblob(bpos, data, area, leaves, air, ignore, {x = midradius, y = 1.5, z = midradius}, np)
 		pos.y = pos.y - math.random(1, 2)
 	end
 end
