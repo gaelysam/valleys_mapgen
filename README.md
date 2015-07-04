@@ -1,12 +1,14 @@
 # Valleys Mapgen
 Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 
-![Screenshot](http://i.imgur.com/VU5DRBZ.png)
+![Screenshot](http://i.imgur.com/A6CBuaV.png)
 
 [Discussion on Minetest Forums](https://forum.minetest.net/viewtopic.php?f=9&t=11430)
 
 ## Changelog
-### 2.0 ~> Latest
+### 2.0 ~> 2.1 (Saturday July 4, 2015)
+* Modified conditions for desert plants
+* Added pine tree
 * Generate special water in rivers
 * Changed valley shape a bit (no more cliffs on the sides of the rivers)
 * Changed river shape (smooth floor)
