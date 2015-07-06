@@ -6,6 +6,9 @@ Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 [Discussion on Minetest Forums](https://forum.minetest.net/viewtopic.php?f=9&t=11430)
 
 ## Changelog
+### 2.1 ~> Latest
+* Added flowers (6 species)
+
 ### 2.0 ~> 2.1 (Saturday July 4, 2015)
 * Modified conditions for desert plants
 * Added pine tree

@@ -1,5 +1,5 @@
--- Mapgen 2.1
--- Saturday July 4, 2015
+-- Mapgen 2.2
+-- Monday July 6, 2015
 
 vmg.noises = {
 
@@ -165,6 +165,12 @@ function vmg.generate(minp, maxp, seed)
 	local c_dryshrub = minetest.get_content_id("default:dry_shrub")
 	local c_cactus = minetest.get_content_id("default:cactus")
 	local c_papyrus = minetest.get_content_id("default:papyrus")
+	local c_geranium = minetest.get_content_id("flowers:geranium")
+	local c_rose = minetest.get_content_id("flowers:rose")
+	local c_tulip = minetest.get_content_id("flowers:tulip")
+	local c_viola = minetest.get_content_id("flowers:viola")
+	local c_dandelion_white = minetest.get_content_id("flowers:dandelion_white")
+	local c_dandelion_yellow = minetest.get_content_id("flowers:dandelion_yellow")
 
 	local c_air = minetest.get_content_id("air")
 	local c_ignore = minetest.get_content_id("ignore")
@@ -287,9 +293,9 @@ function vmg.generate(minp, maxp, seed)
 				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
 					if not is_cave then
-						local above = math.ceil(
-							v7 + math.random() - math.sqrt(math.abs(y)) / dirt_thickness -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness.
-						)
+						local thickness = v7 - math.sqrt(math.abs(y)) / dirt_thickness
+						local above = math.ceil(thickness + math.random()) -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness.
+
 						if y >= water_level and n6[i3d_sup+i3d_incrY] * slopes <= y + 1 - mountain_ground and not river then
 							if is_beach and y < beach then
 								data[ivm] = c_sand
@@ -372,6 +378,20 @@ function vmg.generate(minp, maxp, seed)
 											end
 										elseif temp > 1.2 then -- Dry Shrub
 											data[ivm2] = c_dryshrub
+										end
+									elseif math.random() < 0.04 and temp > 0.98 and temp < 1.8 and humidity < 1.7 and v14 >= -0.1 and v15 < 0.4 and v15 >= -0.6 and v13 < 0.82 then -- Flowers
+										if temp > 1.2 and math.random() < 0.3 then
+											data[ivm2] = c_rose
+										elseif thickness <= 1.3 and math.random() < 0.4 then
+											data[ivm2] = c_geranium
+										elseif v16 < 1.6 and math.random() < 0.7 then
+											data[ivm2] = c_viola
+										elseif temp > 1.3 and humidity < 1.5 and math.random() < 0.2 then
+											data[ivm2] = c_tulip
+										elseif math.random() < 0.5 then
+											data[ivm2] = c_dandelion_white
+										else
+											data[ivm2] = c_dandelion_yellow
 										end
 									end
 								end
