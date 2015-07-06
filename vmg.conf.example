@@ -11,7 +11,7 @@
 
 
 
-#version = 2.1
+#version = 2.2
 #    mapgen version used.
 
 #player_max_distance = 450
