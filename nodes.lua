@@ -114,17 +114,6 @@ minetest.register_node("valleys_mapgen:fir_tree", {
 	on_place = minetest.rotate_node
 })
 
-minetest.register_node("valleys_mapgen:fir_tree", {
-	description = "Fir Tree",
-	tiles = {"vmg_fir_tree_top.png", "vmg_fir_tree_top.png", "vmg_fir_tree.png"},
-	paramtype2 = "facedir",
-	is_ground_content = false,
-	groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
-	sounds = default.node_sound_wood_defaults(),
-
-	on_place = minetest.rotate_node
-})
-
 minetest.register_node("valleys_mapgen:fir_sapling", {
 	description = "Fir Sapling",
 	drawtype = "plantlike",
