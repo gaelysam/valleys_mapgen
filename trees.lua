@@ -285,3 +285,11 @@ function vmg.make_leavesblob(pos, data, area, leaves, air, ignore, radius, np, f
 		end
 	end
 end
+
+-- Adapt the code to the latest minetest_game that use these functions
+function default.grow_new_apple_tree(pos)
+	local is_apple_tree = math.random(4) == 1
+	default.grow_tree(pos, is_apple_tree)
+end
+default.grow_new_jungle_tree = default.grow_jungle_tree
+default.grow_new_pine_tree = default.grow_pine_tree
