@@ -129,4 +129,5 @@ else
 	dofile(vmg.path .. "/old_mapgens/" .. version .. ".lua")
 end
 
-vmg.settings:write()
+-- Write settings after loading
+minetest.after(0, function() vmg.settings:write() end)
