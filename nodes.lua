@@ -1,8 +1,10 @@
+-- Set the liquid range according to settings (by default 3)
 local waterflow = vmg.define("waterflow", 3)
 
 minetest.override_item("default:river_water_source", {liquid_range = waterflow})
 minetest.override_item("default:river_water_flowing", {liquid_range = waterflow})
 
+-- Add silt
 minetest.register_node("valleys_mapgen:silt", {
 	description = "Silt",
 	tiles = {"vmg_silt.png"},
@@ -11,6 +13,7 @@ minetest.register_node("valleys_mapgen:silt", {
 	sounds = default.node_sound_dirt_defaults(),
 })
 
+-- I don't like the default:clay, this does not look like clay. So add red clay.
 minetest.register_node("valleys_mapgen:red_clay", {
 	description = "Red Clay",
 	tiles = {"vmg_red_clay.png"},
@@ -21,6 +24,7 @@ minetest.register_node("valleys_mapgen:red_clay", {
 
 minetest.override_item("default:clay", {description = "White Clay"})
 
+-- Add dirts
 local function register_dirts(readname)
 	local name = readname:lower()
 	local itemstr_dirt = "valleys_mapgen:dirt_" .. name
@@ -95,14 +99,20 @@ local function register_dirts(readname)
 	})
 end
 
+-- 3 types of dirt :
+-- Clayey dirt is a dirt that contains clay, but is not pure clay
 register_dirts("Clayey")
+-- Idem for silty dirt that contains silt without beeing pure silt
 register_dirts("Silty")
+-- And sandy dirt
 register_dirts("Sandy")
 
 -----------
 -- Trees --
 -----------
 
+-- Fir tree don't exist in the default game.
+-- Textures from Forest mod (Gael-de-Sailly)
 minetest.register_node("valleys_mapgen:fir_tree", {
 	description = "Fir Tree",
 	tiles = {"vmg_fir_tree_top.png", "vmg_fir_tree_top.png", "vmg_fir_tree.png"},
@@ -176,6 +186,7 @@ minetest.register_craft({
 	}
 })
 
+-- Change leafdecay ratings
 minetest.add_group("default:leaves", {leafdecay = 5})
 minetest.add_group("default:jungleleaves", {leafdecay = 8})
 minetest.add_group("default:pine_needles", {leafdecay = 7})

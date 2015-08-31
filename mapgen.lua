@@ -1,6 +1,7 @@
 -- Mapgen 2.2
 -- Monday July 6, 2015
 
+-- Define perlin noises used in this mapgen by default
 vmg.noises = {
 
 -- Noise 1 : Base Ground Height						2D
@@ -59,6 +60,7 @@ vmg.noises = {
 
 }
 
+-- function to get noisemaps
 function vmg.noisemap(i, minp, chulens)
 	local obj = minetest.get_perlin_map(vmg.noises[i], chulens)
 	if minp.z then
@@ -68,10 +70,12 @@ function vmg.noisemap(i, minp, chulens)
 	end
 end
 
+-- If the noises are already defined in settings, use it instead of the noise parameters above.
 for i, n in ipairs(vmg.noises) do
 	vmg.noises[i] = vmg.define("noise_" .. i, n)
 end
 
+-- List of functions to run at the end of the mapgen procedure, used especially by jungle tree roots
 vmg.after_mapgen = {}
 
 function vmg.register_after_mapgen(f, ...)
@@ -85,6 +89,7 @@ function vmg.execute_after_mapgen()
 	vmg.after_mapgen = {}
 end
 
+-- Define parameters
 local river_depth = vmg.define("river_depth", 3) + 1
 local river_size = vmg.define("river_size", 5) / 100
 local caves_size = vmg.define("caves_size", 7) / 100
@@ -112,15 +117,24 @@ local plants = vmg.define("plants", true)
 local water_level = vmg.define("water_level", 1)
 local river_water = vmg.define("river_water", true)
 
+-- THE MAPGEN FUNCTION
 function vmg.generate(minp, maxp, seed)
+	-- minp and maxp strings, used by logs
 	local minps, maxps = minetest.pos_to_string(minp), minetest.pos_to_string(maxp)
 	if vmg.loglevel >= 2 then
 		print("[Valleys Mapgen] Preparing to generate map from " .. minps .. " to " .. maxps .. " ...")
 	elseif vmg.loglevel == 1 then
 		print("[Valleys Mapgen] Generating map from " .. minps .. " to " .. maxps .. " ...")
 	end
+	-- start the timer
 	local t0 = os.clock()
 
+	-- Define content IDs
+	-- A content ID is a number that represents a node in the core of Minetest.
+	-- Every nodename has its ID.
+	-- The VoxelManipulator uses content IDs instead of nodenames.
+
+	-- Ground nodes
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_dirt = minetest.get_content_id("default:dirt")
 	local c_lawn = minetest.get_content_id("default:dirt_with_grass")
@@ -144,6 +158,7 @@ function vmg.generate(minp, maxp, seed)
 	local c_lava = minetest.get_content_id("default:lava_source")
 	local c_snow_layer = minetest.get_content_id("default:snow")
 
+	-- Tree nodes
 	local c_tree = minetest.get_content_id("default:tree")
 	local c_leaves = minetest.get_content_id("default:leaves")
 	local c_apple = minetest.get_content_id("default:apple")
@@ -154,7 +169,8 @@ function vmg.generate(minp, maxp, seed)
 	local c_firtree = minetest.get_content_id("valleys_mapgen:fir_tree")
 	local c_firleaves = minetest.get_content_id("valleys_mapgen:fir_needles")
 
-	local c_grass = {
+	-- Plants
+	local c_grass = { -- Use an array instead of defining 5 variables. More useful: c_grass[i] is the content ID of default:grass_i.
 		minetest.get_content_id("default:grass_1"),
 		minetest.get_content_id("default:grass_2"),
 		minetest.get_content_id("default:grass_3"),
@@ -172,24 +188,32 @@ function vmg.generate(minp, maxp, seed)
 	local c_dandelion_white = minetest.get_content_id("flowers:dandelion_white")
 	local c_dandelion_yellow = minetest.get_content_id("flowers:dandelion_yellow")
 
+	-- Air and Ignore
 	local c_air = minetest.get_content_id("air")
 	local c_ignore = minetest.get_content_id("ignore")
 
+	-- The VoxelManipulator, a complicated but speedy method to set many nodes at the same time
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	local data = vm:get_data()
+	local data = vm:get_data() -- data is the original array of content IDs (solely or mostly air)
+	-- Be careful: emin ≠ minp and emax ≠ maxp !
+	-- The data array is not limited by minp and maxp. It exceeds it by 16 nodes in the 6 directions.
+	-- The real limits of data array are emin and emax.
+	-- The VoxelArea is used to convert a position into an index for the array.
 	local a = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
-	local ystride = a.ystride
+	local ystride = a.ystride -- Tip : the ystride of a VoxelArea is the number to add to the array index to get the index of the position above. It's faster because it avoids to completely recalculate the index.
 
-	local chulens = vector.add(vector.subtract(maxp, minp), 1)
-	local chulens_sup = {x = chulens.x, y = chulens.y + 6, z = chulens.z}
+	local chulens = vector.add(vector.subtract(maxp, minp), 1) -- Size of the generated area, used by noisemaps
+	local chulens_sup = {x = chulens.x, y = chulens.y + 6, z = chulens.z} -- for the noise #6 that needs extra values
 	local minp2d = pos2d(minp)
 
+	-- Mapgen preparation is now finished. Check the timer to know the elapsed time.
 	local t1 = os.clock()
 	if vmg.loglevel >= 2 then
 		print("[Valleys Mapgen] Mapgen preparation finished in " .. displaytime(t1-t0))
 		print("[Valleys Mapgen] Calculating noises ...")
 	end
 
+	-- Calculate the noise values
 	local n1 = vmg.noisemap(1, minp2d, chulens)
 	local n2 = vmg.noisemap(2, minp2d, chulens)
 	local n3 = vmg.noisemap(3, minp2d, chulens)
@@ -206,16 +230,21 @@ function vmg.generate(minp, maxp, seed)
 	local n14 = vmg.noisemap(14, minp2d, chulens)
 	local n15 = vmg.noisemap(15, minp2d, chulens)
 	local n16 = vmg.noisemap(16, minp2d, chulens)
+	-- Noise #17 is not used this way
 	local n18 = vmg.noisemap(18, minp2d, chulens)
 
+	-- After noise calculation, check the timer
 	local t2 = os.clock()
 	if vmg.loglevel >= 2 then
 		print("[Valleys Mapgen] Noises calculation finished in " .. displaytime(t2-t1))
 		print("[Valleys Mapgen] Collecting data ...")
 	end
 
+	-- THE CORE OF THE MOD: THE MAPGEN ALGORITHM ITSELF
+
+	-- indexes for noise arrays
 	local i2d = 1 -- index for 2D noises
-	local i3d_sup = 1 -- index for noise 6 which has a special size
+	local i3d_sup = 1 -- index for noise #6 which has a special size
 	local i3d = 1 -- index for 3D noises
 
 	-- Calculate increments
@@ -228,27 +257,29 @@ function vmg.generate(minp, maxp, seed)
 
 	for x = minp.x, maxp.x do -- for each YZ plane
 		for z = minp.z, maxp.z do -- for each vertical line in this plane
-			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16, v18 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d] -- n for noise, v for value
-			v3 = v3 ^ 2 -- v3 must be > 0 and by the square there are high mountains but the median valleys depth is small.
-			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher when valleys are deep (mountains)
-			v2 = math.abs(v2) - river_size
-			local river = v2 < 0
-			local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 will change the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4)
-			local mountain_ground = base_ground + valleys
-			local slopes = v5 * valleys
+			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16, v18 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d] -- take the noise values for 2D noises
+			v3 = v3 ^ 2 -- The square function changes the behaviour of this noise : very often small, and sometimes very high.
+			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher where valleys are deep (mountains). base_ground represents the height of the rivers, most of the surface is above.
+			v2 = math.abs(v2) - river_size -- v2 represents the distance from the river, in arbitrary units.
+			local river = v2 < 0 -- the rivers are placed where v2 is negative, so where the original v2 value is close to zero.
+			local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 changes the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4). This variable represents the height of the terrain, from the rivers.
+			local mountain_ground = base_ground + valleys -- approximate height of the terrain at this point (could be slightly modified by the 3D noise #6)
+			local slopes = v5 * valleys -- This variable represents the maximal influence of the noise #6 on the elevation. v5 is the rate of the height from rivers (variable "valleys") that is concerned.
 
 			if river then
-				local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1-x²) which modelizes a circle.
+				local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1−x²) which modelizes a circle.
 				mountain_ground = math.min(math.max(base_ground - depth, water_level - 6), mountain_ground)
-				slopes = 0
+					-- base_ground - depth : height of the bottom of the river
+					-- water_level - 6 : don't make rivers below 6 nodes under the surface
+				slopes = 0 -- noise #6 has not any influence on rivers
 			end
 
-			-- Choose biome
+			-- Choose biome, by default normal dirt
 			local dirt = c_dirt
 			local lawn = c_lawn
 			local snow = c_snow
-			local max = math.max(v13, v14, v15) -- the biome is the maximal of these 3 values, if bigger than 0.5. Else, make normal dirt.
-			if max > dirt_threshold then
+			local max = math.max(v13, v14, v15) -- the biome is the maximal of these 3 values.
+			if max > dirt_threshold then -- if one of these values is bigger than dirt_threshold, make clayey, silty or sandy dirt, depending on the case. If none of clay, silt or sand is predominant, make normal dirt.
 				if v13 == max then
 					if v13 > clay_threshold then
 						dirt = c_clay
@@ -281,53 +312,53 @@ function vmg.generate(minp, maxp, seed)
 					end
 				end
 			end
-			local is_beach = v15 > 0 and v16 > 0
-			local beach = v15 * v16 + water_level -- the y coordinate below which dirt is replaced by beach sand
+			local is_beach = v15 > 0 and v16 > 0 -- 2 conditions must been met to make possible the beach.
+			local beach = v15 * v16 + water_level -- the y coordinate below which dirt is replaced by beach sand. So if the terrain is higher, there is no beach.
 
-			-- raw humidity
+			-- raw humidity, see below at vmg.get_humidity
 			local hraw = 2 ^ (v13 - v15 + v18 * 2)
 
 			for y = minp.y, maxp.y do -- for each node in vertical line
-				local ivm = a:index(x, y, z)
-				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d]
-				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size
+				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
+				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d] -- take the noise values for 3D noises
+				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size -- The 4 cave noises must be close to zero to produce a cave. The square is used for 2 reasons : we need positive values, and, for mathematical reasons, it results in more circular caves.
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
-					if not is_cave then
-						local thickness = v7 - math.sqrt(math.abs(y)) / dirt_thickness
-						local above = math.ceil(thickness + math.random()) -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness.
+					if not is_cave then -- if pos is not inside a cave
+						local thickness = v7 - math.sqrt(math.abs(y)) / dirt_thickness -- Calculate dirt thickness, according to noise #7, dirt thickness parameter, and elevation (y coordinate)
+						local above = math.ceil(thickness + math.random()) -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness. An "above" of zero = bare stone.
 
-						if y >= water_level and n6[i3d_sup+i3d_incrY] * slopes <= y + 1 - mountain_ground and not river then
-							if is_beach and y < beach then
+						if y >= water_level and n6[i3d_sup+i3d_incrY] * slopes <= y + 1 - mountain_ground and not river then -- If node above is in the ground
+							if is_beach and y < beach then -- if beach, make sand
 								data[ivm] = c_sand
-							else -- if node above is not in the ground, place lawn
+							else -- place lawn
 
-								-- calculate humidity
+								-- calculate humidity, see below at vmg.get_humidity
 								local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
 								local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0)
 								local water = sea_water + (1 - sea_water) * river_water
 								local humidity = hraw + water
 
-								local ivm2 = ivm + ystride
+								local ivm2 = ivm + ystride -- index of the node above
 								y = y + 1
 								local pos = {x = x, y = y, z = z}
 
-								local v17 = vmg.get_noise(pos, 17)
-								local temp -- calculate_temperature for node above
+								local v17 = vmg.get_noise(pos, 17) -- Noise #17 is used this way : that's a 3D noise, so a noisemap would be heavy, and less than 2% would be used, contrary to other 3D noises. So it's faster to calculate it node per node, only when needed.
+								local temp -- calculate_temperature for node above, see below at vmg.get_temperature
 								if y > 0 then
-									temp = v17 * 0.5 ^ (y / altitude_chill)
+									temp = v17 * 0.5 ^ (y / altitude_chill) -- Divide temperature noise by 2 by climbing altitude_chill
 								else
 									temp = v17 * 0.5 ^ (-y / altitude_chill) + 20 * (v12 + 1) * (1 - 2 ^ (y / lava_depth))
 								end
 
-								if temp > snow_threshold then
+								if temp > snow_threshold then -- If temperature is too high for snow
 									if above > 0 then
 										data[ivm] = lawn
 									else
 										data[ivm] = c_stone
 									end
-								else
+								else -- Snow
 									if above > 0 then
-										data[ivm] = snow
+										data[ivm] = snow -- dirt with snow
 									else
 										data[ivm] = c_stone
 									end
@@ -434,13 +465,14 @@ function vmg.generate(minp, maxp, seed)
 	end
 	vmg.execute_after_mapgen() -- needed for jungletree roots
 
+	-- After data collecting, check timer
 	local t3 = os.clock()
 	if vmg.loglevel >= 2 then
 		print("[Valleys Mapgen] Data collecting finished in " .. displaytime(t3-t2))
 		print("[Valleys Mapgen] Writing data ...")
 	end
 
-	-- execute voxelmanip boring stuff to write to the map
+	-- execute voxelmanip boring stuff to write to the map...
 	vm:set_data(data)
 	minetest.generate_ores(vm, minp, maxp)
 	vm:set_lighting({day = 0, night = 0})
@@ -448,6 +480,7 @@ function vmg.generate(minp, maxp, seed)
 	vm:update_liquids()
 	vm:write_to_map()
 
+	-- Now mapgen is finished. What an adventure for just generating a chunk ! I hope your processor is speedy and you have enough RAM !
 	local t4 = os.clock()
 	if vmg.loglevel >= 2 then
 		print("[Valleys Mapgen] Data writing finished in " .. displaytime(t4-t3))
@@ -457,13 +490,14 @@ function vmg.generate(minp, maxp, seed)
 	end
 end
 
+-- Trees are registered in a separate file
 dofile(vmg.path .. "/trees.lua")
 
 function vmg.get_humidity_raw(pos)
-	local v13 = vmg.get_noise(pos, 13)
-	local v15 = vmg.get_noise(pos, 15)
-	local v18 = vmg.get_noise(pos, 18)
-	return 2 ^ (v13 - v15 + v18 * 2)
+	local v13 = vmg.get_noise(pos, 13) -- Clayey soil : wetter
+	local v15 = vmg.get_noise(pos, 15) -- Sandy soil : drier
+	local v18 = vmg.get_noise(pos, 18) -- Humidity noise
+	return 2 ^ (v13 - v15 + v18 * 2) -- Make sure that humidity is positive. Humidity is between 0.25 and 16.
 end
 
 function vmg.get_humidity(pos)
@@ -471,32 +505,33 @@ function vmg.get_humidity(pos)
 	local flatpos = pos2d(pos)
 	local hraw = vmg.get_humidity_raw(flatpos)
 
+	-- Get base ground level to know the river level that influences humidity
 	local v1 = vmg.get_noise(flatpos, 1)
 	local v3 = vmg.get_noise(flatpos, 3) ^ 2
 	local base_ground = v1 + v3
-	local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
-	local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0)
-	local water = sea_water + (1 - sea_water) * river_water
+	local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0) -- At the sea level, sea_water is 1. Every 6 nodes height divide it by 2.
+	local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0) -- At the river level, river_water is 1. Every 3 nodes height divide it by 2.
+	local water = sea_water + (1 - sea_water) * river_water -- A simple sum is not satisfactory, because it may be bigger than 1.
 	return hraw + water
 end
 
 function vmg.get_temperature(pos)
-	local v12 = vmg.get_noise(pos, 12) + 1
-	local v17 = vmg.get_noise(pos, 17)
+	local v12 = vmg.get_noise(pos, 12) + 1 -- Lava noise for underground
+	local v17 = vmg.get_noise(pos, 17) -- Climate noise
 	local y = pos.y
 	if y > 0 then
-		return v17 * 0.5 ^ (y / altitude_chill)
+		return v17 * 0.5 ^ (y / altitude_chill) -- Divide v17 by 2 by climbing "altitude_chill" nodes
 	else
-		return v17 * 0.5 ^ (-y / altitude_chill) + 20 * v12 * (1 - 2 ^ (y / lava_depth))
+		return v17 * 0.5 ^ (-y / altitude_chill) + 20 * v12 * (1 - 2 ^ (y / lava_depth)) -- Underground, v17 less and less matter. So, gradually replace it by another calculation method, based on lava. Sorry: I don't remember the sense ofthis code :/
 	end
 end
 
 function vmg.get_noise(pos, i)
 	local n = vmg.noises[i]
 	local noise = minetest.get_perlin(n.seed, n.octaves, n.persist, 1)
-	if not pos.z then
+	if not pos.z then -- 2D noise
 		return noise:get2d({x = pos.x / n.spread.x, y = pos.y / n.spread.y}) * n.scale + n.offset
-	else
+	else -- 3D noise
 		return noise:get3d({x = pos.x / n.spread.x, y = pos.y / n.spread.y, z = pos.z / n.spread.z}) * n.scale + n.offset
 	end
 end
@@ -506,47 +541,52 @@ local function round(n)
 end
 
 function vmg.get_elevation(pos)
-	local v1 = vmg.get_noise(pos, 1)
-	local v2 = math.abs(vmg.get_noise(pos, 2)) - river_size
-	local v3 = vmg.get_noise(pos, 3) ^ 2
+	local v1 = vmg.get_noise(pos, 1) -- base ground
+	local v2 = math.abs(vmg.get_noise(pos, 2)) - river_size -- valleys
+	local v3 = vmg.get_noise(pos, 3) ^ 2 -- valleys depth
 	local base_ground = v1 + v3
-	if v2 < 0 then
+	if v2 < 0 then -- river
 		return math.ceil(base_ground), true
 	end
-	local v4 = vmg.get_noise(pos, 4)
-	local v5 = vmg.get_noise(pos, 5)
+	local v4 = vmg.get_noise(pos, 4) -- valleys profile
+	local v5 = vmg.get_noise(pos, 5) -- inter-valleys slopes
+	-- Same calculation than in vmg.generate
 	local base_ground = v1 + v3
 	local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2))
 	local mountain_ground = base_ground + valleys
-	local pos = pos3d(pos, round(mountain_ground))
+	local pos = pos3d(pos, round(mountain_ground)) -- For now we don't know the elevation. We will test some y values. Set the position to montain_ground which is the most probable value.
 	local slopes = v5 * valleys
-	if vmg.get_noise(pos, 6) * slopes > pos.y - mountain_ground then
+	if vmg.get_noise(pos, 6) * slopes > pos.y - mountain_ground then -- Position is in the ground, so look for air higher
 		pos.y = pos.y + 1
 		while vmg.get_noise(pos, 6) * slopes > pos.y - mountain_ground do
 			pos.y = pos.y + 1
-		end
-		return pos.y, false
-	else
+		end -- End of the loop when there is air
+		return pos.y, false -- Return position of the first air node, and false because that's not a river
+	else -- Position is not in the ground, so look for dirt lower
 		pos.y = pos.y - 1
 		while vmg.get_noise(pos, 6) * slopes <= pos.y - mountain_ground do
 			pos.y = pos.y - 1
-		end
-		return pos.y, false
+		end -- End of the loop when there is dirt (or any ground)
+		pos.y = pos.y + 1 -- We have the latest dirt node and we want the first air node that is just above
+		return pos.y, false -- Return position of the first air node, and false because that's not a river
 	end
 end
 
 function vmg.spawnplayer(player)
+	-- Choose a point to spawn the player, from an angle, and a distance from (0;0)
 	local angle = math.random() * math.pi * 2
 	local distance = math.random() * player_max_distance
-	local p_angle = {x = math.cos(angle), y = math.sin(angle)}
-	local pos = {x = -p_angle.x * distance, y = -p_angle.y * distance}
-	local elevation, river = vmg.get_elevation(pos)
-	while elevation < water_level + 2 or river do
-		pos.x = pos.x + p_angle.x
-		pos.y = pos.y + p_angle.y
+	local p_angle = {x = math.cos(angle), y = math.sin(angle)} -- Get a position on the trigonometric circle. This position is exactely at 1 unit from (0;0)
+	local pos = {x = p_angle.x * distance, y = p_angle.y * distance} -- Multiply it by distance, to get the position that meets angle and distance
+	local elevation, river = vmg.get_elevation(pos) -- get elevation from the previous function
+	while elevation < water_level + 2 or river do -- If there is water, choose another point
+		-- Move the position by one unit, to (0;0) to avoid spawning farther than player_max_distance.
+		pos.x = pos.x - p_angle.x
+		pos.y = pos.y - p_angle.y
+		-- and check again
 		elevation, river = vmg.get_elevation({x = round(pos.x), y = round(pos.y)})
-	end
-	pos = {x = round(pos.x), y = round(elevation + 1), z = round(pos.y)}
+	end -- end of the loop when pos is not in the water
+	pos = {x = round(pos.x), y = round(elevation + 1), z = round(pos.y)} -- Round position and add elevation
 	player:setpos(pos)
-	return true
+	return true -- Disable default player spawner
 end

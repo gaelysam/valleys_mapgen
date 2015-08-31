@@ -1,84 +1,84 @@
-vmg.settings = Settings(minetest.get_worldpath() .. "/vmg.conf")
+vmg.settings = Settings(minetest.get_worldpath() .. "/vmg.conf") -- Create settings object
 
 local function define_str(flag, default, write_to_config)
 	local value = vmg.settings:get(flag)
-	if value then
+	if value then -- This flag exists in vmg.conf, return its value
 		return value, true
 	else
-		local on_config = minetest.setting_get("vmg_" .. flag)
-		if on_config then
+		local on_config = minetest.setting_get("vmg_" .. flag) -- get this flag in minetest.conf
+		if on_config then -- This flag exists in minetest.conf, so return its value
 			vmg.settings:set(flag, on_config)
 			return on_config, false
-		else
+		else -- Flag don't exist anywhere, so the default value will be written in settings and returned
 			if write_to_config then
-				minetest.setting_set("vmg_" .. flag, default)
+				minetest.setting_set("vmg_" .. flag, default) -- write to minetest.conf if write_to_config is enabled (usually disabled)
 			end
-			vmg.settings:set(flag, default)
-			return default, false
+			vmg.settings:set(flag, default) -- write to vmg.conf
+			return default, false -- return default value
 		end
 	end
 end
 
 local function define_num(flag, default, write_to_config)
 	local value = vmg.settings:get(flag)
-	if value then
+	if value then -- This flag exists in vmg.conf, return its value
 		return tonumber(value), true
 	else
-		local on_config = minetest.setting_get("vmg_" .. flag)
-		if on_config then
+		local on_config = minetest.setting_get("vmg_" .. flag) -- get this flag in minetest.conf
+		if on_config then -- This flag exists in minetest.conf, so return its value
 			vmg.settings:set(flag, on_config)
 			return tonumber(on_config), false
-		else
+		else -- Flag don't exist anywhere, so the default value will be written in settings and returned
 			if write_to_config then
-				minetest.setting_set("vmg_" .. flag, default)
+				minetest.setting_set("vmg_" .. flag, default) -- write to minetest.conf if write_to_config is enabled (usually disabled)
 			end
-			vmg.settings:set(flag, default)
-			return default, false
+			vmg.settings:set(flag, default) -- write to vmg.conf
+			return default, false -- return default value
 		end
 	end
 end
 
 local function define_bool(flag, default, write_to_config)
 	local value = vmg.settings:get_bool(flag)
-	if value ~= nil then
+	if value ~= nil then -- This flag exists in vmg.conf, return its value
 		return value, true
 	else
-		local on_config = minetest.setting_getbool("vmg_" .. flag)
-		if on_config ~= nil then
+		local on_config = minetest.setting_getbool("vmg_" .. flag) -- get this flag in minetest.conf
+		if on_config ~= nil then -- This flag exists in minetest.conf, so return its value
 			vmg.settings:set(flag, tostring(on_config))
 			return on_config, false
-		else
+		else -- Flag don't exist anywhere, so the default value will be written in settings and returned
 			if write_to_config then
-				minetest.setting_setbool("vmg_" .. flag, default)
+				minetest.setting_setbool("vmg_" .. flag, default) -- write to minetest.conf if write_to_config is enabled (usually disabled)
 			end
-			vmg.settings:set(flag, tostring(default))
-			return default, false
+			vmg.settings:set(flag, tostring(default)) -- write to vmg.conf
+			return default, false -- return default value
 		end
 	end
 end
 
 local function define_noise(flag, default, write_to_config)
 	local value = vmg.settings:get(flag)
-	if value then
+	if value then -- This flag exists in vmg.conf, return its value
 		return vmg.string_to_noise(value), true
 	else
-		local on_config = minetest.setting_get("vmg_" .. flag)
-		if on_config then
+		local on_config = minetest.setting_get("vmg_" .. flag) -- get this flag in minetest.conf
+		if on_config then -- This flag exists in minetest.conf, so return its value
 			vmg.settings:set(flag, on_config)
 			return vmg.string_to_noise(on_config), false
-		else
+		else -- Flag don't exist anywhere, so the default value will be written in settings and returned
 			local str_default = vmg.noise_to_string(default)
 			if write_to_config then
-				minetest.setting_set("vmg_" .. flag, str_default)
+				minetest.setting_set("vmg_" .. flag, str_default) -- write to minetest.conf if write_to_config is enabled (usually disabled)
 			end
-			vmg.settings:set(flag, str_default)
-			return default, false
+			vmg.settings:set(flag, str_default) -- write to vmg.conf
+			return default, false -- return default value
 		end
 	end
 end
 
 function vmg.define(flag, default, write_to_config)
-	local typeval = type(default)
+	local typeval = type(default) -- Select function from the type of the default value
 	if typeval == "string" then
 		return define_str(flag, default, write_to_config)
 	elseif typeval == "number" then

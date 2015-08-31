@@ -11,6 +11,7 @@ local function can_grow(pos) -- from default mod
 	return true
 end
 
+-- Fir sapling growth
 minetest.register_abm({
 	nodenames = {"valleys_mapgen:fir_sapling"},
 	interval = 14,
@@ -26,11 +27,13 @@ minetest.register_abm({
 	end
 })
 
-function default.grow_tree(pos, is_apple_tree)
+function default.grow_tree(pos, is_apple_tree) -- Override default function to generate VMG trees
+	-- individual parameters
 	local rand = math.random()
 	local height = math.floor(4 + 2.5 * rand)
 	local radius = 3 + rand
 
+	-- VoxelManip stuff
 	local leaves = minetest.get_content_id("default:leaves")
 	local trunk = minetest.get_content_id("default:tree")
 	local air = minetest.get_content_id("air")
@@ -111,26 +114,26 @@ function vmg.make_tree(pos, data, area, height, radius, trunk, leaves, air, igno
 	if vmg.loglevel >= 3 then
 		print("[Valleys Mapgen] Generating tree at " .. minetest.pos_to_string(pos) .. " ...")
 	end
-	local ystride = area.ystride
+	local ystride = area.ystride -- Useful to get the index above
 	local iv = area:indexp(pos)
-	for i = 1, height do
+	for i = 1, height do -- Build the trunk
 		data[iv] = trunk
-		iv = iv + ystride
+		iv = iv + ystride -- increment by one node up
 	end
-	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.5}
-	pos.y = pos.y + height - 1
-	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius, z = radius}, np)
+	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.5} -- VMG trees use a PerlinNoise to place leaves
+	pos.y = pos.y + height - 1 -- pos was at the sapling position. By adding height we have the first air node above the trunk, so subtract 1 to get the highest trunk node.
+	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius, z = radius}, np) -- Generate leaves
 end
 
-function vmg.make_apple_tree(pos, data, area, height, radius, trunk, leaves, fruit, air, ignore)
+function vmg.make_apple_tree(pos, data, area, height, radius, trunk, leaves, fruit, air, ignore) -- Same code but with apples
 	if vmg.loglevel >= 3 then
 		print("[Valleys Mapgen] Generating apple tree at " .. minetest.pos_to_string(pos) .. " ...")
 	end
-	local ystride = area.ystride
+	local ystride = area.ystride -- Useful to get the index above
 	local iv = area:indexp(pos)
-	for i = 1, height do
+	for i = 1, height do -- Build the trunk
 		data[iv] = trunk
-		iv = iv + ystride
+		iv = iv + ystride -- increment by one node up
 	end
 	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.5}
 	pos.y = pos.y + height - 1
@@ -141,10 +144,10 @@ local function make_jungle_root(x0, y0, z0, data, area, tree, air)
 	local ystride = area.ystride
 	local ybot = y0 - 1
 	for x = x0 - 1, x0 + 1 do
-		for z = z0 - 1, z0 + 1 do
+		for z = z0 - 1, z0 + 1 do -- iterate in a 3x3 square around the trunk
 			local iv = area:index(x, ybot, z)
 			for i = 0, 5 do
-				if data[iv] == air then
+				if data[iv] == air then -- find the ground level
 					if math.random() < 0.6 then
 						data[iv-ystride] = tree -- make jungle tree below
 						if math.random() < 0.6 then
@@ -153,7 +156,7 @@ local function make_jungle_root(x0, y0, z0, data, area, tree, air)
 					end
 					break
 				end
-				iv = iv + ystride
+				iv = iv + ystride -- increment by one node up
 			end
 		end
 	end
@@ -163,11 +166,11 @@ function vmg.make_jungle_tree(pos, data, area, height, radius, trunk, leaves, ai
 	if vmg.loglevel >= 3 then
 		print("[Valleys Mapgen] Generating jungle tree at " .. minetest.pos_to_string(pos) .. " ...")
 	end
-	local ystride = area.ystride
+	local ystride = area.ystride -- Useful to get the index above
 	local iv = area:indexp(pos)
-	for i = 1, height do
+	for i = 1, height do -- Build the trunk
 		data[iv] = trunk
-		iv = iv + ystride
+		iv = iv + ystride -- increment by one node up
 	end
 	vmg.register_after_mapgen(make_jungle_root, pos.x, pos.y, pos.z, data, area, trunk, air)
 	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.8}
@@ -179,11 +182,11 @@ function vmg.make_fir_tree(pos, data, area, height, radius, trunk, leaves, air, 
 	if vmg.loglevel >= 3 then
 		print("[Valleys Mapgen] Generating fir tree at " .. minetest.pos_to_string(pos) .. " ...")
 	end
-	local ystride = area.ystride
+	local ystride = area.ystride -- Useful to get the index above
 	local iv = area:indexp(pos)
-	for i = 1, height do
+	for i = 1, height do -- Build the trunk
 		data[iv] = trunk
-		iv = iv + ystride
+		iv = iv + ystride -- increment by one node up
 	end
 
 	-- add leaves on the top (4% 0 ; 36% 1 ; 60% 2)
@@ -214,9 +217,9 @@ function vmg.make_pine_tree(pos, data, area, height, radius, trunk, leaves, air,
 	if vmg.loglevel >= 3 then
 		print("[Valleys Mapgen] Generating pine tree at " .. minetest.pos_to_string(pos) .. " ...")
 	end
-	local ystride = area.ystride
+	local ystride = area.ystride -- Useful to get the index above
 	local iv = area:indexp(pos)
-	for i = 1, height do
+	for i = 1, height do -- Build the trunk
 		data[iv] = trunk
 		iv = iv + ystride
 	end
@@ -236,9 +239,9 @@ function vmg.make_pine_tree(pos, data, area, height, radius, trunk, leaves, air,
 	local midradius = radius / 2
 
 	pos.y = pos.y + height - 1
-	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = 1.5, z = radius}, np)
-	while pos.y >= min_height do
-		local angle, distance = math.random() * 2 * math.pi, math.random() * midradius
+	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = 1.5, z = radius}, np) -- The first leavesblob at the top
+	while pos.y >= min_height do -- Lower leavesblobs
+		local angle, distance = math.random() * 2 * math.pi, math.random() * midradius -- For the pine tree, lower leavesblobs are smaller and shifted
 		local cos, sin = math.cos(angle) * distance, math.sin(angle) * distance
 		local bpos = {x = pos.x + cos, y = pos.y, z = pos.z + sin}
 		vmg.make_leavesblob(bpos, data, area, leaves, air, ignore, {x = midradius, y = 1.5, z = midradius}, np)
@@ -247,13 +250,12 @@ function vmg.make_pine_tree(pos, data, area, height, radius, trunk, leaves, air,
 end
 
 function vmg.make_leavesblob(pos, data, area, leaves, air, ignore, radius, np, fruit_chance, fruit)
-	local count = 0
 	fruit_chance = fruit_chance or 0
 
-	np.seed = math.random(0, 16777215)
-	local minp = vector.subtract(pos, radius)
-	local maxp = vector.add(pos, radius)
-	local int_minp = {x = math.floor(minp.x), y = math.floor(minp.y), z = math.floor(minp.z)}
+	np.seed = math.random(0, 16777215) -- noise seed
+	local minp = vector.subtract(pos, radius) -- minimal corner of the leavesblob
+	local maxp = vector.add(pos, radius) -- maximal corner of the leavesblob
+	local int_minp = {x = math.floor(minp.x), y = math.floor(minp.y), z = math.floor(minp.z)} -- Same positions, but with integer coordinates
 	local int_maxp = {x = math.ceil(maxp.x), y = math.ceil(maxp.y), z = math.ceil(maxp.z)}
 
 	local length = vector.subtract(int_maxp, int_minp)
@@ -261,18 +263,19 @@ function vmg.make_leavesblob(pos, data, area, leaves, air, ignore, radius, np, f
 	local obj = minetest.get_perlin_map(np, chulens)
 	local pmap = obj:get3dMap_flat(minp)
 	local i = 1
+	-- iterate for every position
+	-- calculate the distance from the center by the Pythagorean theorem: d = sqrt(x²+y²+z²)
 	for x = int_minp.x, int_maxp.x do
-		local xval = ((x - pos.x) / radius.x) ^ 2
+		local xval = ((x - pos.x) / radius.x) ^ 2 -- calculate x², y², z² separately, to avoid recalculating x² for every y or z iteration. Divided by the radius to scale it to 0…1
 		for y = int_minp.y, int_maxp.y do
 			local yval = ((y - pos.y) / radius.y) ^ 2
 			for z = int_minp.z, int_maxp.z do
 				local zval = ((z - pos.z) / radius.z) ^ 2
-				local dist = math.sqrt(xval + yval + zval)
-				local nval = pmap[i]
-				if nval > dist then
+				local dist = math.sqrt(xval + yval + zval) -- Calculate the distance
+				local nval = pmap[i] -- Get the noise value
+				if nval > dist then -- if the noise is bigger than the distance, make leaves
 					local iv = area:index(x, y, z)
 					if data[iv] == air or data[iv] == ignore then
-						count = count + 1
 						if math.random() < fruit_chance then
 							data[iv] = fruit
 						else
@@ -280,7 +283,7 @@ function vmg.make_leavesblob(pos, data, area, leaves, air, ignore, radius, np, f
 						end
 					end
 				end
-				i = i + 1
+				i = i + 1 -- increment noise index
 			end
 		end
 	end
