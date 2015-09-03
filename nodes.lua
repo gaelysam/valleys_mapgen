@@ -186,6 +186,78 @@ minetest.register_craft({
 	}
 })
 
+minetest.register_node("valleys_mapgen:huge_mushroom_cap", {
+	description = "Huge Mushroom Cap",
+	tiles = {"vmg_mushroom_giant_cap.jpg", "vmg_mushroom_giant_under.jpg", "vmg_mushroom_giant_cap.jpg"},
+	is_ground_content = false,
+	paramtype = "light",
+	drawtype = "nodebox",
+	node_box = { type = "fixed", 
+		fixed = {
+			{-0.5, -0.5, -0.33, 0.5, -0.33, 0.33}, 
+			{-0.33, -0.5, 0.33, 0.33, -0.33, 0.5}, 
+			{-0.33, -0.5, -0.33, 0.33, -0.33, -0.5}, 
+			{-0.33, -0.33, -0.33, 0.33, -0.17, 0.33}, 
+		} },
+	light_source = 1,
+	groups = {oddly_breakable_by_hand=1, dig_immediate=3, flammable=2},
+})
+
+minetest.register_node("valleys_mapgen:giant_mushroom_cap", {
+	description = "Giant Mushroom Cap",
+	tiles = {"vmg_mushroom_giant_cap.jpg", "vmg_mushroom_giant_under.jpg", "vmg_mushroom_giant_cap.jpg"},
+	is_ground_content = false,
+	paramtype = "light",
+	drawtype = "nodebox",
+	node_box = { type = "fixed", 
+		fixed = {
+			{-0.75, -0.5, -0.4, 0.75, -0.25, 0.4}, 
+			{-0.4, -0.5, 0.4, 0.4, -0.25, 0.75}, 
+			{-0.4, -0.5, -0.4, 0.4, -0.25, -0.75}, 
+			{-0.4, -0.25, -0.4, 0.4, 0.0, 0.4}, 
+		} },
+	light_source = 1,
+	groups = {oddly_breakable_by_hand=1, dig_immediate=3, flammable=2},
+})
+
+minetest.register_node("valleys_mapgen:giant_mushroom_stem", {
+	description = "Giant Mushroom Stem",
+	tiles = {"vmg_mushroom_giant_under.jpg", "vmg_mushroom_giant_under.jpg", "vmg_mushroom_giant_stem.jpg"},
+	is_ground_content = false,
+	groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
+	sounds = default.node_sound_wood_defaults(),
+	paramtype = "light",
+	drawtype = "nodebox",
+	node_box = { type = "fixed", fixed = { {-0.25, -0.5, -0.25, 0.25, 0.5, 0.25}, }},
+})
+
+minetest.register_craft({
+	output = "default:wood",
+	recipe = {
+		{"valleys_mapgen:giant_mushroom_stem"}
+	}
+})
+
+minetest.register_craftitem("valleys_mapgen:mushroom_steak", {
+	description = "Mushroom Steak",
+	inventory_image = "vmg_mushroom_steak.png",
+	on_use = minetest.item_eat(4),
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "valleys_mapgen:mushroom_steak",
+	recipe = "valleys_mapgen:huge_mushroom_cap",
+	cooktime = 2,
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "valleys_mapgen:mushroom_steak 2",
+	recipe = "valleys_mapgen:giant_mushroom_cap",
+	cooktime = 2,
+})
+
 -- Change leafdecay ratings
 minetest.add_group("default:leaves", {leafdecay = 5})
 minetest.add_group("default:jungleleaves", {leafdecay = 8})

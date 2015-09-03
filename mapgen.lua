@@ -96,6 +96,7 @@ local caves_size = vmg.define("caves_size", 7) / 100
 local lava_depth = vmg.define("lava_depth", 2000)
 local lava_max_height = vmg.define("lava_max_height", -1)
 local altitude_chill = vmg.define("altitude_chill", 90)
+local do_cave_stuff = vmg.define("cave_stuff", false)
 
 local average_stone_level = vmg.define("average_stone_level", 180)
 local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 0.5)
@@ -189,6 +190,9 @@ function vmg.generate(minp, maxp, seed)
 	local c_dandelion_yellow = minetest.get_content_id("flowers:dandelion_yellow")
 	local c_mushroom_fertile_brown = minetest.get_content_id("flowers:mushroom_fertile_brown")
 	local c_mushroom_fertile_red = minetest.get_content_id("flowers:mushroom_fertile_red")
+	local c_huge_mushroom_cap = minetest.get_content_id("valleys_mapgen:huge_mushroom_cap")
+	local c_giant_mushroom_cap = minetest.get_content_id("valleys_mapgen:giant_mushroom_cap")
+	local c_giant_mushroom_stem = minetest.get_content_id("valleys_mapgen:giant_mushroom_stem")
 
 	-- Air and Ignore
 	local c_air = minetest.get_content_id("air")
@@ -449,6 +453,45 @@ function vmg.generate(minp, maxp, seed)
 						end
 					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
 						data[ivm] = c_lava
+					elseif do_cave_stuff then
+						-- mushrooms and water in caves -- djr
+						-- check how much air we have til we reach stone
+						local air_to_stone = -1
+						for i = 1,3 do
+							local d = data[ivm - (ystride * i)]
+							if d ~= c_air then
+								if d == c_stone then
+									air_to_stone = i
+								end
+								break
+							end
+						end
+
+						if air_to_stone == 1 and math.random() < 0.08 then
+							local r = math.random()
+							if r < 0.03 then
+								data[ivm] = c_water
+							elseif r < 0.1 then
+								-- reserved
+							elseif r < 0.3 then
+								data[ivm - ystride] = c_dirt
+								data[ivm] = c_mushroom_fertile_red
+							elseif r < 0.5 then
+								data[ivm - ystride] = c_dirt
+								data[ivm] = c_mushroom_fertile_brown
+							else  -- leave some extra dirt, for appearances sake
+								data[ivm - ystride] = c_dirt
+							end
+						elseif air_to_stone == 2 and math.random() < 0.015 then
+							data[ivm] = c_huge_mushroom_cap
+							data[ivm - ystride] = c_giant_mushroom_stem
+							data[ivm - (ystride * 2)] = c_dirt
+						elseif air_to_stone == 3 and math.random() < 0.01 then
+							data[ivm] = c_giant_mushroom_cap
+							data[ivm - ystride] = c_giant_mushroom_stem
+							data[ivm - (ystride * 2)] = c_giant_mushroom_stem
+							data[ivm - (ystride * 3)] = c_dirt
+						end
 					end
 				elseif y <= water_level then -- if pos is not in the ground, and below water_level, it's an ocean
 					data[ivm] = c_water
