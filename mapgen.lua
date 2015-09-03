@@ -187,6 +187,8 @@ function vmg.generate(minp, maxp, seed)
 	local c_viola = minetest.get_content_id("flowers:viola")
 	local c_dandelion_white = minetest.get_content_id("flowers:dandelion_white")
 	local c_dandelion_yellow = minetest.get_content_id("flowers:dandelion_yellow")
+	local c_mushroom_fertile_brown = minetest.get_content_id("flowers:mushroom_fertile_brown")
+	local c_mushroom_fertile_red = minetest.get_content_id("flowers:mushroom_fertile_red")
 
 	-- Air and Ignore
 	local c_air = minetest.get_content_id("air")
@@ -423,6 +425,12 @@ function vmg.generate(minp, maxp, seed)
 											data[ivm2] = c_dandelion_white
 										else
 											data[ivm2] = c_dandelion_yellow
+										end
+									elseif math.random() < 0.02 and temp > 1.2 and temp < 1.6 and humidity > 0.5 and v13 < 0.5 and v14 < 0.5 and v15 < 0.5 then -- Mushrooms -- djr
+										if math.random() < 0.5 then
+											data[ivm2] = c_mushroom_fertile_red
+										else
+											data[ivm2] = c_mushroom_fertile_brown
 										end
 									end
 								end
