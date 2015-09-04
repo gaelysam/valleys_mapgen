@@ -158,6 +158,7 @@ function vmg.generate(minp, maxp, seed)
 	local c_riverwater = minetest.get_content_id("default:river_water_source")
 	local c_lava = minetest.get_content_id("default:lava_source")
 	local c_snow_layer = minetest.get_content_id("default:snow")
+	local c_glowing_fungal_stone = minetest.get_content_id("valleys_mapgen:glowing_fungal_stone")
 
 	-- Tree nodes
 	local c_tree = minetest.get_content_id("default:tree")
@@ -261,6 +262,8 @@ function vmg.generate(minp, maxp, seed)
 	local i3d_decrX = chulens.x * chulens.y * chulens.z - 1
 	local i3d_sup_decrX = chulens.x * (chulens.y + 6) * chulens.z - 1
 
+	local last_cave_block = {x,y,z}
+
 	for x = minp.x, maxp.x do -- for each YZ plane
 		for z = minp.z, maxp.z do -- for each vertical line in this plane
 			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16, v18 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d] -- take the noise values for 2D noises
@@ -328,6 +331,10 @@ function vmg.generate(minp, maxp, seed)
 				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
 				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d] -- take the noise values for 3D noises
 				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size -- The 4 cave noises must be close to zero to produce a cave. The square is used for 2 reasons : we need positive values, and, for mathematical reasons, it results in more circular caves.
+				if do_cave_stuff and is_cave then
+					last_cave_block = {x,y,z}
+				end
+
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
 					if not is_cave then -- if pos is not inside a cave
 						local thickness = v7 - math.sqrt(math.abs(y)) / dirt_thickness -- Calculate dirt thickness, according to noise #7, dirt thickness parameter, and elevation (y coordinate)
@@ -449,7 +456,11 @@ function vmg.generate(minp, maxp, seed)
 								data[ivm] = dirt
 							end
 						else
-							data[ivm] = c_stone
+							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.05 then
+								data[ivm] = c_glowing_fungal_stone
+							else
+								data[ivm] = c_stone
+							end
 						end
 					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
 						data[ivm] = c_lava

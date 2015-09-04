@@ -188,7 +188,7 @@ minetest.register_craft({
 
 minetest.register_node("valleys_mapgen:huge_mushroom_cap", {
 	description = "Huge Mushroom Cap",
-	tiles = {"vmg_mushroom_giant_cap.jpg", "vmg_mushroom_giant_under.jpg", "vmg_mushroom_giant_cap.jpg"},
+	tiles = {"vmg_mushroom_giant_cap.png", "vmg_mushroom_giant_under.png", "vmg_mushroom_giant_cap.png"},
 	is_ground_content = false,
 	paramtype = "light",
 	drawtype = "nodebox",
@@ -199,13 +199,13 @@ minetest.register_node("valleys_mapgen:huge_mushroom_cap", {
 			{-0.33, -0.5, -0.33, 0.33, -0.33, -0.5}, 
 			{-0.33, -0.33, -0.33, 0.33, -0.17, 0.33}, 
 		} },
-	light_source = 1,
+	light_source = 4,
 	groups = {oddly_breakable_by_hand=1, dig_immediate=3, flammable=2},
 })
 
 minetest.register_node("valleys_mapgen:giant_mushroom_cap", {
 	description = "Giant Mushroom Cap",
-	tiles = {"vmg_mushroom_giant_cap.jpg", "vmg_mushroom_giant_under.jpg", "vmg_mushroom_giant_cap.jpg"},
+	tiles = {"vmg_mushroom_giant_cap.png", "vmg_mushroom_giant_under.png", "vmg_mushroom_giant_cap.png"},
 	is_ground_content = false,
 	paramtype = "light",
 	drawtype = "nodebox",
@@ -216,13 +216,13 @@ minetest.register_node("valleys_mapgen:giant_mushroom_cap", {
 			{-0.4, -0.5, -0.4, 0.4, -0.25, -0.75}, 
 			{-0.4, -0.25, -0.4, 0.4, 0.0, 0.4}, 
 		} },
-	light_source = 1,
+	light_source = 8,
 	groups = {oddly_breakable_by_hand=1, dig_immediate=3, flammable=2},
 })
 
 minetest.register_node("valleys_mapgen:giant_mushroom_stem", {
 	description = "Giant Mushroom Stem",
-	tiles = {"vmg_mushroom_giant_under.jpg", "vmg_mushroom_giant_under.jpg", "vmg_mushroom_giant_stem.jpg"},
+	tiles = {"vmg_mushroom_giant_under.png", "vmg_mushroom_giant_under.png", "vmg_mushroom_giant_stem.png"},
 	is_ground_content = false,
 	groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
 	sounds = default.node_sound_wood_defaults(),
@@ -256,6 +256,54 @@ minetest.register_craft({
 	output = "valleys_mapgen:mushroom_steak 2",
 	recipe = "valleys_mapgen:giant_mushroom_cap",
 	cooktime = 2,
+})
+
+minetest.register_node("valleys_mapgen:glowing_fungal_stone", {
+	description = "Glowing Fungal Stone",
+	tiles = {"default_stone.png^vmg_glowing_fungal.png",},
+	is_ground_content = true,
+	light_source = 8,
+	groups = {cracky=3, stone=1},
+	drop = {items={ {items={"default:cobble"},}, {items={"valleys_mapgen:glowing_fungus",},},},},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("valleys_mapgen:glowing_fungus", {
+	description = "Glowing Fungus",
+	inventory_image = "vmg_glowing_fungus.png",
+})
+
+minetest.register_node("valleys_mapgen:moon_juice", {
+	description = "Moon Juice",
+	inventory_image = "vmg_moon_juice.png",
+})
+
+minetest.register_node("valleys_mapgen:moon_glass", {
+	description = "Moon Glass",
+	drawtype = "glasslike",
+	tiles = {"default_glass.png",},
+	is_ground_content = true,
+	light_source = 14,
+	groups = {cracky=3},
+	sounds = default.node_sound_glass_defaults(),
+})
+
+minetest.register_craft({
+	output = "valleys_mapgen:moon_juice",
+	recipe = {
+		{"valleys_mapgen:glowing_fungus", "valleys_mapgen:glowing_fungus", "valleys_mapgen:glowing_fungus"},
+		{"valleys_mapgen:glowing_fungus", "valleys_mapgen:glowing_fungus", "valleys_mapgen:glowing_fungus"},
+		{"valleys_mapgen:glowing_fungus", "vessels:glass_bottle", "valleys_mapgen:glowing_fungus"},
+	},
+})
+
+minetest.register_craft({
+	output = "valleys_mapgen:moon_glass",
+	recipe = {
+		{"default:glass", "default:glass", "default:glass"},
+		{"default:glass", "valleys_mapgen:moon_juice", "default:glass"},
+		{"default:glass", "default:glass", "default:glass"},
+	},
 })
 
 -- Change leafdecay ratings
