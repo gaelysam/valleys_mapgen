@@ -211,10 +211,11 @@ minetest.register_node("valleys_mapgen:giant_mushroom_cap", {
 	drawtype = "nodebox",
 	node_box = { type = "fixed", 
 		fixed = {
-			{-0.75, -0.5, -0.4, 0.75, -0.25, 0.4}, 
-			{-0.4, -0.5, 0.4, 0.4, -0.25, 0.75}, 
-			{-0.4, -0.5, -0.4, 0.4, -0.25, -0.75}, 
-			{-0.4, -0.25, -0.4, 0.4, 0.0, 0.4}, 
+			{-0.4, -0.5, -0.4, 0.4, 0.0, 0.4},
+			{-0.75, -0.5, -0.4, -0.4, -0.25, 0.4},
+			{0.4, -0.5, -0.4, 0.75, -0.25, 0.4},
+			{-0.4, -0.5, -0.75, 0.4, -0.25, -0.4},
+			{-0.4, -0.5, 0.4, 0.4, -0.25, 0.75},
 		} },
 	light_source = 8,
 	groups = {oddly_breakable_by_hand=1, dig_immediate=3, flammable=2},
@@ -300,9 +301,9 @@ minetest.register_craft({
 minetest.register_craft({
 	output = "valleys_mapgen:moon_glass",
 	recipe = {
-		{"default:glass", "default:glass", "default:glass"},
-		{"default:glass", "valleys_mapgen:moon_juice", "default:glass"},
-		{"default:glass", "default:glass", "default:glass"},
+		{"", "valleys_mapgen:moon_juice", ""},
+		{"", "valleys_mapgen:moon_juice", ""},
+		{"", "default:glass", ""},
 	},
 })
 
