@@ -200,7 +200,7 @@ minetest.register_node("valleys_mapgen:huge_mushroom_cap", {
 			{-0.33, -0.33, -0.33, 0.33, -0.17, 0.33}, 
 		} },
 	light_source = 4,
-	groups = {oddly_breakable_by_hand=1, dig_immediate=3, flammable=2},
+	groups = {oddly_breakable_by_hand=1, dig_immediate=3, flammable=2, plant=1},
 })
 
 minetest.register_node("valleys_mapgen:giant_mushroom_cap", {
@@ -218,14 +218,14 @@ minetest.register_node("valleys_mapgen:giant_mushroom_cap", {
 			{-0.4, -0.5, 0.4, 0.4, -0.25, 0.75},
 		} },
 	light_source = 8,
-	groups = {oddly_breakable_by_hand=1, dig_immediate=3, flammable=2},
+	groups = {oddly_breakable_by_hand=1, dig_immediate=3, flammable=2, plant=1},
 })
 
 minetest.register_node("valleys_mapgen:giant_mushroom_stem", {
 	description = "Giant Mushroom Stem",
 	tiles = {"vmg_mushroom_giant_under.png", "vmg_mushroom_giant_under.png", "vmg_mushroom_giant_stem.png"},
 	is_ground_content = false,
-	groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
+	groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2, plant=1},
 	sounds = default.node_sound_wood_defaults(),
 	paramtype = "light",
 	drawtype = "nodebox",

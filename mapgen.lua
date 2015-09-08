@@ -484,7 +484,7 @@ function vmg.generate(minp, maxp, seed)
 						if air_to_stone == 1 and math.random() < 0.08 then
 							local r = math.random()
 							if r < 0.03 then
-								data[ivm] = c_water
+								data[ivm] = c_riverwater
 							elseif r < 0.1 then
 								-- reserved
 							elseif r < 0.3 then
