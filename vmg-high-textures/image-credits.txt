@@ -9,6 +9,10 @@ vmg_fir_tree  https://commons.wikimedia.org/wiki/File:SubalpineFir_7753t.jpg
 vmg_fir_tree_top  https://commons.wikimedia.org/wiki/File:Pseudotsuga_menziesii_cut_trunk.jpg
 vmg_red_clay  https://commons.wikimedia.org/wiki/File:Clay_Store.jpg
 vmg_silt  https://en.wikipedia.org/wiki/File:Silt_deposition_at_Kosi_embankment_at_Navbhata_near_Saharsa.JPG
-vmg_giant_mushroom_stem.jpg  https://en.wikipedia.org/wiki/File:Boletus_edulis_%287%29.jpg
-vmg_giant_mushroom_cap_1.jpg  https://en.wikipedia.org/wiki/File:Agaricus_qtl2.jpg
-vmg_mushroom_steak.png  https://openclipart.org/detail/71713/mushrooms-line-art
+vmg_giant_mushroom_stem  https://en.wikipedia.org/wiki/File:Boletus_edulis_%287%29.jpg
+vmg_giant_mushroom_cap_1  https://en.wikipedia.org/wiki/File:Agaricus_qtl2.jpg
+vmg_mushroom_steak  https://openclipart.org/detail/71713/mushrooms-line-art
+vmg_glow_crystal  https://commons.wikimedia.org/wiki/File:Menthol_Crystals.JPG
+vmg_glowing_fungal  https://commons.wikimedia.org/wiki/File:Pulcherricium_caeruleum,_Cobalt_Crust_fungus.JPG
+vmg_glowing_fungus  https://openclipart.org/detail/184512/green-glob
+vmg_moon_juice  https://openclipart.org/detail/1218/tubo-de-ensaio

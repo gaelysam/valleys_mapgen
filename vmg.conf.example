@@ -56,6 +56,9 @@
 #tree_density = 5
 #    Percent of the lawn nodes that are covered by trees.
 #plant_density = 32
+#cave_stuff = false
+# Add mushrooms and water features to caves.
+
 
 #    NOISES : offset, scale, (spread), seed, octaves, persist, lacunarity
 #    (see mapgen.lua to see what is the role of each noise)

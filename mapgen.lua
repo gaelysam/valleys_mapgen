@@ -96,6 +96,7 @@ local caves_size = vmg.define("caves_size", 7) / 100
 local lava_depth = vmg.define("lava_depth", 2000)
 local lava_max_height = vmg.define("lava_max_height", -1)
 local altitude_chill = vmg.define("altitude_chill", 90)
+local do_cave_stuff = vmg.define("cave_stuff", false)
 
 local average_stone_level = vmg.define("average_stone_level", 180)
 local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 0.5)
@@ -157,6 +158,9 @@ function vmg.generate(minp, maxp, seed)
 	local c_riverwater = minetest.get_content_id("default:river_water_source")
 	local c_lava = minetest.get_content_id("default:lava_source")
 	local c_snow_layer = minetest.get_content_id("default:snow")
+	local c_glowing_fungal_stone = minetest.get_content_id("valleys_mapgen:glowing_fungal_stone")
+	local c_stalactite = minetest.get_content_id("valleys_mapgen:stalactite")
+	local c_stalagmite = minetest.get_content_id("valleys_mapgen:stalagmite")
 
 	-- Tree nodes
 	local c_tree = minetest.get_content_id("default:tree")
@@ -189,6 +193,9 @@ function vmg.generate(minp, maxp, seed)
 	local c_dandelion_yellow = minetest.get_content_id("flowers:dandelion_yellow")
 	local c_mushroom_fertile_brown = minetest.get_content_id("flowers:mushroom_fertile_brown")
 	local c_mushroom_fertile_red = minetest.get_content_id("flowers:mushroom_fertile_red")
+	local c_huge_mushroom_cap = minetest.get_content_id("valleys_mapgen:huge_mushroom_cap")
+	local c_giant_mushroom_cap = minetest.get_content_id("valleys_mapgen:giant_mushroom_cap")
+	local c_giant_mushroom_stem = minetest.get_content_id("valleys_mapgen:giant_mushroom_stem")
 
 	-- Air and Ignore
 	local c_air = minetest.get_content_id("air")
@@ -257,6 +264,8 @@ function vmg.generate(minp, maxp, seed)
 	local i3d_decrX = chulens.x * chulens.y * chulens.z - 1
 	local i3d_sup_decrX = chulens.x * (chulens.y + 6) * chulens.z - 1
 
+	local last_cave_block = {nil,nil,nil}
+
 	for x = minp.x, maxp.x do -- for each YZ plane
 		for z = minp.z, maxp.z do -- for each vertical line in this plane
 			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16, v18 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d] -- take the noise values for 2D noises
@@ -324,6 +333,7 @@ function vmg.generate(minp, maxp, seed)
 				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
 				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d] -- take the noise values for 3D noises
 				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size -- The 4 cave noises must be close to zero to produce a cave. The square is used for 2 reasons : we need positive values, and, for mathematical reasons, it results in more circular caves.
+
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
 					if not is_cave then -- if pos is not inside a cave
 						local thickness = v7 - math.sqrt(math.abs(y)) / dirt_thickness -- Calculate dirt thickness, according to noise #7, dirt thickness parameter, and elevation (y coordinate)
@@ -437,7 +447,16 @@ function vmg.generate(minp, maxp, seed)
 								y = y - 1
 							end
 						elseif above <= 0 then
-							data[ivm] = c_stone
+							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.13 then
+								if data[ivm - ystride] == c_air and math.random() < 0.75 then
+									data[ivm] = c_stone
+									data[ivm - ystride] = c_stalactite
+								else
+									data[ivm] = c_glowing_fungal_stone
+								end
+							else
+								data[ivm] = c_stone
+							end
 						elseif n6[i3d_sup+above*i3d_incrY] * slopes <= y + above - mountain_ground then -- if node at "above" nodes up is not in the ground, make dirt
 							if is_beach and y < beach then
 								data[ivm] = c_sand
@@ -445,10 +464,62 @@ function vmg.generate(minp, maxp, seed)
 								data[ivm] = dirt
 							end
 						else
-							data[ivm] = c_stone
+							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.13 then
+								if data[ivm - ystride] == c_air and math.random() < 0.75 then
+									data[ivm] = c_stone
+									data[ivm - ystride] = c_stalactite
+								else
+									data[ivm] = c_glowing_fungal_stone
+								end
+							else
+								data[ivm] = c_stone
+							end
 						end
 					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
 						data[ivm] = c_lava
+					elseif do_cave_stuff then
+						-- mushrooms and water in caves -- djr
+						last_cave_block = {x,y,z}
+
+						-- check how much air we have til we reach stone
+						local air_to_stone = -1
+						for i = 1,3 do
+							local d = data[ivm - (ystride * i)]
+							if d ~= c_air then
+								if d == c_stone then
+									air_to_stone = i
+								end
+								break
+							end
+						end
+
+						if air_to_stone == 1 and math.random() < 0.18 then
+							local r = math.random()
+							if r < 0.015 then
+								data[ivm] = c_riverwater
+							elseif r < 0.04 then
+								-- reserved
+							elseif r < 0.13 then
+								data[ivm - ystride] = c_dirt
+								data[ivm] = c_mushroom_fertile_red
+							elseif r < 0.22 then
+								data[ivm - ystride] = c_dirt
+								data[ivm] = c_mushroom_fertile_brown
+							elseif r < 0.44 then  -- leave some extra dirt, for appearances sake
+								data[ivm - ystride] = c_dirt
+							else
+								data[ivm] = c_stalagmite
+							end
+						elseif air_to_stone == 2 and math.random() < 0.015 then
+							data[ivm] = c_huge_mushroom_cap
+							data[ivm - ystride] = c_giant_mushroom_stem
+							data[ivm - (ystride * 2)] = c_dirt
+						elseif air_to_stone == 3 and math.random() < 0.01 then
+							data[ivm] = c_giant_mushroom_cap
+							data[ivm - ystride] = c_giant_mushroom_stem
+							data[ivm - (ystride * 2)] = c_giant_mushroom_stem
+							data[ivm - (ystride * 3)] = c_dirt
+						end
 					end
 				elseif y <= water_level then -- if pos is not in the ground, and below water_level, it's an ocean
 					data[ivm] = c_water
