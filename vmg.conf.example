@@ -56,7 +56,7 @@
 #tree_density = 5
 #    Percent of the lawn nodes that are covered by trees.
 #plant_density = 32
-#cave_stuff = true
+#cave_stuff = false
 # Add mushrooms and water features to caves.
 
 

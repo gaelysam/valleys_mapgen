@@ -447,8 +447,8 @@ function vmg.generate(minp, maxp, seed)
 								y = y - 1
 							end
 						elseif above <= 0 then
-							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.15 then
-								if data[ivm - ystride] == c_air and math.random() < 0.66 then
+							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.13 then
+								if data[ivm - ystride] == c_air and math.random() < 0.75 then
 									data[ivm] = c_stone
 									data[ivm - ystride] = c_stalactite
 								else
@@ -493,22 +493,22 @@ function vmg.generate(minp, maxp, seed)
 							end
 						end
 
-						if air_to_stone == 1 and math.random() < 0.1 then
-							data[ivm] = c_stalagmite
-						elseif air_to_stone == 1 and math.random() < 0.08 then
+						if air_to_stone == 1 and math.random() < 0.18 then
 							local r = math.random()
-							if r < 0.03 then
+							if r < 0.015 then
 								data[ivm] = c_riverwater
-							elseif r < 0.1 then
+							elseif r < 0.04 then
 								-- reserved
-							elseif r < 0.3 then
+							elseif r < 0.13 then
 								data[ivm - ystride] = c_dirt
 								data[ivm] = c_mushroom_fertile_red
-							elseif r < 0.5 then
+							elseif r < 0.22 then
 								data[ivm - ystride] = c_dirt
 								data[ivm] = c_mushroom_fertile_brown
-							else  -- leave some extra dirt, for appearances sake
+							elseif r < 0.44 then  -- leave some extra dirt, for appearances sake
 								data[ivm - ystride] = c_dirt
+							else
+								data[ivm] = c_stalagmite
 							end
 						elseif air_to_stone == 2 and math.random() < 0.015 then
 							data[ivm] = c_huge_mushroom_cap
