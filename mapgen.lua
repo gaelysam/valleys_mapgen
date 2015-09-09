@@ -159,6 +159,8 @@ function vmg.generate(minp, maxp, seed)
 	local c_lava = minetest.get_content_id("default:lava_source")
 	local c_snow_layer = minetest.get_content_id("default:snow")
 	local c_glowing_fungal_stone = minetest.get_content_id("valleys_mapgen:glowing_fungal_stone")
+	local c_stalactite = minetest.get_content_id("valleys_mapgen:stalactite")
+	local c_stalagmite = minetest.get_content_id("valleys_mapgen:stalagmite")
 
 	-- Tree nodes
 	local c_tree = minetest.get_content_id("default:tree")
@@ -445,8 +447,13 @@ function vmg.generate(minp, maxp, seed)
 								y = y - 1
 							end
 						elseif above <= 0 then
-							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.05 then
-								data[ivm] = c_glowing_fungal_stone
+							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.15 then
+								if data[ivm - ystride] == c_air and math.random() < 0.66 then
+									data[ivm] = c_stone
+									data[ivm - ystride] = c_stalactite
+								else
+									data[ivm] = c_glowing_fungal_stone
+								end
 							else
 								data[ivm] = c_stone
 							end
@@ -457,8 +464,13 @@ function vmg.generate(minp, maxp, seed)
 								data[ivm] = dirt
 							end
 						else
-							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.05 then
-								data[ivm] = c_glowing_fungal_stone
+							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.13 then
+								if data[ivm - ystride] == c_air and math.random() < 0.75 then
+									data[ivm] = c_stone
+									data[ivm - ystride] = c_stalactite
+								else
+									data[ivm] = c_glowing_fungal_stone
+								end
 							else
 								data[ivm] = c_stone
 							end
@@ -481,7 +493,9 @@ function vmg.generate(minp, maxp, seed)
 							end
 						end
 
-						if air_to_stone == 1 and math.random() < 0.08 then
+						if air_to_stone == 1 and math.random() < 0.1 then
+							data[ivm] = c_stalagmite
+						elseif air_to_stone == 1 and math.random() < 0.08 then
 							local r = math.random()
 							if r < 0.03 then
 								data[ivm] = c_riverwater

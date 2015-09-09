@@ -307,6 +307,40 @@ minetest.register_craft({
 	},
 })
 
+minetest.register_node("valleys_mapgen:stalactite", {
+	description = "Stalactite",
+	tiles = {"default_stone.png"},
+	is_ground_content = false,
+	walkable = false,
+	paramtype = "light",
+	drawtype = "nodebox",
+	node_box = { type = "fixed", 
+		fixed = {
+			{-0.07, 0.0, -0.07, 0.07, 0.5, 0.07}, 
+			{-0.04, -0.25, -0.04, 0.04, 0.0, 0.04}, 
+			{-0.02, -0.5, -0.02, 0.02, 0.25, 0.02}, 
+		} },
+	groups = {stone=1, cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("valleys_mapgen:stalagmite", {
+	description = "Stalagmite",
+	tiles = {"default_stone.png"},
+	is_ground_content = false,
+	walkable = false,
+	paramtype = "light",
+	drawtype = "nodebox",
+	node_box = { type = "fixed", 
+		fixed = {
+			{-0.07, -0.5, -0.07, 0.07, 0.0, 0.07}, 
+			{-0.04, 0.0, -0.04, 0.04, 0.25, 0.04}, 
+			{-0.02, 0.25, -0.02, 0.02, 0.5, 0.02}, 
+		} },
+	groups = {stone=1, cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 -- Change leafdecay ratings
 minetest.add_group("default:leaves", {leafdecay = 5})
 minetest.add_group("default:jungleleaves", {leafdecay = 8})
