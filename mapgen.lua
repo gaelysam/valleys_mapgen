@@ -452,7 +452,10 @@ function vmg.generate(minp, maxp, seed)
 									data[ivm] = c_stone
 									data[ivm - ystride] = c_stalactite
 								else
-									data[ivm] = c_glowing_fungal_stone
+									local temp = vmg.get_temperature({x=x, y=y, z=z})
+									if temp > 1.2 and temp < 1.6 then
+										data[ivm] = c_glowing_fungal_stone
+									end
 								end
 							else
 								data[ivm] = c_stone
@@ -469,7 +472,10 @@ function vmg.generate(minp, maxp, seed)
 									data[ivm] = c_stone
 									data[ivm - ystride] = c_stalactite
 								else
-									data[ivm] = c_glowing_fungal_stone
+									local temp = vmg.get_temperature({x=x, y=y, z=z})
+									if temp > 1.2 and temp < 1.6 then
+										data[ivm] = c_glowing_fungal_stone
+									end
 								end
 							else
 								data[ivm] = c_stone
@@ -493,16 +499,17 @@ function vmg.generate(minp, maxp, seed)
 							end
 						end
 
+						local temp = vmg.get_temperature({x=x, y=y, z=z})
 						if air_to_stone == 1 and math.random() < 0.18 then
 							local r = math.random()
-							if r < 0.015 then
+							if r < 0.01 then
 								data[ivm] = c_riverwater
 							elseif r < 0.04 then
 								-- reserved
-							elseif r < 0.13 then
+							elseif r < 0.13 and temp > 1.2 and temp < 1.6 then
 								data[ivm - ystride] = c_dirt
 								data[ivm] = c_mushroom_fertile_red
-							elseif r < 0.22 then
+							elseif r < 0.22 and temp > 1.2 and temp < 1.6 then
 								data[ivm - ystride] = c_dirt
 								data[ivm] = c_mushroom_fertile_brown
 							elseif r < 0.44 then  -- leave some extra dirt, for appearances sake
@@ -510,11 +517,11 @@ function vmg.generate(minp, maxp, seed)
 							else
 								data[ivm] = c_stalagmite
 							end
-						elseif air_to_stone == 2 and math.random() < 0.015 then
+						elseif air_to_stone == 2 and temp > 1.2 and temp < 1.6 and math.random() < 0.01 then
 							data[ivm] = c_huge_mushroom_cap
 							data[ivm - ystride] = c_giant_mushroom_stem
 							data[ivm - (ystride * 2)] = c_dirt
-						elseif air_to_stone == 3 and math.random() < 0.01 then
+						elseif air_to_stone == 3 and temp > 1.2 and temp < 1.6 and math.random() < 0.005 then
 							data[ivm] = c_giant_mushroom_cap
 							data[ivm - ystride] = c_giant_mushroom_stem
 							data[ivm - (ystride * 2)] = c_giant_mushroom_stem
