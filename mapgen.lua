@@ -338,6 +338,7 @@ function vmg.generate(minp, maxp, seed)
 					if not is_cave then -- if pos is not inside a cave
 						local thickness = v7 - math.sqrt(math.abs(y)) / dirt_thickness -- Calculate dirt thickness, according to noise #7, dirt thickness parameter, and elevation (y coordinate)
 						local above = math.ceil(thickness + math.random()) -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness. An "above" of zero = bare stone.
+						above = math.max(above, 0) -- must be positive
 
 						if y >= water_level and n6[i3d_sup+i3d_incrY] * slopes <= y + 1 - mountain_ground and not river then -- If node above is in the ground
 							if is_beach and y < beach then -- if beach, make sand
@@ -445,20 +446,6 @@ function vmg.generate(minp, maxp, seed)
 									end
 								end
 								y = y - 1
-							end
-						elseif above <= 0 then
-							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.13 then
-								if data[ivm - ystride] == c_air and math.random() < 0.75 then
-									data[ivm] = c_stone
-									data[ivm - ystride] = c_stalactite
-								else
-									local temp = vmg.get_temperature({x=x, y=y, z=z})
-									if temp > 1.2 and temp < 1.6 then
-										data[ivm] = c_glowing_fungal_stone
-									end
-								end
-							else
-								data[ivm] = c_stone
 							end
 						elseif n6[i3d_sup+above*i3d_incrY] * slopes <= y + above - mountain_ground then -- if node at "above" nodes up is not in the ground, make dirt
 							if is_beach and y < beach then
