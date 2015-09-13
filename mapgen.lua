@@ -468,7 +468,8 @@ function vmg.generate(minp, maxp, seed)
 								data[ivm] = c_stone
 							end
 						end
-					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
+						-- Allow lava above ground to max_height, but see nodes.lua.
+					elseif y <= lava_max_height and v11 + v12 > 2^((y - lava_max_height) / lava_depth) then
 						data[ivm] = c_lava
 					elseif do_cave_stuff then
 						-- mushrooms and water in caves -- djr
