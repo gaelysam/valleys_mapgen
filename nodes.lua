@@ -402,6 +402,106 @@ minetest.register_node("valleys_mapgen:stalagmite", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
+minetest.register_node("valleys_mapgen:volcanic_stone", {
+	description = "Volcanic Stone",
+	tiles = {"vmg_volcanic_stone.png"},
+	groups = {cracky=2, stone=1},
+	drop = 'default:cobble',
+	sounds = default.node_sound_stone_defaults(),
+})
+
+local lava_growth = vmg.define("lava_growth", 0)
+local c_air = minetest.get_content_id("air")
+local c_volcanic_stone = minetest.get_content_id("valleys_mapgen:volcanic_stone")
+local lava_max_height = vmg.define("lava_max_height", -1)
+
+-- If lava growth is allowed, register an abm.
+if lava_growth > 0 then
+	print("Valleys Mapgen: Lava will grow")
+	minetest.register_abm({
+		nodenames = {"default:lava_source"},
+		neighbors = {"group:soil", "group:stone"},
+		interval = 60,
+		chance = lava_growth,
+		action = function(pos, node, _, _)
+			local pos2 = {x=pos.x+math.random(-1,1), y=(pos.y+1), z=pos.z+math.random(-1,1)}
+			if pos2.y < lava_max_height then
+				minetest.env:add_node(pos2, {name="default:lava_source"})
+			end
+		end
+	})
+end
+
+-- For some reason lava doesn't normally melt snow.
+--  This may be too cpu intensive.
+if false then
+	minetest.register_abm({
+		nodenames = {"default:dirt_with_snow"},
+		neighbors = {"default:lava_source", "default:lava_flowing"},
+		interval = 2,
+		chance = 1,
+		action = function(pos, node, _, active_object_count_wider)
+			minetest.env:add_node(pos, {name="default:dirt"})
+		end
+	})
+
+	minetest.register_abm({
+		nodenames = {"valleys_mapgen:dirt_clayey_with_snow"},
+		neighbors = {"default:lava_source", "default:lava_flowing"},
+		interval = 2,
+		chance = 1,
+		action = function(pos, node, _, active_object_count_wider)
+			minetest.env:add_node(pos, {name="valleys_mapgen:dirt_clayey"})
+		end
+	})
+
+	minetest.register_abm({
+		nodenames = {"valleys_mapgen:dirt_silty_with_snow"},
+		neighbors = {"default:lava_source", "default:lava_flowing"},
+		interval = 2,
+		chance = 1,
+		action = function(pos, node, _, active_object_count_wider)
+			minetest.env:add_node(pos, {name="valleys_mapgen:dirt_silty"})
+		end
+	})
+
+	minetest.register_abm({
+		nodenames = {"valleys_mapgen:dirt_sandy_with_snow"},
+		neighbors = {"default:lava_source", "default:lava_flowing"},
+		interval = 2,
+		chance = 1,
+		action = function(pos, node, _, active_object_count_wider)
+			minetest.env:add_node(pos, {name="valleys_mapgen:dirt_sandy"})
+		end
+	})
+
+	minetest.register_abm({
+		nodenames = {"default:snow"},
+		neighbors = {"default:lava_source", "default:lava_flowing"},
+		interval = 2,
+		chance = 1,
+		action = function(pos, node, _, active_object_count_wider)
+			minetest.remove_node(pos)
+		end
+	})
+end
+
+-- To prevent uncontrolled damage, lava will now cool rapidly,
+--  based on how fast it grows, forming darker stone.
+local cool_chance = 2
+if lava_growth > 1 then
+	cool_chance = math.ceil(lava_growth / 25)
+end
+minetest.register_abm({
+	nodenames = {"default:lava_flowing"},
+	-- neighbors = {"air"},
+	interval = 10,
+	chance = cool_chance,
+	action = function(pos, node, _, active_object_count_wider)
+		minetest.env:add_node(pos, {name="valleys_mapgen:volcanic_stone"})
+	end
+})
+
 -- Change leafdecay ratings
 minetest.add_group("default:leaves", {leafdecay = 5})
 minetest.add_group("default:jungleleaves", {leafdecay = 8})

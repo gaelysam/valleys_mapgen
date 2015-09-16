@@ -200,6 +200,33 @@ function vmg.generate(minp, maxp, seed)
 	local c_bird_of_paradise = minetest.get_content_id("valleys_mapgen:bird_of_paradise")
 	local c_orchid = minetest.get_content_id("valleys_mapgen:orchid")
 
+	local c_carrot
+	local c_beanbush
+	local c_blueberry
+	local c_coffee
+	local c_corn
+	local c_cucumber
+	local c_melon
+	local c_potato
+	local c_pumpkin
+	local c_raspberry
+	local c_rhubarb
+	local c_tomato
+	if farming.mod == "redo" then
+		c_carrot = minetest.get_content_id("farming:carrot_8")
+		c_beanbush = minetest.get_content_id("farming:beanbush")
+		c_blueberry = minetest.get_content_id("farming:blueberry_4")
+		c_coffee = minetest.get_content_id("farming:coffee_5")
+		c_corn = minetest.get_content_id("farming:corn_8")
+		c_cucumber = minetest.get_content_id("farming:cucumber_4")
+		c_melon = minetest.get_content_id("farming:melon_8")
+		c_potato = minetest.get_content_id("farming:potato_3")
+		c_pumpkin = minetest.get_content_id("farming:pumpkin_8")
+		c_raspberry = minetest.get_content_id("farming:raspberry_4")
+		c_rhubarb = minetest.get_content_id("farming:rhubarb_3")
+		c_tomato = minetest.get_content_id("farming:tomato_7")
+	end
+
 	-- Air and Ignore
 	local c_air = minetest.get_content_id("air")
 	local c_ignore = minetest.get_content_id("ignore")
@@ -450,7 +477,35 @@ function vmg.generate(minp, maxp, seed)
 										else
 											data[ivm2] = c_dandelion_yellow
 										end
-									elseif math.random() < 0.02 and temp > 1.2 and temp < 1.6 and humidity > 0.5 and v13 < 0.5 and v14 < 0.5 and v15 < 0.5 then -- Mushrooms -- djr
+										-- http://www.google.com/url?q=http://www.kzndard.gov.za/Portals/0/Horticulture/Veg%2520prod/climatic_requirements.pdf&sa=U&ved=0CDIQFjAFOApqFQoTCOmli7DO88cCFQcNkgodd1sA3A&usg=AFQjCNHJaALpGad38u5JjpqbPjBG-BrI9w
+									elseif farming.mod == "redo" and temp > 0.98 and temp < 2.5 and humidity < 2.6 and v13 < 0.8 and v15 < 0.4 and math.random() < 0.04 then -- Wild Vegetables
+										local r = math.random()
+										if r < 0.08 and temp > 1.18 and temp < 1.65 and humidity > 0.5 then
+											data[ivm2] = c_carrot
+										elseif r < 0.16 and temp > 1.26 and temp < 1.72 and y > 20 then
+											data[ivm2] = c_beanbush
+										elseif r < 0.24 and temp < 1.4 and y < 20 then
+											data[ivm2] = c_blueberry
+										elseif r < 0.32 and temp > 1.5 and y > 40 then
+											data[ivm2] = c_coffee
+										elseif r < 0.40 and temp > 1.26 and temp < 1.93 and y > 10 and y < 25 then
+											data[ivm2] = c_corn
+										elseif r < 0.48 and temp > 1.4 and temp < 1.85 and humidity > 0.5 then
+											data[ivm2] = c_cucumber
+										elseif r < 0.56 and temp > 1.2 and temp < 1.8 and humidity > 0.5 then
+											data[ivm2] = c_melon
+										elseif r < 0.64 and temp > 1.18 and temp < 1.65 and y > 15 then
+											data[ivm2] = c_potato
+										elseif r < 0.72 and temp > 1.4 and temp < 2 and humidity > 0.5 then
+											data[ivm2] = c_pumpkin
+										elseif r < 0.8 and temp > 1.4 and y < 25 then
+											data[ivm2] = c_raspberry
+										elseif r < 0.88 and temp > 1.18 and temp < 1.65 and y < 30 then
+											data[ivm2] = c_rhubarb
+										elseif r < 0.96 and temp > 1.48 and temp < 1.72 then
+											data[ivm2] = c_tomato
+										end
+									elseif temp > 1.25 and temp < 1.7 and humidity > 1.0 and v13 < 0.6 and v15 < 0.2 and math.random() < 0.02 then -- Mushrooms -- djr
 										if math.random() < 0.5 then
 											data[ivm2] = c_mushroom_fertile_red
 										else
@@ -481,7 +536,8 @@ function vmg.generate(minp, maxp, seed)
 								data[ivm] = c_stone
 							end
 						end
-					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
+						-- Allow lava above ground to max_height, but see nodes.lua.
+					elseif y <= lava_max_height and v11 + v12 > 2^((y - lava_max_height) / lava_depth) then
 						data[ivm] = c_lava
 					elseif do_cave_stuff then
 						-- mushrooms and water in caves -- djr
@@ -506,10 +562,10 @@ function vmg.generate(minp, maxp, seed)
 								data[ivm] = c_riverwater
 							elseif r < 0.04 then
 								-- reserved
-							elseif r < 0.13 and temp > 1.2 and temp < 1.6 then
+							elseif r < 0.13 and temp > 1.25 and temp < 1.7 then
 								data[ivm - ystride] = c_dirt
 								data[ivm] = c_mushroom_fertile_red
-							elseif r < 0.22 and temp > 1.2 and temp < 1.6 then
+							elseif r < 0.22 and temp > 1.25 and temp < 1.7 then
 								data[ivm - ystride] = c_dirt
 								data[ivm] = c_mushroom_fertile_brown
 							elseif r < 0.44 then  -- leave some extra dirt, for appearances sake
@@ -517,11 +573,11 @@ function vmg.generate(minp, maxp, seed)
 							else
 								data[ivm] = c_stalagmite
 							end
-						elseif air_to_stone == 2 and temp > 1.2 and temp < 1.6 and math.random() < 0.01 then
+						elseif air_to_stone == 2 and temp > 1.25 and temp < 1.7 and math.random() < 0.01 then
 							data[ivm] = c_huge_mushroom_cap
 							data[ivm - ystride] = c_giant_mushroom_stem
 							data[ivm - (ystride * 2)] = c_dirt
-						elseif air_to_stone == 3 and temp > 1.2 and temp < 1.6 and math.random() < 0.005 then
+						elseif air_to_stone == 3 and temp > 1.25 and temp < 1.7 and math.random() < 0.005 then
 							data[ivm] = c_giant_mushroom_cap
 							data[ivm - ystride] = c_giant_mushroom_stem
 							data[ivm - (ystride * 2)] = c_giant_mushroom_stem
