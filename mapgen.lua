@@ -189,6 +189,7 @@ function vmg.generate(minp, maxp, seed)
 	local c_rose = minetest.get_content_id("flowers:rose")
 	local c_tulip = minetest.get_content_id("flowers:tulip")
 	local c_viola = minetest.get_content_id("flowers:viola")
+	local c_gerbera = minetest.get_content_id("valleys_mapgen:gerbera")
 	local c_dandelion_white = minetest.get_content_id("flowers:dandelion_white")
 	local c_dandelion_yellow = minetest.get_content_id("flowers:dandelion_yellow")
 	local c_mushroom_fertile_brown = minetest.get_content_id("flowers:mushroom_fertile_brown")
@@ -196,6 +197,8 @@ function vmg.generate(minp, maxp, seed)
 	local c_huge_mushroom_cap = minetest.get_content_id("valleys_mapgen:huge_mushroom_cap")
 	local c_giant_mushroom_cap = minetest.get_content_id("valleys_mapgen:giant_mushroom_cap")
 	local c_giant_mushroom_stem = minetest.get_content_id("valleys_mapgen:giant_mushroom_stem")
+	local c_bird_of_paradise = minetest.get_content_id("valleys_mapgen:bird_of_paradise")
+	local c_orchid = minetest.get_content_id("valleys_mapgen:orchid")
 
 	-- Air and Ignore
 	local c_air = minetest.get_content_id("air")
@@ -414,7 +417,15 @@ function vmg.generate(minp, maxp, seed)
 									elseif v15 < 0.65 and temp >= 0.65 and temp < 1.5 and humidity < 2.6 and v16 < 1.5 and v13 < 0.8 and math.random() < 0.7 then -- Grass
 										data[ivm2] = c_grass[math.random(1, 5)]
 									elseif v15 > -0.6 and temp >= 1.8 and humidity > 2.2 and v16 > 1.8 then -- Jungle Grass
-										data[ivm2] = c_junglegrass
+										if math.random(100) <= 2 then
+											data[ivm2] = c_bird_of_paradise
+										else
+											data[ivm2] = c_junglegrass
+										end
+									elseif v15 < 0.7 and temp >= 1.9 and humidity > 2 and v16 > 2 then -- orchids amongst jungle trees
+										if math.random(100) <= 2 then
+											data[ivm2] = c_orchid
+										end
 									elseif v15 > 0.65 and humidity < 0.5 and math.random() < 0.2 then
 										if v16 > 0 and temp > 1.6 and math.random() < 0.12 then -- Cactus
 											for i = 1, 4 do
@@ -426,6 +437,8 @@ function vmg.generate(minp, maxp, seed)
 									elseif math.random() < 0.04 and temp > 0.98 and temp < 1.8 and humidity < 1.7 and v14 >= -0.1 and v15 < 0.4 and v15 >= -0.6 and v13 < 0.82 then -- Flowers
 										if temp > 1.2 and math.random() < 0.3 then
 											data[ivm2] = c_rose
+										elseif temp > 1.2 and math.random() < 0.2 then
+											data[ivm2] = c_gerbera
 										elseif thickness <= 1.3 and math.random() < 0.4 then
 											data[ivm2] = c_geranium
 										elseif v16 < 1.6 and math.random() < 0.7 then
