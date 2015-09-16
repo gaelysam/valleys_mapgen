@@ -193,6 +193,60 @@ minetest.register_craft({
 	}
 })
 
+----------------------
+-- Flowers / Plants --
+----------------------
+
+minetest.register_node("valleys_mapgen:bird_of_paradise", {
+	description = "Bird of Paradise",
+	drawtype = "plantlike",
+	tiles = {"vmg_bird_of_paradise.png"},
+	inventory_image = "vmg_bird_of_paradise.png",
+	paramtype = "light",
+	walkable = false,
+	visual_scale = 1.2,
+	groups = {snappy=3,flammable=2,flora=1,attached_node=1},
+	sounds = default.node_sound_leaves_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5},
+	},
+})
+
+minetest.register_node("valleys_mapgen:gerbera", {
+	description = "Gerbera",
+	drawtype = "plantlike",
+	tiles = {"vmg_gerbera.png"},
+	inventory_image = "vmg_gerbera.png",
+	sunlight_propagates = true,
+	paramtype = "light",
+	walkable = false,
+	groups = {snappy=3,flammable=2,flower=1,flora=1,attached_node=1,color_pink=1},
+	sounds = default.node_sound_leaves_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.15, -0.5, -0.15, 0.15, 0.2, 0.15},
+	},
+})
+
+minetest.register_node("valleys_mapgen:orchid", {
+	description = "Orchid",
+	drawtype = "plantlike",
+	tiles = {"vmg_orchid.png"},
+	inventory_image = "vmg_orchid.png",
+	paramtype = "light",
+	walkable = false,
+	waving = 1,
+	groups = {snappy=3,flammable=2,flower=1,flora=1,attached_node=1,color_white=1},
+	sounds = default.node_sound_leaves_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5},
+	},
+})
+
+
+
 minetest.register_node("valleys_mapgen:huge_mushroom_cap", {
 	description = "Huge Mushroom Cap",
 	tiles = {"vmg_mushroom_giant_cap.png", "vmg_mushroom_giant_under.png", "vmg_mushroom_giant_cap.png"},
