@@ -229,6 +229,22 @@ minetest.register_node("valleys_mapgen:gerbera", {
 	},
 })
 
+minetest.register_node("valleys_mapgen:hibiscus", {
+	description = "White Hibiscus",
+	drawtype = "plantlike",
+	tiles = {"vmg_hibiscus.png"},
+	inventory_image = "vmg_hibiscus.png",
+	paramtype = "light",
+	walkable = false,
+	waving = 1,
+	groups = {snappy=3,flammable=2,flower=1,flora=1,attached_node=1,color_white=1},
+	sounds = default.node_sound_leaves_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5},
+	},
+})
+
 minetest.register_node("valleys_mapgen:orchid", {
 	description = "Orchid",
 	drawtype = "plantlike",
