@@ -52,6 +52,27 @@ function default.grow_tree(pos, is_apple_tree) -- Override default function to g
 	vm:update_map()
 end
 
+function default.grow_banana_tree(pos)
+	-- individual parameters
+	local rand = math.random()
+	local height = math.floor(4 + 2.5 * rand)
+	local radius = 3 + rand
+
+	-- VoxelManip stuff
+	local leaves = minetest.get_content_id("valleys_mapgen:banana_leaves")
+	local trunk = minetest.get_content_id("valleys_mapgen:banana_tree")
+	local air = minetest.get_content_id("air")
+	local ignore = minetest.get_content_id("ignore")
+	local vm = minetest.get_voxel_manip()
+	local emin, emax = vm:read_from_map({x = pos.x - 4, y = pos.y, z = pos.z - 4}, {x = pos.x + 4, y = pos.y + height + 4, z = pos.z + 4})
+	local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
+	local data = vm:get_data()
+	vmg.make_banana_tree(pos, data, area, height, radius, trunk, leaves, minetest.get_content_id("valleys_mapgen:banana"), air, ignore)
+	vm:set_data(data)
+	vm:write_to_map()
+	vm:update_map()
+end
+
 function default.grow_jungle_tree(pos)
 	local rand = math.random()
 	local height = math.floor(8 + 4 * rand)
@@ -128,6 +149,21 @@ end
 function vmg.make_apple_tree(pos, data, area, height, radius, trunk, leaves, fruit, air, ignore) -- Same code but with apples
 	if vmg.loglevel >= 3 then
 		print("[Valleys Mapgen] Generating apple tree at " .. minetest.pos_to_string(pos) .. " ...")
+	end
+	local ystride = area.ystride -- Useful to get the index above
+	local iv = area:indexp(pos)
+	for i = 1, height do -- Build the trunk
+		data[iv] = trunk
+		iv = iv + ystride -- increment by one node up
+	end
+	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.5}
+	pos.y = pos.y + height - 1
+	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius, z = radius}, np, 0.06, fruit)
+end
+
+function vmg.make_banana_tree(pos, data, area, height, radius, trunk, leaves, fruit, air, ignore)
+	if vmg.loglevel >= 3 then
+		print("[Valleys Mapgen] Generating banana tree at " .. minetest.pos_to_string(pos) .. " ...")
 	end
 	local ystride = area.ystride -- Useful to get the index above
 	local iv = area:indexp(pos)
