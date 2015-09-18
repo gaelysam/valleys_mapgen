@@ -1,5 +1,6 @@
 # Valleys Mapgen
 Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
+Mod created by Gael-de-Sailly and now mainly developed by duane-r.
 
 ![Screenshot](http://i.imgur.com/A6CBuaV.png)
 
@@ -7,7 +8,10 @@ Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 
 ## Changelog
 ### 2.1 ~> Latest
-* Added flowers (6 species)
+* Water and giant mushrooms in caves
+* Added Mushrooms
+* Adapted sapling growth to new minetest_game API
+* Added flowers (10 species)
 
 ### 2.0 ~> 2.1 (Saturday July 4, 2015)
 * Modified conditions for desert plants
