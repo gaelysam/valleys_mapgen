@@ -166,6 +166,9 @@ function vmg.generate(minp, maxp, seed)
 	local c_tree = minetest.get_content_id("default:tree")
 	local c_leaves = minetest.get_content_id("default:leaves")
 	local c_apple = minetest.get_content_id("default:apple")
+	local c_banana_tree = minetest.get_content_id("valleys_mapgen:banana_tree")
+	local c_banana_leaves = minetest.get_content_id("valleys_mapgen:banana_leaves")
+	local c_banana = minetest.get_content_id("valleys_mapgen:banana")
 	local c_jungletree = minetest.get_content_id("default:jungletree")
 	local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
 	local c_pinetree = minetest.get_content_id("default:pinetree")
@@ -404,6 +407,13 @@ function vmg.generate(minp, maxp, seed)
 										local height = math.floor(8 + 4 * rand)
 										local radius = 5 + 3 * rand
 										vmg.make_jungle_tree(pos, data, a, height, radius, c_jungletree, c_jungleleaves, c_air, c_ignore)
+									elseif v15 > -0.6 and temp >= 1.8 and humidity > 2.2 and v16 > 1.8 then -- banana tree
+										local rand = math.random()
+										local height = math.floor(4 + 2.5 * rand)
+										local radius = 3 + rand
+										if math.random(100) <= 10 then
+											vmg.make_banana_tree(pos, data, a, height, radius, c_banana_tree, c_banana_leaves, c_banana, c_air, c_ignore)
+										end
 									elseif temp > 0.38 and temp < 1 and humidity > 0.9 and v15 > 0 and v15 < 0.55 then -- Fir Tree
 										local rand = math.random()
 										local height = math.floor(9 + 6 * rand)
