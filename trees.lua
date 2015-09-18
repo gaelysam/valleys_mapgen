@@ -27,6 +27,22 @@ minetest.register_abm({
 	end
 })
 
+-- Banana sapling growth
+minetest.register_abm({
+	nodenames = {"valleys_mapgen:banana_sapling"},
+	interval = 10,
+	chance = 50,
+	action = function(pos, node)
+		if not can_grow(pos) then
+			return
+		end
+
+		minetest.log("action", "A banana sapling grows into a tree at "..
+				minetest.pos_to_string(pos))
+		vmg.grow_banana_tree(pos)
+	end
+})
+
 function default.grow_tree(pos, is_apple_tree) -- Override default function to generate VMG trees
 	-- individual parameters
 	local rand = math.random()
@@ -52,7 +68,7 @@ function default.grow_tree(pos, is_apple_tree) -- Override default function to g
 	vm:update_map()
 end
 
-function default.grow_banana_tree(pos)
+function vmg.grow_banana_tree(pos)
 	-- individual parameters
 	local rand = math.random()
 	local height = math.floor(4 + 2.5 * rand)

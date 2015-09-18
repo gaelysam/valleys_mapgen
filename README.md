@@ -8,6 +8,7 @@ Mod created by Gael-de-Sailly and now mainly developed by duane-r.
 
 ## Changelog
 ### 2.1 ~> Latest
+* Added banana tree
 * Water and giant mushrooms in caves
 * Added Mushrooms
 * Adapted sapling growth to new minetest_game API
