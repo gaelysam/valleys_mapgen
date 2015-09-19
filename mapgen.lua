@@ -564,6 +564,10 @@ function vmg.generate(minp, maxp, seed)
 	end
 	vmg.execute_after_mapgen() -- needed for jungletree roots
 
+	if darkage_mapgen then -- Compatibility with darkage mod by CraigyDavi. If you see error messages like "WARNING: unknown global variable" at this line, don't worry :)
+		darkage_mapgen(data, a, minp, maxp, seed)
+	end
+
 	-- After data collecting, check timer
 	local t3 = os.clock()
 	if vmg.loglevel >= 2 then
