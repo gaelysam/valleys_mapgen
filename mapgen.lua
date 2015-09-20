@@ -169,6 +169,8 @@ function vmg.generate(minp, maxp, seed)
 	local c_banana_tree = minetest.get_content_id("valleys_mapgen:banana_tree")
 	local c_banana_leaves = minetest.get_content_id("valleys_mapgen:banana_leaves")
 	local c_banana = minetest.get_content_id("valleys_mapgen:banana")
+	local c_cherryblossom_tree = minetest.get_content_id("valleys_mapgen:cherry_blossom_tree")
+	local c_cherryblossom_leaves = minetest.get_content_id("valleys_mapgen:cherry_blossom_leaves")
 	local c_jungletree = minetest.get_content_id("default:jungletree")
 	local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
 	local c_pinetree = minetest.get_content_id("default:pinetree")
@@ -419,6 +421,13 @@ function vmg.generate(minp, maxp, seed)
 										local height = math.floor(9 + 6 * rand)
 										local radius = 4 + 2 * rand
 										vmg.make_fir_tree(pos, data, a, height, radius, c_firtree, c_firleaves, c_air, c_ignore)
+									elseif temp > 0.6 and temp < 1 and humidity < 1.4 and v15 > 0 and v15 < 0.55 and y > 30 then -- cherry blossom Tree
+										local rand = math.random()
+										local height = math.floor(4 + 2.5 * rand)
+										local radius = 3 + rand
+										if math.random(100) <= 10 then
+											vmg.make_cherry_blossom_tree(pos, data, a, height, radius, c_cherryblossom_tree, c_cherryblossom_leaves, c_air, c_ignore)
+										end
 									end
 								elseif plants and math.random() < plant_density and above > 0 then -- make a plant
 									if temp > 1 and temp < 1.8 and water > 0.7 and humidity > 3 and v13 > -0.4 and math.random() < 0.04 then -- Papyrus
