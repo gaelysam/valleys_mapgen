@@ -43,6 +43,22 @@ minetest.register_abm({
 	end
 })
 
+-- Birch sapling growth
+minetest.register_abm({
+	nodenames = {"valleys_mapgen:birch_sapling"},
+	interval = 20,
+	chance = 50,
+	action = function(pos, node)
+		if not can_grow(pos) then
+			return
+		end
+
+		minetest.log("action", "A birch sapling grows into a tree at "..
+				minetest.pos_to_string(pos))
+		vmg.grow_birch_tree(pos)
+	end
+})
+
 -- Cherry Blossom sapling growth
 minetest.register_abm({
 	nodenames = {"valleys_mapgen:cherry_blossom_sapling"},
@@ -100,6 +116,26 @@ function vmg.grow_banana_tree(pos)
 	local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
 	local data = vm:get_data()
 	vmg.make_banana_tree(pos, data, area, height, radius, trunk, leaves, minetest.get_content_id("valleys_mapgen:banana"), air, ignore)
+	vm:set_data(data)
+	vm:write_to_map()
+	vm:update_map()
+end
+
+function vmg.grow_birch(pos)
+	local rand = math.random()
+	local height = math.floor(6 + 2.5 * rand)
+	local radius = 2 + rand
+
+	-- VoxelManip stuff
+	local leaves = minetest.get_content_id("valleys_mapgen:birch_leaves")
+	local trunk = minetest.get_content_id("valleys_mapgen:birch_tree")
+	local air = minetest.get_content_id("air")
+	local ignore = minetest.get_content_id("ignore")
+	local vm = minetest.get_voxel_manip()
+	local emin, emax = vm:read_from_map({x = pos.x - 4, y = pos.y, z = pos.z - 4}, {x = pos.x + 4, y = pos.y + height + 4, z = pos.z + 4})
+	local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
+	local data = vm:get_data()
+	vmg.make_birch_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
 	vm:set_data(data)
 	vm:write_to_map()
 	vm:update_map()
@@ -227,6 +263,21 @@ function vmg.make_banana_tree(pos, data, area, height, radius, trunk, leaves, fr
 	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.5}
 	pos.y = pos.y + height - 1
 	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius, z = radius}, np, 0.06, fruit)
+end
+
+function vmg.make_birch_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
+	if vmg.loglevel >= 3 then
+		print("[Valleys Mapgen] Generating birch tree at " .. minetest.pos_to_string(pos) .. " ...")
+	end
+	local ystride = area.ystride -- Useful to get the index above
+	local iv = area:indexp(pos)
+	for i = 1, height do -- Build the trunk
+		data[iv] = trunk
+		iv = iv + ystride -- increment by one node up
+	end
+	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.5}
+	pos.y = pos.y + height - 1
+	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius, z = radius}, np)
 end
 
 function vmg.make_cherry_blossom_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
