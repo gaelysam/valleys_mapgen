@@ -1,9 +1,4 @@
 -- Greatly abbreviated...
--- This file is a shell which can be used to adapt the existing vmg code to
---  the C++ version, using voxelmanip to place everything.
--- This is NOT a good strategy for the long run, as it ignores all the
---  existing systems in the game, but it's easier. Our goal should be
---  to avoid this method.
 
 -- THE MAPGEN FUNCTION
 function vmg.generate(minp, maxp, seed)
@@ -18,7 +13,6 @@ function vmg.generate(minp, maxp, seed)
 	-- Ground nodes
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_dirt = minetest.get_content_id("default:dirt")
-	local c_dirt_with_grass = minetest.get_content_id("default:dirt_with_grass")
 
 	local c_mushroom_fertile_brown = minetest.get_content_id("flowers:mushroom_fertile_brown")
 	local c_mushroom_fertile_red = minetest.get_content_id("flowers:mushroom_fertile_red")
@@ -32,9 +26,8 @@ function vmg.generate(minp, maxp, seed)
 
 	-- The VoxelManipulator, a complicated but speedy method to set many nodes at the same time
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	local heightmap = minetest.get_mapgen_object("heightmap")
-	local heatmap = minetest.get_mapgen_object("heatmap")
-	local humiditymap = minetest.get_mapgen_object("humiditymap")
+	-- local heightmap = minetest.get_mapgen_object("heightmap")
+	-- local heatmap = minetest.get_mapgen_object("heatmap")
 	local data = vm:get_data() -- data is the original array of content IDs (solely or mostly air)
 	-- Be careful: emin ≠ minp and emax ≠ maxp !
 	-- The data array is not limited by minp and maxp. It exceeds it by 16 nodes in the 6 directions.
@@ -50,36 +43,39 @@ function vmg.generate(minp, maxp, seed)
 
 	-- THE CORE OF THE MOD: THE MAPGEN ALGORITHM ITSELF
 
-	local i = 1
-	for z = minp.z, maxp.z do -- for each vertical line in this plane
-		for x = minp.x, maxp.x do -- for each YZ plane
-			-- This gives you an idea of where to start.
-			local y = heightmap[i]
-			local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
-			if data[ivm] == c_air then
-				while y >= minp.y and data[ivm] == c_air do
-					y = y - 1
-					ivm = a:index(x, y, z)
-				end
-			else
-				while y <= maxp.y and data[ivm] ~= c_air do
-					y = y + 1
-					ivm = a:index(x, y, z)
-				end
-				y = y - 1
-			end
-			if y >= minp.y and y < maxp.y then
-				if data[ivm] == c_dirt_with_grass or data[ivm] == c_dirt then
-					vmg.decorate(vm, x, y, z, heatmap[i], humiditymap[i])
-				else
--- 					local s = minetest.get_name_from_content_id(data[ivm])
--- 					if s ~= "air" then
--- 						print(s)
--- 					end
-				end
-			end
+	local air_count = 5
+	for x = minp.x, maxp.x do -- for each YZ plane
+		for z = minp.z, maxp.z do -- for each vertical line in this plane
+			air_count = 5
+			for y = minp.y, maxp.y do -- for each node in vertical line
+				if y < -1 then
+					local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
+					if data[ivm] == c_dirt then
+						-- print("dirt")
+						air_count = 0
+					elseif data[ivm] == c_air then
+						air_count = air_count + 1
+						local r = math.random(6)
 
-			i = i + 1
+						if air_count == 1 then
+							if r == 1 then
+								data[ivm] = c_mushroom_fertile_red
+							elseif r == 2 then
+								data[ivm] = c_mushroom_fertile_brown
+							end
+						elseif air_count == 2 and r == 1 then
+							data[ivm] = c_huge_mushroom_cap
+							data[ivm - ystride] = c_giant_mushroom_stem
+						elseif air_count == 3 and r == 1 then
+							data[ivm] = c_giant_mushroom_cap
+							data[ivm - ystride] = c_giant_mushroom_stem
+							data[ivm - (ystride * 2)] = c_giant_mushroom_stem
+						end
+					else
+						air_count = 5
+					end
+				end
+			end
 		end
 	end
 
@@ -88,6 +84,3 @@ function vmg.generate(minp, maxp, seed)
 	vm:write_to_map()
 end
 
-function vmg.decorate(vm, x, y, z, heat, humidity)
-		print(x..","..y..","..z..", heat: "..heat..", humidity: "..humidity)
-end

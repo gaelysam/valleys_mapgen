@@ -24,7 +24,7 @@ end
 --dofile(vmg.path.."/biomes.lua")
 dofile(vmg.path.."/deco.lua")
 dofile(vmg.path.."/nodes.lua")
-dofile(vmg.path.."/mapgen.lua")
+dofile(vmg.path.."/voxel.lua")
 --dofile(vmg.path.."/traditional.lua")
 
 -- Call the mapgen function vmg.generate on mapgen.
