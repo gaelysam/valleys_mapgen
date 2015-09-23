@@ -2,3 +2,8 @@ GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
 See http://www.gnu.org/licenses/gpl-3.0.en.html
+
+Note: If we want this to be a part of the minetest base code, this
+must be relicensed to be compatible. For my part, I am willing to
+switch to BSD or any other license.
+-- Duane
