@@ -16,9 +16,9 @@ function vmg.generate(minp, maxp, seed)
 
 	local c_mushroom_fertile_brown = minetest.get_content_id("flowers:mushroom_fertile_brown")
 	local c_mushroom_fertile_red = minetest.get_content_id("flowers:mushroom_fertile_red")
-	local c_huge_mushroom_cap = minetest.get_content_id("valleys_mapgen_c:huge_mushroom_cap")
-	local c_giant_mushroom_cap = minetest.get_content_id("valleys_mapgen_c:giant_mushroom_cap")
-	local c_giant_mushroom_stem = minetest.get_content_id("valleys_mapgen_c:giant_mushroom_stem")
+	local c_huge_mushroom_cap = minetest.get_content_id("valleys_mapgen:huge_mushroom_cap")
+	local c_giant_mushroom_cap = minetest.get_content_id("valleys_mapgen:giant_mushroom_cap")
+	local c_giant_mushroom_stem = minetest.get_content_id("valleys_mapgen:giant_mushroom_stem")
 
 	-- Air and Ignore
 	local c_air = minetest.get_content_id("air")

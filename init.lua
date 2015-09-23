@@ -1,7 +1,7 @@
 vmg = {}
 vmg.version = "3.0"
 
-vmg.path = minetest.get_modpath("valleys_mapgen_c")
+vmg.path = minetest.get_modpath("valleys_mapgen")
 
 -- Modify a node to add a group
 function minetest.add_group(node, groups)
