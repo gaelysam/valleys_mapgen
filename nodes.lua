@@ -124,12 +124,14 @@ register_dirts("Sandy")
 
 -- Credits / Notes
 -- Banana tree: textures by demon_boy
+-- Birch tree: textures by Gael-de-Sailly
 -- Cherry Blossom tree: textures by demon_boy
 -- Fir tree: Fir trees don't exist in the default game. Textures from Forest mod by Gael-de-Sailly
 
 vmg.treelist = {
 --	 treename			treedesc			leafname	leafdesc	leaftiles					fruitname	fruitdesc	droprarity	selbox									healthpoints
 	{"banana",			"Banana",			"leaves",	"Leaves",	"banana_leaves",			"banana",	"Banana",	20,			{-0.35, -0.5, -0.35, 0.35, 0.5, 0.35},	3},
+	{"birch",			"Birch",			"leaves",	"Leaves",	"birch_leaves",				nil,		nil,		20,			nil,									nil},
 	{"cherry_blossom",	"Cherry Blossom",	"leaves",	"Leaves",	"cherry_blossom_leaves",	nil,		nil,		20,			nil,									nil},
 	{"fir",				"Fir",				"needles",	"Needles",	"fir_leaves",				nil,		nil,		20,			nil,									nil},
 }
