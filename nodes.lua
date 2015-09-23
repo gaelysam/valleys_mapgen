@@ -118,248 +118,149 @@ register_dirts("Sandy")
 -- Trees --
 -----------
 
--- Fir tree don't exist in the default game.
--- Textures from Forest mod (Gael-de-Sailly)
-minetest.register_node("valleys_mapgen:fir_tree", {
-	description = "Fir Tree",
-	tiles = {"vmg_fir_tree_top.png", "vmg_fir_tree_top.png", "vmg_fir_tree.png"},
-	paramtype2 = "facedir",
-	is_ground_content = false,
-	groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
-	sounds = default.node_sound_wood_defaults(),
+-- Credits / Notes
+-- Banana tree: textures by demon_boy
+-- Cherry Blossom tree: textures by demon_boy
+-- Fir tree: Fir trees don't exist in the default game. Textures from Forest mod by Gael-de-Sailly
 
-	on_place = minetest.rotate_node
-})
+vmg.treelist = {
+--	 treename			treedesc			leafname	leafdesc	leaftiles					fruitname	fruitdesc	droprarity	selbox									healthpoints
+	{"banana",			"Banana",			"leaves",	"Leaves",	"banana_leaves",			"banana",	"Banana",	20,			{-0.35, -0.5, -0.35, 0.35, 0.5, 0.35},	3},
+	{"cherry_blossom",	"Cherry Blossom",	"leaves",	"Leaves",	"cherry_blossom_leaves",	nil,		nil,		20,			nil,									nil},
+	{"fir",				"Fir",				"needles",	"Needles",	"fir_leaves",				nil,		nil,		20,			nil,									nil},
+}
 
-minetest.register_node("valleys_mapgen:fir_sapling", {
-	description = "Fir Sapling",
-	drawtype = "plantlike",
-	visual_scale = 1.0,
-	tiles = {"vmg_fir_sapling.png"},
-	inventory_image = "vmg_fir_sapling.png",
-	wield_image = "vmg_fir_sapling.png",
-	paramtype = "light",
-	sunlight_propagates = true,
-	walkable = false,
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.3, -0.5, -0.3, 0.3, 0.35, 0.3}
-	},
-	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1,sapling=1},
-	sounds = default.node_sound_leaves_defaults(),
-})
+for i in ipairs(vmg.treelist) do
+	local treename = vmg.treelist[i][1]
+	local treedesc = vmg.treelist[i][2]
+	local leafname = vmg.treelist[i][3]
+	local leafdesc = vmg.treelist[i][4]
+	local leaftiles = vmg.treelist[i][5]
+	local fruitname = vmg.treelist[i][6]
+	local fruitdesc = vmg.treelist[i][7]
+	local droprarity = vmg.treelist[i][8]
+	local selbox = vmg.treelist[i][9]
+	local healthpoints = vmg.treelist[i][10]
 
-minetest.register_node("valleys_mapgen:fir_needles", {
-	description = "Fir Needles",
-	drawtype = "allfaces_optional",
-	waving = 1,
-	visual_scale = 1.3,
-	tiles = {"vmg_fir_leaves.png"},
-	paramtype = "light",
-	is_ground_content = false,
-	groups = {snappy=3, leafdecay=7, flammable=2, leaves=1},
-	drop = {
-		max_items = 1,
-		items = {
-			{
-				-- player will get sapling with 1/20 chance
-				items = {'valleys_mapgen:fir_sapling'},
-				rarity = 20,
-			},
-			{
-				-- player will get leaves only if he get no saplings,
-				-- this is because max_items is 1
-				items = {'valleys_mapgen:fir_needles'},
-			}
+	minetest.register_node("valleys_mapgen:"..treename.."_tree", {
+		description = treedesc.." Tree",
+		tiles = {
+			"vmg_"..treename.."_tree_top.png",
+			"vmg_"..treename.."_tree_top.png",
+			"vmg_"..treename.."_tree.png"
+		},
+		paramtype2 = "facedir",
+		is_ground_content = true,
+		groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
+		sounds = default.node_sound_wood_defaults(),
+		on_place = minetest.rotate_node,
+	})
+
+	minetest.register_node("valleys_mapgen:"..treename.."_wood", {
+		description = treedesc.." Planks",
+		tiles = {"vmg_"..treename.."_wood.png"},
+		is_ground_content = true,
+		groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+		sounds = default.node_sound_wood_defaults(),
+	})
+
+	minetest.register_craft({
+		output = "valleys_mapgen:"..treename.."_wood 5",
+		recipe = {
+			{"valleys_mapgen:"..treename.."_tree"}
 		}
-	},
-	sounds = default.node_sound_leaves_defaults(),
+	})
 
-	after_place_node = default.after_place_leaves,
-})
+	minetest.register_node("valleys_mapgen:"..treename.."_sapling", {
+		description = treedesc.." Sapling",
+		drawtype = "plantlike",
+		visual_scale = 1.0,
+		tiles = {"vmg_"..treename.."_sapling.png"},
+		inventory_image = "vmg_"..treename.."_sapling.png",
+		wield_image = "vmg_"..treename.."_sapling.png",
+		paramtype = "light",
+		sunlight_propagates = true,
+		walkable = false,
+		selection_box = {
+			type = "fixed",
+			fixed = {-0.3, -0.5, -0.3, 0.3, 0.35, 0.3}
+		},
+		groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1,sapling=1},
+		sounds = default.node_sound_leaves_defaults(),
+	})
 
-minetest.register_node("valleys_mapgen:fir_wood", {
-	description = "Fir Wood Planks",
-	tiles = {"vmg_fir_wood.png"},
-	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
-	sounds = default.node_sound_wood_defaults(),
-})
-
-minetest.register_craft({
-	output = "valleys_mapgen:fir_wood 5",
-	recipe = {
-		{"valleys_mapgen:fir_tree"}
-	}
-})
-
-minetest.register_node("valleys_mapgen:banana_tree", {
-	description = "Banana Tree",
-	tiles = {"vmg_banana_tree_top.png", "vmg_banana_tree_top.png", "vmg_banana_tree.png"},
-	paramtype2 = "facedir",
-	is_ground_content = false,
-	groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
-	sounds = default.node_sound_wood_defaults(),
-	on_place = minetest.rotate_node
-})
-
-minetest.register_node("valleys_mapgen:banana_sapling", {
-	description = "Banana Sapling",
-	drawtype = "plantlike",
-	visual_scale = 1.0,
-	tiles = {"vmg_banana_sapling.png"},
-	inventory_image = "vmg_banana_sapling.png",
-	wield_image = "vmg_banana_sapling.png",
-	paramtype = "light",
-	sunlight_propagates = true,
-	walkable = false,
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.3, -0.5, -0.3, 0.3, 0.35, 0.3}
-	},
-	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1,sapling=1},
-	sounds = default.node_sound_leaves_defaults(),
-})
-
-minetest.register_node("valleys_mapgen:banana_leaves", {
-	description = "Banana Leaves",
-	drawtype = "allfaces_optional",
-	waving = 1,
-	visual_scale = 1.3,
-	tiles = {"vmg_banana_leaves.png"},
-	paramtype = "light",
-	is_ground_content = false,
-	groups = {snappy=3, leafdecay=7, flammable=2, leaves=1},
-	drop = {
-		max_items = 1,
-		items = {
-			{
-				-- player will get sapling with 1/20 chance
-				items = {'valleys_mapgen:banana_sapling'},
-				rarity = 20,
-			},
-			{
-				-- player will get leaves only if he get no saplings,
-				-- this is because max_items is 1
-				items = {'valleys_mapgen:banana_leaves'},
+	minetest.register_node("valleys_mapgen:"..treename.."_"..leafname.."", {
+		description = treedesc.." "..leafdesc.."",
+		drawtype = "allfaces_optional",
+		waving = 1,
+		visual_scale = 1.3,
+		tiles = { "vmg_"..leaftiles..".png"},
+		paramtype = "light",
+		is_ground_content = false,
+		groups = {snappy=3, leafdecay=7, flammable=2, leaves=1},
+		drop = {
+			max_items = 1,
+			items = {
+				{items = {"valleys_mapgen:"..treename.."_sapling"}, rarity = droprarity },
+				{items = {"valleys_mapgen:"..treename.."_"..leafname..""} }
 			}
-		}
-	},
-	sounds = default.node_sound_leaves_defaults(),
+		},
+		sounds = default.node_sound_leaves_defaults(),
+		after_place_node = default.after_place_leaves,
+	})
 
-	after_place_node = default.after_place_leaves,
-})
-
-minetest.register_node("valleys_mapgen:banana_wood", {
-	description = "Banana Wood Planks",
-	tiles = {"vmg_banana_wood.png"},
-	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
-	sounds = default.node_sound_wood_defaults(),
-})
-
-minetest.register_craft({
-	output = "valleys_mapgen:banana_wood 5",
-	recipe = {
-		{"valleys_mapgen:banana_tree"}
-	}
-})
-
-minetest.register_node("valleys_mapgen:banana", {
-	description = "Banana",
-	drawtype = "plantlike",
-	visual_scale = 1.0,
-	tiles = {"vmg_banana.png"},
-	inventory_image = "vmg_banana.png",
-	paramtype = "light",
-	sunlight_propagates = true,
-	walkable = false,
-	is_ground_content = false,
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.2, -0.5, -0.2, 0.2, 0, 0.2}
-	},
-	groups = {fleshy=3,dig_immediate=3,flammable=2,leafdecay=3,leafdecay_drop=1},
-	on_use = minetest.item_eat(3),
-	sounds = default.node_sound_leaves_defaults(),
-	after_place_node = function(pos, placer, itemstack)
-		if placer:is_player() then
-			minetest.set_node(pos, {name="valleys_mapgen:banana", param2=1})
-		end
-	end,
-})
-
-minetest.register_node("valleys_mapgen:cherry_blossom_tree", {
-	description = "Cherry Blossom Tree",
-	tiles = {"vmg_cherry_blossom_tree_top.png", "vmg_cherry_blossom_tree_top.png", "vmg_cherry_blossom_tree.png"},
-	paramtype2 = "facedir",
-	is_ground_content = false,
-	groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
-	sounds = default.node_sound_wood_defaults(),
-	on_place = minetest.rotate_node
-})
-
-minetest.register_node("valleys_mapgen:cherry_blossom_sapling", {
-	description = "Cherry Blossom Sapling",
-	drawtype = "plantlike",
-	visual_scale = 1.0,
-	tiles = {"vmg_cherry_blossom_sapling.png"},
-	inventory_image = "vmg_cherry_blossom_sapling.png",
-	wield_image = "vmg_cherry_blossom_sapling.png",
-	paramtype = "light",
-	sunlight_propagates = true,
-	walkable = false,
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.3, -0.5, -0.3, 0.3, 0.35, 0.3}
-	},
-	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1,sapling=1},
-	sounds = default.node_sound_leaves_defaults(),
-})
-
-minetest.register_node("valleys_mapgen:cherry_blossom_leaves", {
-	description = "Cherry Blossom Leaves",
-	drawtype = "allfaces_optional",
-	waving = 1,
-	visual_scale = 1.3,
-	tiles = {"vmg_cherry_blossom_leaves.png"},
-	paramtype = "light",
-	is_ground_content = false,
-	groups = {snappy=3, leafdecay=7, flammable=2, leaves=1},
-	drop = {
-		max_items = 1,
-		items = {
-			{
-				-- player will get sapling with 1/20 chance
-				items = {'valleys_mapgen:cherry_blossom_sapling'},
-				rarity = 20,
+	if fruitname then
+		minetest.register_node("valleys_mapgen:"..fruitname.."", {
+			description = fruitdesc,
+			drawtype = "plantlike",
+			visual_scale = 1.0,
+			tiles = { "vmg_"..fruitname..".png" },
+			inventory_image = "vmg_"..fruitname..".png",
+			wield_image = "vmg_"..fruitname..".png",
+			paramtype = "light",
+			sunlight_propagates = true,
+			walkable = false,
+			is_ground_content = false,
+			selection_box = {
+				type = "fixed",
+					fixed = selbox
 			},
-			{
-				-- player will get leaves only if he get no saplings,
-				-- this is because max_items is 1
-				items = {'valleys_mapgen:cherry_blossom_leaves'},
-			}
-		}
-	},
-	sounds = default.node_sound_leaves_defaults(),
+			groups = {fleshy=3,dig_immediate=3,flammable=2, leafdecay=3,leafdecay_drop=1},
+			on_use = minetest.item_eat(healthpoints),
+			sounds = default.node_sound_leaves_defaults(),
+			after_place_node = function(pos, placer, itemstack)
+				if placer:is_player() then
+					minetest.set_node(pos, {name="valleys_mapgen:"..fruitname.."", param2=1})
+				end
+			end,
+		})
+	end
 
-	after_place_node = default.after_place_leaves,
-})
+	if minetest.get_modpath("stairs") then
+		stairs.register_stair_and_slab(
+			"vmg_"..treename.."_tree",
+			"valleys_mapgen:"..treename.."_tree",
+			{snappy=1, choppy=2, oddly_breakable_by_hand=1, flammable=2 },
+			{	"vmg_"..treename.."_tree_top.png",
+				"vmg_"..treename.."_tree_top.png",
+				"vmg_"..treename.."_tree.png"
+			},
+			treedesc.." Tree Stair",
+			treedesc.." Tree Slab",
+			default.node_sound_wood_defaults()
+		)
+		stairs.register_stair_and_slab(
+			"vmg_"..treename.."_wood",
+			"valleys_mapgen:"..treename.."_wood",
+			{ snappy=1, choppy=2, oddly_breakable_by_hand=2, flammable=3 },
+			{"vmg_"..treename.."_wood.png" },
+			treedesc.." Planks Stair",
+			treedesc.." Planks Slab",
+			default.node_sound_wood_defaults()
+		)
+	end
 
-minetest.register_node("valleys_mapgen:cherry_blossom_wood", {
-	description = "Cherry Blossom Planks",
-	tiles = {"vmg_cherry_blossom_wood.png"},
-	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
-	sounds = default.node_sound_wood_defaults(),
-})
-
-minetest.register_craft({
-	output = "valleys_mapgen:cherry_blossom_wood 5",
-	recipe = {
-		{"valleys_mapgen:cherry_blossom_tree"}
-	}
-})
+end
 
 
 ----------------------
