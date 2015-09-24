@@ -269,70 +269,61 @@ end
 -- Flowers / Plants --
 ----------------------
 
-minetest.register_node("valleys_mapgen:bird_of_paradise", {
-	description = "Bird of Paradise",
-	drawtype = "plantlike",
-	tiles = {"vmg_bird_of_paradise.png"},
-	inventory_image = "vmg_bird_of_paradise.png",
-	paramtype = "light",
-	walkable = false,
-	visual_scale = 1.2,
-	groups = {snappy=3,flammable=2,flora=1,attached_node=1},
-	sounds = default.node_sound_leaves_defaults(),
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5},
-	},
-})
+-- Credits / Notes
+-- Arrow Arum: texture by demon_boy
+-- Bird of Paradise: texture by demon_boy
+-- Calla Lily: texture by demon_boy
+-- Gerbera: texture by demon_boy
+-- Hibiscus: texture by demon_boy
+-- Orchid: texture by demon_boy
 
-minetest.register_node("valleys_mapgen:gerbera", {
-	description = "Gerbera",
-	drawtype = "plantlike",
-	tiles = {"vmg_gerbera.png"},
-	inventory_image = "vmg_gerbera.png",
-	sunlight_propagates = true,
-	paramtype = "light",
-	walkable = false,
-	groups = {snappy=3,flammable=2,flower=1,flora=1,attached_node=1,color_pink=1},
-	sounds = default.node_sound_leaves_defaults(),
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.15, -0.5, -0.15, 0.15, 0.2, 0.15},
-	},
-})
+vmg.plantlist = {
+--	 plantname				plantdesc			plantwave	plantlight	plantgroup			selbox
+	{"arrow_arum",			"Arrow Arum",		1,			"false",	"plantnodye",		{-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5}},
+	{"bird_of_paradise",	"Bird of Paradise",	0, 			"true",		"flowernodye",		{-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5}},
+	{"calla_lily",			"Calla Lily",		1,			"true",		"flowerwhitedye",	{-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5}},
+	{"gerbera",				"Gerbera",			0,			"true",		"flowerpinkdye",	{-0.15, -0.5, -0.15, 0.15, 0.2, 0.15}},
+	{"hibiscus",			"Hibiscus",			1,			"false",	"flowerwhitedye",	{-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5}},
+	{"orchid",				"Orchid",			1,			"true",		"flowerwhitedye",	{-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5}},
+}
 
-minetest.register_node("valleys_mapgen:hibiscus", {
-	description = "White Hibiscus",
-	drawtype = "plantlike",
-	tiles = {"vmg_hibiscus.png"},
-	inventory_image = "vmg_hibiscus.png",
-	paramtype = "light",
-	walkable = false,
-	waving = 1,
-	groups = {snappy=3,flammable=2,flower=1,flora=1,attached_node=1,color_white=1},
-	sounds = default.node_sound_leaves_defaults(),
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5},
-	},
-})
+for i in ipairs(vmg.plantlist) do
+	local plantname = vmg.plantlist[i][1]
+	local plantdesc = vmg.plantlist[i][2]
+	local plantwave = vmg.plantlist[i][3]
+	local plantlight = vmg.plantlist[i][4]
+	local plantgroup = vmg.plantlist[i][5]
+	local selbox = vmg.plantlist[i][6]
 
-minetest.register_node("valleys_mapgen:orchid", {
-	description = "Orchid",
-	drawtype = "plantlike",
-	tiles = {"vmg_orchid.png"},
-	inventory_image = "vmg_orchid.png",
-	paramtype = "light",
-	walkable = false,
-	waving = 1,
-	groups = {snappy=3,flammable=2,flower=1,flora=1,attached_node=1,color_white=1},
-	sounds = default.node_sound_leaves_defaults(),
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5},
-	},
-})
+	--group definitions
+	if vmg.plantlist[i][5] == "plantnodye" then
+		plantgroups = {snappy=3,flammable=2,flora=1,attached_node=1}
+	elseif vmg.plantlist[i][5] == "flowernodye" then
+		plantgroups = {snappy=3,flammable=2,flower=1,flora=1,attached_node=1}
+	elseif vmg.plantlist[i][5] == "flowerpinkdye" then
+		plantgroups = {snappy=3,flammable=2,flower=1,flora=1,attached_node=1,color_pink=1}
+	elseif vmg.plantlist[i][5] == "flowerwhitedye" then
+		plantgroups = {snappy=3,flammable=2,flower=1,flora=1,attached_node=1,color_white=1}
+	end
 
+	minetest.register_node("valleys_mapgen:"..plantname.."", {
+		description = plantdesc,
+		drawtype = "plantlike",
+		tiles = {"vmg_"..plantname..".png"},
+		inventory_image = "vmg_"..plantname..".png",
+		waving = plantwave,
+		sunlight_propagates = plantlight,
+		paramtype = "light",
+		walkable = false,
+		groups = plantgroups,
+		sounds = default.node_sound_leaves_defaults(),
+		selection_box = {
+			type = "fixed",
+			fixed = selbox,
+		},
+	})
+
+end
 
 
 minetest.register_node("valleys_mapgen:huge_mushroom_cap", {
