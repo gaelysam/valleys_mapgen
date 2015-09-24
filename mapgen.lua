@@ -204,7 +204,9 @@ function vmg.generate(minp, maxp, seed)
 	local c_huge_mushroom_cap = minetest.get_content_id("valleys_mapgen:huge_mushroom_cap")
 	local c_giant_mushroom_cap = minetest.get_content_id("valleys_mapgen:giant_mushroom_cap")
 	local c_giant_mushroom_stem = minetest.get_content_id("valleys_mapgen:giant_mushroom_stem")
+	local c_arrow_arum = minetest.get_content_id("valleys_mapgen:arrow_arum")
 	local c_bird_of_paradise = minetest.get_content_id("valleys_mapgen:bird_of_paradise")
+	local c_calla_lily = minetest.get_content_id("valleys_mapgen:calla_lily")
 	local c_hibiscus = minetest.get_content_id("valleys_mapgen:hibiscus")
 	local c_orchid = minetest.get_content_id("valleys_mapgen:orchid")
 
@@ -441,8 +443,12 @@ function vmg.generate(minp, maxp, seed)
 										for i = 1, 4 do
 											data[ivm+i*ystride] = c_papyrus
 										end
-									elseif temp > 1 and temp < 1.6 and v2 >= 0 and v2 < 0.1 and math.random(100) <= 2 and y < 60 then -- hibiscus along rivers
+									elseif humidity > 1 and v2 < 0.01 and v13 > 0.1 and v15 < 0.25 and y > 3 then -- arrow arum on river banks
+										data[ivm2] = c_arrow_arum
+									elseif temp > 1 and temp < 1.6 and v2 < 0.05 and math.random(100) <= 2 and y > 3 and y < 60 then -- hibiscus along rivers
 										data[ivm2] = c_hibiscus
+									elseif temp > 1.2 and v2 < 0.02 and v13 < 1 and v14 < 0.1 and v15 < 0.75 and math.random(100) <= 20 and y > 3 then -- calla lily on river banks
+										data[ivm2] = c_calla_lily
 									elseif v15 < 0.65 and temp >= 0.65 and temp < 1.5 and humidity < 2.6 and v16 < 1.5 and v13 < 0.8 and math.random() < 0.7 then -- Grass
 										data[ivm2] = c_grass[math.random(1, 5)]
 									elseif v15 > -0.6 and temp >= 1.8 and humidity > 2.2 and v16 > 1.8 then -- jungle plants
