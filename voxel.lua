@@ -19,6 +19,9 @@ function vmg.generate(minp, maxp, seed)
 	local c_huge_mushroom_cap = minetest.get_content_id("valleys_mapgen:huge_mushroom_cap")
 	local c_giant_mushroom_cap = minetest.get_content_id("valleys_mapgen:giant_mushroom_cap")
 	local c_giant_mushroom_stem = minetest.get_content_id("valleys_mapgen:giant_mushroom_stem")
+	local c_glowing_fungal_stone = minetest.get_content_id("valleys_mapgen:glowing_fungal_stone")
+	local c_stalactite = minetest.get_content_id("valleys_mapgen:stalactite")
+	local c_stalagmite = minetest.get_content_id("valleys_mapgen:stalagmite")
 
 	-- Air and Ignore
 	local c_air = minetest.get_content_id("air")
@@ -43,37 +46,51 @@ function vmg.generate(minp, maxp, seed)
 
 	-- THE CORE OF THE MOD: THE MAPGEN ALGORITHM ITSELF
 
-	local air_count = 5
 	for x = minp.x, maxp.x do -- for each YZ plane
 		for z = minp.z, maxp.z do -- for each vertical line in this plane
-			air_count = 5
-			for y = minp.y, maxp.y do -- for each node in vertical line
-				if y < -1 then
-					local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
-					if data[ivm] == c_dirt then
-						-- print("dirt")
-						air_count = 0
-					elseif data[ivm] == c_air then
-						air_count = air_count + 1
-						local r = math.random(6)
+			local underground = false
+			local air_count = 0
+			for y = maxp.y, minp.y, -1 do -- for each node in vertical line
+				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
+				if y < -1 or data[ivm] == c_stone then
+					underground = true
+				end
 
-						if air_count == 1 then
-							if r == 1 then
-								data[ivm] = c_mushroom_fertile_red
-							elseif r == 2 then
-								data[ivm] = c_mushroom_fertile_brown
-							end
-						elseif air_count == 2 and r == 1 then
-							data[ivm] = c_huge_mushroom_cap
-							data[ivm - ystride] = c_giant_mushroom_stem
-						elseif air_count == 3 and r == 1 then
-							data[ivm] = c_giant_mushroom_cap
-							data[ivm - ystride] = c_giant_mushroom_stem
-							data[ivm - (ystride * 2)] = c_giant_mushroom_stem
-						end
-					else
-						air_count = 5
+				if underground and data[ivm] == c_stone or data[ivm] == c_dirt then
+					local r = math.random(50)
+
+					if air_count > 0 and r == 1 then
+						data[ivm + ystride] = c_mushroom_fertile_red
+						data[ivm] = c_dirt
+					elseif air_count > 0 and r == 2 then
+						data[ivm + ystride] = c_mushroom_fertile_brown
+						data[ivm] = c_dirt
+					elseif air_count > 1 and r == 4 then
+						data[ivm + ystride*2] = c_huge_mushroom_cap
+						data[ivm + ystride] = c_giant_mushroom_stem
+						data[ivm] = c_dirt
+					elseif air_count > 2 and r == 5 then
+						data[ivm + ystride*3] = c_giant_mushroom_cap
+						data[ivm + ystride*2] = c_giant_mushroom_stem
+						data[ivm + ystride] = c_giant_mushroom_stem
+						data[ivm] = c_dirt
+					elseif air_count > 0 and r <18 then
+						data[ivm + ystride] = c_stalagmite
 					end
+
+					air_count = 0
+				elseif underground and data[ivm] == c_air then
+					air_count = air_count + 1
+					if air_count == 1 and y < maxp.y and data[ivm + ystride] == c_stone then
+						local r = math.random(20)
+						if r == 1 then
+							data[ivm + ystride] = c_glowing_fungal_stone
+						elseif r < 5 then
+							data[ivm] = c_stalactite
+						end
+					end
+				else
+					air_count = 0
 				end
 			end
 		end

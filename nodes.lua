@@ -1,7 +1,3 @@
-minetest.register_alias("default:glowing_fungal_stone", "valleys_mapgen:glowing_fungal_stone")
-minetest.register_alias("default:stalactite", "valleys_mapgen:stalactite")
-minetest.register_alias("default:stalagmite", "valleys_mapgen:stalagmite")
-
 -- Set the liquid range according to settings (by default 3)
 -- local waterflow = vmg.define("waterflow", 3)
 
