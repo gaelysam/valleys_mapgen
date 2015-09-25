@@ -15,9 +15,9 @@ minetest.add_group("default:leaves", {leafdecay = 4})
 minetest.add_group("default:jungleleaves", {leafdecay = 7})
 minetest.add_group("default:pine_needles", {leafdecay = 6})
 
-decos = {}
+local decos = {}
 for id, deco_table in pairs(minetest.registered_decorations) do
-	if deco_table.schematic and not (deco_table.schematic:find('apple_tree') or deco_table.schematic:find('pine_tree') or deco_table.schematic:find('jungle_tree')) then
+	if not deco_table.schematic or not (deco_table.schematic:find('apple_tree') or deco_table.schematic:find('pine_tree') or deco_table.schematic:find('jungle_tree')) then
 		table.insert(decos, deco_table)
 	end
 end
@@ -47,7 +47,7 @@ newnode.tiles = {"default_pine_needles^[colorize:#00FF00:20"}
 minetest.register_node("valleys_mapgen:pine_needles4", newnode)
 
 newnode = vmg.clone_node("default:jungleleaves")
-newnode.tiles = {"default_jungleleaves.png^[colorize:#FF0000:20"}
+newnode.tiles = {"default_jungleleaves.png^[colorize:#FF0000:10"}
 minetest.register_node("valleys_mapgen:jungleleaves2", newnode)
 newnode.tiles = {"default_jungleleaves^[colorize:#FFFF00:40"}
 minetest.register_node("valleys_mapgen:jungleleaves3", newnode)
@@ -231,9 +231,8 @@ function vmg.generate_tree_schematic(height, radii, trunk, leaf, limbs)
 			for y = -radii.y,radii.y do
 				for z = -radii.z,radii.z do
 					if x^2/(radii.x-3)^2 + y^2/(radii.y-3)^2 + z^2/(radii.z-3)^2 <= 1 then
-						--local dist = math.sqrt(x^2 + y^2 + z^2)
-						-- if dist < radii.x - 3 then
-						if math.random(4) == 1 then
+						local dist = math.sqrt(x^2 + y^2 + z^2)
+						if dist < radii.x - 3 and math.random(4) == 1 then
 							local i = (x+radii.x)*width*height + (y+(height-radii.y-1))*width + (z+radii.z) + 1
 
 							d[i].name = trunk
@@ -338,7 +337,7 @@ for i = 1,#leaves do
 			deco_type = "schematic",
 			place_on = {"default:dirt_with_grass", "default:dirt_with_dry_grass"},
 			sidelen = 80,
-			fill_ratio = (6-r)/500,
+			fill_ratio = (6-r)/300,
 			biomes = {"deciduous_forest",},
 			-- y_min = -31000,
 			-- y_max = 31000,
