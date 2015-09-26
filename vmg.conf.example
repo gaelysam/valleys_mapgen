@@ -41,6 +41,8 @@
 #    if not any of noises 13, 14 and 15 is above this value, make normal dirt. Else make special dirt.
 #river_depth = 3
 #river_size = 5
+#caves = true
+# Set to false to turn caves off. This saves significant processing time.
 #caves_size = 7
 #lava_depth = 2000
 #    to manage lava amount increasing by going deep underground : lower values = bigger increasing.

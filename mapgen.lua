@@ -96,6 +96,7 @@ local caves_size = vmg.define("caves_size", 7) / 100
 local lava_depth = vmg.define("lava_depth", 2000)
 local lava_max_height = vmg.define("lava_max_height", -1)
 local altitude_chill = vmg.define("altitude_chill", 90)
+local do_caves = vmg.define("caves", true)
 local do_cave_stuff = vmg.define("cave_stuff", false)
 
 local average_stone_level = vmg.define("average_stone_level", 180)
@@ -243,11 +244,18 @@ function vmg.generate(minp, maxp, seed)
 	local n5 = vmg.noisemap(5, minp2d, chulens)
 	local n6 = vmg.noisemap(6, minp, chulens_sup)
 	local n7 = vmg.noisemap(7, minp2d, chulens)
-	local n8 = vmg.noisemap(8, minp, chulens)
-	local n9 = vmg.noisemap(9, minp, chulens)
-	local n10 = vmg.noisemap(10, minp, chulens)
-	local n11 = vmg.noisemap(11, minp, chulens)
-	local n12 = vmg.noisemap(12, minp, chulens)
+	local n8
+	local n9
+	local n10
+	local n11
+	local n12
+	if do_caves then
+		n8 = vmg.noisemap(8, minp, chulens)
+		n9 = vmg.noisemap(9, minp, chulens)
+		n10 = vmg.noisemap(10, minp, chulens)
+		n11 = vmg.noisemap(11, minp, chulens)
+		n12 = vmg.noisemap(12, minp, chulens)
+	end
 	local n13 = vmg.noisemap(13, minp2d, chulens)
 	local n14 = vmg.noisemap(14, minp2d, chulens)
 	local n15 = vmg.noisemap(15, minp2d, chulens)
@@ -344,8 +352,12 @@ function vmg.generate(minp, maxp, seed)
 
 			for y = minp.y, maxp.y do -- for each node in vertical line
 				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
-				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d] -- take the noise values for 3D noises
-				local is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size -- The 4 cave noises must be close to zero to produce a cave. The square is used for 2 reasons : we need positive values, and, for mathematical reasons, it results in more circular caves.
+				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], -1, -1, -1, -1, -1 -- take the noise values for 3D noises
+				local is_cave = false
+				if do_caves then
+					v8, v9, v10, v11, v12 = n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d] -- take the noise values for 3D noises
+					is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size -- The 4 cave noises must be close to zero to produce a cave. The square is used for 2 reasons : we need positive values, and, for mathematical reasons, it results in more circular caves.
+				end
 
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
 					if not is_cave then -- if pos is not inside a cave
