@@ -2,18 +2,18 @@
 Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
 Mod created by Gael-de-Sailly and now mainly developed by duane-r.
 
-![Screenshot](http://i.imgur.com/A6CBuaV.png)
+![Screenshot](http://i.imgur.com/9Avs3tw.png)
 
 [Discussion on Minetest Forums](https://forum.minetest.net/viewtopic.php?f=9&t=11430)
 
 ## Changelog
-### 2.1 ~> Latest
+### 2.1 ~> 2.2 (Saturday September 26, 2015)
 * Added support for darkage ores
-* Added banana tree
+* Added birch tree, cherry tree and banana tree
 * Water and giant mushrooms in caves
 * Added Mushrooms
 * Adapted sapling growth to new minetest_game API
-* Added flowers (10 species)
+* Added flowers (12 species)
 
 ### 2.0 ~> 2.1 (Saturday July 4, 2015)
 * Modified conditions for desert plants
