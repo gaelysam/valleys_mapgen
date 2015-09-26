@@ -1,4 +1,4 @@
--- Mapgen 2.3-dev
+-- Mapgen 2.2
 -- Saturday September 26, 2015
 
 -- Define perlin noises used in this mapgen by default
@@ -616,7 +616,7 @@ function vmg.generate(minp, maxp, seed)
 end
 
 -- Trees are registered in a separate file
-dofile(vmg.path .. "/trees.lua")
+dofile(vmg.path .. "/old_mapgens/2.2-trees.lua")
 
 function vmg.get_humidity_raw(pos)
 	local v13 = vmg.get_noise(pos, 13) -- Clayey soil : wetter
