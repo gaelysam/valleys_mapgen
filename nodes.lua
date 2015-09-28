@@ -157,7 +157,7 @@ for i in ipairs(vmg.treelist) do
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
 	}
-	if treename == "banana" or treename == "cherry_blossom" then
+	if treename == "banana" or treename == "cherry_blossom" or treename == "birch" then
 		node_d.paramtype = "light"
 		node_d.drawtype = "nodebox"
 		node_d.node_box = { type = "fixed", 
@@ -499,6 +499,6 @@ minetest.register_craft({
 })
 
 -- Change leafdecay ratings
-minetest.add_group("default:leaves", {leafdecay = 5})
-minetest.add_group("default:jungleleaves", {leafdecay = 8})
-minetest.add_group("default:pine_needles", {leafdecay = 7})
+-- minetest.add_group("default:leaves", {leafdecay = 5})
+-- minetest.add_group("default:jungleleaves", {leafdecay = 8})
+-- minetest.add_group("default:pine_needles", {leafdecay = 7})

@@ -85,7 +85,31 @@ minetest.register_decoration({
 	sidelen = 80,
 	noise_params = v2,
 	decoration = {"valleys_mapgen_c:hibiscus",},
-	biomes = {"sandstone_grassland", "stone_grassland", "coniferous_forest", "deciduous_forest", "rainforest",},
+	biomes = {"sandstone_grassland", "stone_grassland", "deciduous_forest",},
+	y_max = 60,
+})
+
+-- Flower: Arrow Arum
+local v2 = {offset = 0, scale = 0.005, seed = -6050, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.6, lacunarity = 2}
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass"},
+	sidelen = 80,
+	noise_params = v2,
+	decoration = {"valleys_mapgen_c:arrow_arum",},
+	biomes = {"rainforest",},
+	y_max = 60,
+})
+
+-- Flower: Calla Lily
+local v2 = {offset = 0, scale = 0.005, seed = -6050, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.6, lacunarity = 2}
+minetest.register_decoration({
+	deco_type = "simple",
+	place_on = {"default:dirt_with_grass"},
+	sidelen = 80,
+	noise_params = v2,
+	decoration = {"valleys_mapgen_c:calla_lily",},
+	biomes = {"sandstone_grassland", "stone_grassland", "deciduous_forest", "rainforest",},
 	y_max = 60,
 })
 
@@ -114,6 +138,7 @@ end
 
 -- Create a schematic for a spherical tree.
 function vmg.generate_tree_schematic(height, radii, trunk, leaf, fruit, limbs)
+	height = height + 1
 	local width = 2 * radii.z + 1
 	local trunk_top = height-radii.y-1
 	local trunk_bottom = height-2*radii.y
@@ -204,6 +229,7 @@ end
 
 -- Create a schematic for a jungle tree.
 function vmg.generate_jungle_tree_schematic(height, trunk, leaf)
+	height = height + 1
 	local radius = 6
 	local width = 2 * radius + 1
 	local trunk_top = height - 4
@@ -215,7 +241,7 @@ function vmg.generate_jungle_tree_schematic(height, trunk, leaf)
 	for x = -1,1 do
 		for y = 0,trunk_top do
 			for z = -1,1 do
-				i = (x+radius)*width*height + y*width + (z+radius) + 1
+				local i = (x+radius)*width*height + y*width + (z+radius) + 1
 				if x == 0 and z == 0 then
 					s.data[i].name = trunk
 					s.data[i].param1 = 255
@@ -283,6 +309,7 @@ end
 
 -- similar to the general tree schematic, but basically vertical
 function vmg.generate_conifer_schematic(height, radius, trunk, leaf)
+	height = height + 1
 	local width = 2 * radius + 1
 	local trunk_top = height - radius - 1
 	local trunk_bottom = math.min(radius, 3)
@@ -526,12 +553,37 @@ do
 	end
 end
 
+-- Birch trees work with the generic generator.
+vmg.schematics.birch_trees = {}
+do
+	local max_h = 7
+
+	for h = 5,max_h do
+		local schem = vmg.generate_tree_schematic(h, {x=2, y=2, z=2}, "valleys_mapgen:birch_tree", "valleys_mapgen:birch_leaves")
+
+		push(vmg.schematics.birch_trees, schem)
+
+		minetest.register_decoration({
+			deco_type = "schematic",
+			sidelen = 80,
+			place_on = {"default:dirt_with_grass", "default:dirt_with_dry_grass"},
+			fill_ratio = (max_h-h+1)/3000,
+			biomes = {"deciduous_forest",},
+			schematic = schem,
+			flags = "place_center_x, place_center_z",
+			rotation = "random",
+		})
+	end
+end
+
 -- list of all vmg-specific saplings
 vmg.saplings = {
 	{sapling="valleys_mapgen:banana_sapling",
 	 schematics=vmg.schematics.banana_plants},
 	{sapling="valleys_mapgen:cherry_blossom_sapling",
 	 schematics=vmg.schematics.cherry_trees},
+	{sapling="valleys_mapgen:birch_sapling",
+	 schematics=vmg.schematics.birch_trees},
  }
 -- create a list of just the node names
 local sapling_list = {}
