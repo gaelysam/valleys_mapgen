@@ -144,7 +144,7 @@ for i in ipairs(vmg.treelist) do
 	local selbox = vmg.treelist[i][9]
 	local healthpoints = vmg.treelist[i][10]
 
-	minetest.register_node("valleys_mapgen:"..treename.."_tree", {
+	local node_d = {
 		description = treedesc.." Tree",
 		tiles = {
 			"vmg_"..treename.."_tree_top.png",
@@ -156,7 +156,15 @@ for i in ipairs(vmg.treelist) do
 		groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
-	})
+	}
+	if treename == "banana" or treename == "cherry_blossom" then
+		node_d.paramtype = "light"
+		node_d.drawtype = "nodebox"
+		node_d.node_box = { type = "fixed", 
+			fixed = { {-0.3, -0.5, -0.3, 0.3, 0.5, 0.3}, }
+		}
+	end
+	minetest.register_node("valleys_mapgen:"..treename.."_tree", node_d)
 
 	minetest.register_node("valleys_mapgen:"..treename.."_wood", {
 		description = treedesc.." Planks",
@@ -479,6 +487,15 @@ minetest.register_node("valleys_mapgen:stalagmite", {
 		} },
 	groups = {stone=1, cracky=3},
 	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_craft({
+	output = "default:cobble",
+	recipe = {
+		{"", "", ""},
+		{"valleys_mapgen:small_rocks", "valleys_mapgen:small_rocks", ""},
+		{"valleys_mapgen:small_rocks", "valleys_mapgen:small_rocks", ""},
+	},
 })
 
 -- Change leafdecay ratings
