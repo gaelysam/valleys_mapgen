@@ -49,15 +49,15 @@ minetest.register_node("valleys_mapgen:leaves5", newnode)
 newnode = vmg.clone_node("default:pine_needles")
 newnode.tiles = {"default_pine_needles.png^[colorize:#FF0000:20"}
 minetest.register_node("valleys_mapgen:pine_needles2", newnode)
-newnode.tiles = {"default_pine_needles^[colorize:#FFFF00:20"}
+newnode.tiles = {"default_pine_needles.png^[colorize:#FFFF00:20"}
 minetest.register_node("valleys_mapgen:pine_needles3", newnode)
-newnode.tiles = {"default_pine_needles^[colorize:#00FF00:20"}
+newnode.tiles = {"default_pine_needles.png^[colorize:#00FF00:20"}
 minetest.register_node("valleys_mapgen:pine_needles4", newnode)
 
 newnode = vmg.clone_node("default:jungleleaves")
 newnode.tiles = {"default_jungleleaves.png^[colorize:#FF0000:10"}
 minetest.register_node("valleys_mapgen:jungleleaves2", newnode)
-newnode.tiles = {"default_jungleleaves^[colorize:#FFFF00:40"}
+newnode.tiles = {"default_jungleleaves.png^[colorize:#FFFF00:40"}
 minetest.register_node("valleys_mapgen:jungleleaves3", newnode)
 
 	-- biomes = {"sandstone_grassland", "glacier", "tundra", "taiga", "stone_grassland", "coniferous_forest", "deciduous_forest", "desert", "savanna", "rainforest", "rainforest_swamp",},
