@@ -124,8 +124,8 @@ register_dirts("Sandy")
 -- Cherry Blossom tree: textures by demon_boy
 -- Fir tree: Fir trees don't exist in the default game. Textures from Forest mod by Gael-de-Sailly
 
+-- a list of tree descriptions
 vmg.treelist = {
---	 treename			treedesc			leafname	leafdesc	leaftiles					fruitname	fruitdesc	droprarity	selbox									healthpoints     trunk diameter
 	{name="banana",
 	 desc="Banana",
 	 leaf="leaves",
@@ -161,6 +161,7 @@ vmg.treelist = {
 }
 
 for _, tree in ipairs(vmg.treelist) do
+	-- a standard node description
 	local node_d = {
 		description = tree.desc.." Tree",
 		tiles = {
@@ -174,6 +175,7 @@ for _, tree in ipairs(vmg.treelist) do
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
 	}
+	-- Some trunks aren't a meter wide.
 	if tree.trunk_dia and tree.trunk_dia ~= 1 then
 		local radius = tree.trunk_dia / 2
 		node_d.paramtype = "light"
@@ -184,6 +186,7 @@ for _, tree in ipairs(vmg.treelist) do
 	end
 	minetest.register_node("valleys_mapgen:"..tree.name.."_tree", node_d)
 
+	-- planks that come from the tree
 	minetest.register_node("valleys_mapgen:"..tree.name.."_wood", {
 		description = tree.desc.." Planks",
 		tiles = {"vmg_"..tree.name.."_wood.png"},
@@ -192,6 +195,7 @@ for _, tree in ipairs(vmg.treelist) do
 		sounds = default.node_sound_wood_defaults(),
 	})
 
+	-- how to get the planks
 	minetest.register_craft({
 		output = "valleys_mapgen:"..tree.name.."_wood 5",
 		recipe = {
@@ -199,6 +203,7 @@ for _, tree in ipairs(vmg.treelist) do
 		}
 	})
 
+	-- the tree's sapling form
 	minetest.register_node("valleys_mapgen:"..tree.name.."_sapling", {
 		description = tree.desc.." Sapling",
 		drawtype = "plantlike",
@@ -217,6 +222,7 @@ for _, tree in ipairs(vmg.treelist) do
 		sounds = default.node_sound_leaves_defaults(),
 	})
 
+	-- leaves for the tree
 	minetest.register_node("valleys_mapgen:"..tree.name.."_"..tree.leaf.."", {
 		description = tree.desc.." "..tree.leaf_desc.."",
 		drawtype = "allfaces_optional",
@@ -237,6 +243,7 @@ for _, tree in ipairs(vmg.treelist) do
 		after_place_node = default.after_place_leaves,
 	})
 
+	-- appropriate fruit
 	if tree.fruit then
 		minetest.register_node("valleys_mapgen:"..tree.fruit.."", {
 			description = tree.fruit_desc,
@@ -254,6 +261,7 @@ for _, tree in ipairs(vmg.treelist) do
 					fixed = tree.selbox
 			},
 			groups = {fleshy=3,dig_immediate=3,flammable=2, leafdecay=3,leafdecay_drop=1},
+			-- Fruit makes you healthy.
 			on_use = minetest.item_eat(tree.health),
 			sounds = default.node_sound_leaves_defaults(),
 			after_place_node = function(pos, placer, itemstack)
@@ -264,6 +272,7 @@ for _, tree in ipairs(vmg.treelist) do
 		})
 	end
 
+	-- appropriate wooden stairs and slabs
 	if minetest.get_modpath("stairs") then
 		stairs.register_stair_and_slab(
 			"vmg_"..tree.name.."_tree",
