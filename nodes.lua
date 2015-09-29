@@ -125,31 +125,48 @@ register_dirts("Sandy")
 -- Fir tree: Fir trees don't exist in the default game. Textures from Forest mod by Gael-de-Sailly
 
 vmg.treelist = {
---	 treename			treedesc			leafname	leafdesc	leaftiles					fruitname	fruitdesc	droprarity	selbox									healthpoints
-	{"banana",			"Banana",			"leaves",	"Leaves",	"banana_leaves",			"banana",	"Banana",	20,			{-0.35, -0.5, -0.35, 0.35, 0.5, 0.35},	3},
-	{"birch",			"Birch",			"leaves",	"Leaves",	"birch_leaves",				nil,		nil,		20,			nil,									nil},
-	{"cherry_blossom",	"Cherry Blossom",	"leaves",	"Leaves",	"cherry_blossom_leaves",	nil,		nil,		20,			nil,									nil},
-	{"fir",				"Fir",				"needles",	"Needles",	"fir_leaves",				nil,		nil,		20,			nil,									nil},
+--	 treename			treedesc			leafname	leafdesc	leaftiles					fruitname	fruitdesc	droprarity	selbox									healthpoints     trunk diameter
+	{name="banana",
+	 desc="Banana",
+	 leaf="leaves",
+	 leaf_desc="Leaves",
+	 leaf_tile="banana_leaves",
+	 fruit="banana",
+	 fruit_desc="Banana",
+	 drop_rarity=20,
+	 selbox={-0.35, -0.5, -0.35, 0.35, 0.5, 0.35},
+	 health=3,
+	 trunk_dia=0.75},
+	{name="birch",
+	 desc="Birch",
+	 leaf="leaves",
+	 leaf_desc="Leaves",
+	 leaf_tile="birch_leaves",
+	 drop_rarity=20,
+	 trunk_dia=0.5},
+	{name="cherry_blossom",
+	 desc="Cherry Blossom",
+	 leaf="leaves",
+	 leaf_desc="Leaves",
+	 leaf_tile="cherry_blossom_leaves",
+	 drop_rarity=20,
+	 trunk_dia=0.5},
+	{name="fir",
+	 desc="Fir",
+	 leaf="needles",
+	 leaf_desc="Needles",
+	 leaf_tile="fir_leaves",
+	 drop_rarity=20,
+	 trunk_dia=1.0},
 }
 
-for i in ipairs(vmg.treelist) do
-	local treename = vmg.treelist[i][1]
-	local treedesc = vmg.treelist[i][2]
-	local leafname = vmg.treelist[i][3]
-	local leafdesc = vmg.treelist[i][4]
-	local leaftiles = vmg.treelist[i][5]
-	local fruitname = vmg.treelist[i][6]
-	local fruitdesc = vmg.treelist[i][7]
-	local droprarity = vmg.treelist[i][8]
-	local selbox = vmg.treelist[i][9]
-	local healthpoints = vmg.treelist[i][10]
-
+for _, tree in ipairs(vmg.treelist) do
 	local node_d = {
-		description = treedesc.." Tree",
+		description = tree.desc.." Tree",
 		tiles = {
-			"vmg_"..treename.."_tree_top.png",
-			"vmg_"..treename.."_tree_top.png",
-			"vmg_"..treename.."_tree.png"
+			"vmg_"..tree.name.."_tree_top.png",
+			"vmg_"..tree.name.."_tree_top.png",
+			"vmg_"..tree.name.."_tree.png"
 		},
 		paramtype2 = "facedir",
 		is_ground_content = true,
@@ -157,37 +174,38 @@ for i in ipairs(vmg.treelist) do
 		sounds = default.node_sound_wood_defaults(),
 		on_place = minetest.rotate_node,
 	}
-	if treename == "banana" or treename == "cherry_blossom" then
+	if tree.trunk_dia and tree.trunk_dia ~= 1 then
+		local radius = tree.trunk_dia / 2
 		node_d.paramtype = "light"
 		node_d.drawtype = "nodebox"
 		node_d.node_box = { type = "fixed", 
-			fixed = { {-0.3, -0.5, -0.3, 0.3, 0.5, 0.3}, }
+			fixed = { {-radius, -0.5, -radius, radius, 0.5, radius}, }
 		}
 	end
-	minetest.register_node("valleys_mapgen:"..treename.."_tree", node_d)
+	minetest.register_node("valleys_mapgen:"..tree.name.."_tree", node_d)
 
-	minetest.register_node("valleys_mapgen:"..treename.."_wood", {
-		description = treedesc.." Planks",
-		tiles = {"vmg_"..treename.."_wood.png"},
+	minetest.register_node("valleys_mapgen:"..tree.name.."_wood", {
+		description = tree.desc.." Planks",
+		tiles = {"vmg_"..tree.name.."_wood.png"},
 		is_ground_content = true,
 		groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
 		sounds = default.node_sound_wood_defaults(),
 	})
 
 	minetest.register_craft({
-		output = "valleys_mapgen:"..treename.."_wood 5",
+		output = "valleys_mapgen:"..tree.name.."_wood 5",
 		recipe = {
-			{"valleys_mapgen:"..treename.."_tree"}
+			{"valleys_mapgen:"..tree.name.."_tree"}
 		}
 	})
 
-	minetest.register_node("valleys_mapgen:"..treename.."_sapling", {
-		description = treedesc.." Sapling",
+	minetest.register_node("valleys_mapgen:"..tree.name.."_sapling", {
+		description = tree.desc.." Sapling",
 		drawtype = "plantlike",
 		visual_scale = 1.0,
-		tiles = {"vmg_"..treename.."_sapling.png"},
-		inventory_image = "vmg_"..treename.."_sapling.png",
-		wield_image = "vmg_"..treename.."_sapling.png",
+		tiles = {"vmg_"..tree.name.."_sapling.png"},
+		inventory_image = "vmg_"..tree.name.."_sapling.png",
+		wield_image = "vmg_"..tree.name.."_sapling.png",
 		paramtype = "light",
 		sunlight_propagates = true,
 		walkable = false,
@@ -199,48 +217,48 @@ for i in ipairs(vmg.treelist) do
 		sounds = default.node_sound_leaves_defaults(),
 	})
 
-	minetest.register_node("valleys_mapgen:"..treename.."_"..leafname.."", {
-		description = treedesc.." "..leafdesc.."",
+	minetest.register_node("valleys_mapgen:"..tree.name.."_"..tree.leaf.."", {
+		description = tree.desc.." "..tree.leaf_desc.."",
 		drawtype = "allfaces_optional",
 		waving = 1,
 		visual_scale = 1.3,
-		tiles = { "vmg_"..leaftiles..".png"},
+		tiles = { "vmg_"..tree.leaf_tile..".png"},
 		paramtype = "light",
 		is_ground_content = false,
 		groups = {snappy=3, leafdecay=7, flammable=2, leaves=1},
 		drop = {
 			max_items = 1,
 			items = {
-				{items = {"valleys_mapgen:"..treename.."_sapling"}, rarity = droprarity },
-				{items = {"valleys_mapgen:"..treename.."_"..leafname..""} }
+				{items = {"valleys_mapgen:"..tree.name.."_sapling"}, rarity = tree.drop_rarity },
+				{items = {"valleys_mapgen:"..tree.name.."_"..tree.leaf..""} }
 			}
 		},
 		sounds = default.node_sound_leaves_defaults(),
 		after_place_node = default.after_place_leaves,
 	})
 
-	if fruitname then
-		minetest.register_node("valleys_mapgen:"..fruitname.."", {
-			description = fruitdesc,
+	if tree.fruit then
+		minetest.register_node("valleys_mapgen:"..tree.fruit.."", {
+			description = tree.fruit_desc,
 			drawtype = "plantlike",
 			visual_scale = 1.0,
-			tiles = { "vmg_"..fruitname..".png" },
-			inventory_image = "vmg_"..fruitname..".png",
-			wield_image = "vmg_"..fruitname..".png",
+			tiles = { "vmg_"..tree.fruit..".png" },
+			inventory_image = "vmg_"..tree.fruit..".png",
+			wield_image = "vmg_"..tree.fruit..".png",
 			paramtype = "light",
 			sunlight_propagates = true,
 			walkable = false,
 			is_ground_content = false,
 			selection_box = {
 				type = "fixed",
-					fixed = selbox
+					fixed = tree.selbox
 			},
 			groups = {fleshy=3,dig_immediate=3,flammable=2, leafdecay=3,leafdecay_drop=1},
-			on_use = minetest.item_eat(healthpoints),
+			on_use = minetest.item_eat(tree.health),
 			sounds = default.node_sound_leaves_defaults(),
 			after_place_node = function(pos, placer, itemstack)
 				if placer:is_player() then
-					minetest.set_node(pos, {name="valleys_mapgen:"..fruitname.."", param2=1})
+					minetest.set_node(pos, {name="valleys_mapgen:"..tree.fruit.."", param2=1})
 				end
 			end,
 		})
@@ -248,24 +266,24 @@ for i in ipairs(vmg.treelist) do
 
 	if minetest.get_modpath("stairs") then
 		stairs.register_stair_and_slab(
-			"vmg_"..treename.."_tree",
-			"valleys_mapgen:"..treename.."_tree",
+			"vmg_"..tree.name.."_tree",
+			"valleys_mapgen:"..tree.name.."_tree",
 			{snappy=1, choppy=2, oddly_breakable_by_hand=1, flammable=2 },
-			{	"vmg_"..treename.."_tree_top.png",
-				"vmg_"..treename.."_tree_top.png",
-				"vmg_"..treename.."_tree.png"
+			{	"vmg_"..tree.name.."_tree_top.png",
+				"vmg_"..tree.name.."_tree_top.png",
+				"vmg_"..tree.name.."_tree.png"
 			},
-			treedesc.." Tree Stair",
-			treedesc.." Tree Slab",
+			tree.desc.." Tree Stair",
+			tree.desc.." Tree Slab",
 			default.node_sound_wood_defaults()
 		)
 		stairs.register_stair_and_slab(
-			"vmg_"..treename.."_wood",
-			"valleys_mapgen:"..treename.."_wood",
+			"vmg_"..tree.name.."_wood",
+			"valleys_mapgen:"..tree.name.."_wood",
 			{ snappy=1, choppy=2, oddly_breakable_by_hand=2, flammable=3 },
-			{"vmg_"..treename.."_wood.png" },
-			treedesc.." Planks Stair",
-			treedesc.." Planks Slab",
+			{"vmg_"..tree.name.."_wood.png" },
+			tree.desc.." Planks Stair",
+			tree.desc.." Planks Slab",
 			default.node_sound_wood_defaults()
 		)
 	end
