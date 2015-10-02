@@ -16,13 +16,6 @@ local waterflow = vmg.define("waterflow", 3)
 minetest.override_item("default:river_water_source", {liquid_range = waterflow})
 minetest.override_item("default:river_water_flowing", {liquid_range = waterflow})
 
--- We need more types of stone than just gray. Fortunately, there are
---  two available already. Sandstone forms in layers. Desert stone...
---  doesn't exist, but let's assume it's another sedementary rock
---  and place it similarly. -- djr
-minetest.register_ore({ore_type="sheet", ore="default:sandstone", wherein="default:stone", clust_num_ores=250, clust_scarcity=60, clust_size=10, y_min=-1000, y_max=31000, noise_threshhold=0.1, noise_params={offset=0, scale=1, spread={x=256, y=256, z=256}, seed=4130293965, octaves=5, persist=0.60}, random_factor=1.0})
-minetest.register_ore({ore_type="sheet", ore="default:desert_stone", wherein="default:stone", clust_num_ores=250, clust_scarcity=60, clust_size=10, y_min=-1000, y_max=31000, noise_threshhold=0.1, noise_params={offset=0, scale=1, spread={x=256, y=256, z=256}, seed=163281090, octaves=5, persist=0.60}, random_factor=1.0})
-
 -- Add silt
 minetest.register_node("valleys_mapgen:silt", {
 	description = "Silt",

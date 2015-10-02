@@ -63,6 +63,10 @@
 #cave_stuff = false
 # Add mushrooms and water features to caves.
 
+#ores = true
+#    Spawn ores from minetest.register_ore() and from darkage mod by CraigyDavi
+#stone_ores = true
+#    Enable sandstone and desert stone layers
 
 #    NOISES : offset, scale, (spread), seed, octaves, persist, lacunarity
 #    (see mapgen.lua to see what is the role of each noise)
