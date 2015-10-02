@@ -75,6 +75,9 @@ minetest.register_abm({
 	end
 })
 
+local leaf_types = {"default:leaves", "valleys_mapgen:leaves2", "valleys_mapgen:leaves3", "valleys_mapgen:leaves4", "valleys_mapgen:leaves5"}
+local leaves_colors = vmg.define("leaves_colors", true)
+
 function default.grow_tree(pos, is_apple_tree) -- Override default function to generate VMG trees
 	-- individual parameters
 	local rand = math.random()
@@ -82,8 +85,10 @@ function default.grow_tree(pos, is_apple_tree) -- Override default function to g
 	local radius = 3 + rand
 
 	-- VoxelManip stuff
-	local leaf_types = {"default:leaves", "valleys_mapgen:leaves2", "valleys_mapgen:leaves3", "valleys_mapgen:leaves4", "valleys_mapgen:leaves5"}
-	local leaves = minetest.get_content_id(leaf_types[math.random(#leaf_types)])
+	local leaves = minetest.get_content_id("default:leaves")
+	if leaves_colors then
+		leaves = minetest.get_content_id(leaf_types[math.random(#leaf_types)])
+	end
 	local trunk = minetest.get_content_id("default:tree")
 	local air = minetest.get_content_id("air")
 	local ignore = minetest.get_content_id("ignore")

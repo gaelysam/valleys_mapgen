@@ -58,6 +58,8 @@
 #tree_density = 5
 #    Percent of the lawn nodes that are covered by trees.
 #plant_density = 32
+#leaves_colors = true
+#    5 different colors for apple trees
 #cave_stuff = false
 # Add mushrooms and water features to caves.
 

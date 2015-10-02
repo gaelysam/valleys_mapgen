@@ -115,6 +115,7 @@ local tree_density = vmg.define("tree_density", 5) / 100
 local trees = vmg.define("trees", true)
 local plant_density = vmg.define("plant_density", 32) / 100
 local plants = vmg.define("plants", true)
+local leaves_colors = vmg.define("leaves_colors", true)
 
 local water_level = vmg.define("water_level", 1)
 local river_water = vmg.define("river_water", true)
@@ -167,11 +168,13 @@ function vmg.generate(minp, maxp, seed)
 	local c_tree = minetest.get_content_id("default:tree")
 
 	-- Get some varied leaves.
-	local c_leaves = {}
-	local leaf_types = {"default:leaves", "valleys_mapgen:leaves2", "valleys_mapgen:leaves3", "valleys_mapgen:leaves4", "valleys_mapgen:leaves5"}
-	for _, leaf in pairs(leaf_types) do
-		c_leaves[#c_leaves+1] = minetest.get_content_id(leaf)
-	end
+	local c_leaves = {
+		minetest.get_content_id("default:leaves"),
+		minetest.get_content_id("valleys_mapgen:leaves2"),
+		minetest.get_content_id("valleys_mapgen:leaves3"),
+		minetest.get_content_id("valleys_mapgen:leaves4"),
+		minetest.get_content_id("valleys_mapgen:leaves5"),
+	}
 
 	local c_apple = minetest.get_content_id("default:apple")
 	local c_banana_tree = minetest.get_content_id("valleys_mapgen:banana_tree")
@@ -422,7 +425,11 @@ function vmg.generate(minp, maxp, seed)
 										local rand = math.random()
 										local height = math.floor(4 + 2.5 * rand)
 										local radius = 3 + rand
-										local leaves = c_leaves[math.random(#c_leaves)]
+										local leaves = c_leaves[1]
+										if leaves_colors then
+											leaves = c_leaves[math.random(#c_leaves)]
+										end
+											
 										if math.random(1, 4) == 1 then
 											vmg.make_apple_tree(pos, data, a, height, radius, c_tree, leaves, c_apple, c_air, c_ignore)
 										else
