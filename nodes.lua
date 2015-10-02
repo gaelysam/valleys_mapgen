@@ -1,3 +1,15 @@
+-- clone node from VanessaE's moretrees
+--  https://github.com/VanessaE/moretrees
+function vmg.clone_node(name)
+	local node2 = {}
+	local node = minetest.registered_nodes[name]
+	for k,v in pairs(node) do
+		node2[k]=v
+	end
+	return node2
+end
+
+
 -- Set the liquid range according to settings (by default 3)
 local waterflow = vmg.define("waterflow", 3)
 
@@ -520,3 +532,15 @@ minetest.register_node("valleys_mapgen:stalagmite", {
 minetest.add_group("default:leaves", {leafdecay = 5})
 minetest.add_group("default:jungleleaves", {leafdecay = 8})
 minetest.add_group("default:pine_needles", {leafdecay = 7})
+
+
+-- Make some new leaves with the same properties.
+local newnode = vmg.clone_node("default:leaves")
+newnode.tiles = {"default_leaves.png^[colorize:#FF0000:20"}
+minetest.register_node("valleys_mapgen:leaves2", newnode)
+newnode.tiles = {"default_leaves.png^[colorize:#FFFF00:20"}
+minetest.register_node("valleys_mapgen:leaves3", newnode)
+newnode.tiles = {"default_leaves.png^[colorize:#00FFFF:20"}
+minetest.register_node("valleys_mapgen:leaves4", newnode)
+newnode.tiles = {"default_leaves.png^[colorize:#00FF00:20"}
+minetest.register_node("valleys_mapgen:leaves5", newnode)

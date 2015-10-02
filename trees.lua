@@ -82,7 +82,8 @@ function default.grow_tree(pos, is_apple_tree) -- Override default function to g
 	local radius = 3 + rand
 
 	-- VoxelManip stuff
-	local leaves = minetest.get_content_id("default:leaves")
+	local leaf_types = {"default:leaves", "valleys_mapgen:leaves2", "valleys_mapgen:leaves3", "valleys_mapgen:leaves4", "valleys_mapgen:leaves5"}
+	local leaves = minetest.get_content_id(leaf_types[math.random(#leaf_types)])
 	local trunk = minetest.get_content_id("default:tree")
 	local air = minetest.get_content_id("air")
 	local ignore = minetest.get_content_id("ignore")

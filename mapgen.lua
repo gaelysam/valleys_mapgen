@@ -165,7 +165,14 @@ function vmg.generate(minp, maxp, seed)
 
 	-- Tree nodes
 	local c_tree = minetest.get_content_id("default:tree")
-	local c_leaves = minetest.get_content_id("default:leaves")
+
+	-- Get some varied leaves.
+	local c_leaves = {}
+	local leaf_types = {"default:leaves", "valleys_mapgen:leaves2", "valleys_mapgen:leaves3", "valleys_mapgen:leaves4", "valleys_mapgen:leaves5"}
+	for _, leaf in pairs(leaf_types) do
+		c_leaves[#c_leaves+1] = minetest.get_content_id(leaf)
+	end
+
 	local c_apple = minetest.get_content_id("default:apple")
 	local c_banana_tree = minetest.get_content_id("valleys_mapgen:banana_tree")
 	local c_banana_leaves = minetest.get_content_id("valleys_mapgen:banana_leaves")
@@ -415,10 +422,11 @@ function vmg.generate(minp, maxp, seed)
 										local rand = math.random()
 										local height = math.floor(4 + 2.5 * rand)
 										local radius = 3 + rand
+										local leaves = c_leaves[math.random(#c_leaves)]
 										if math.random(1, 4) == 1 then
-											vmg.make_apple_tree(pos, data, a, height, radius, c_tree, c_leaves, c_apple, c_air, c_ignore)
+											vmg.make_apple_tree(pos, data, a, height, radius, c_tree, leaves, c_apple, c_air, c_ignore)
 										else
-											vmg.make_tree(pos, data, a, height, radius, c_tree, c_leaves, c_air, c_ignore)
+											vmg.make_tree(pos, data, a, height, radius, c_tree, leaves, c_air, c_ignore)
 										end
 									elseif v15 < 0.7 and temp >= 1.9 and humidity > 2 and v16 > 2 then -- Jungle Tree
 										local rand = math.random()
