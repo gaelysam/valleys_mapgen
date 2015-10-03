@@ -87,7 +87,8 @@ if vmg.define("respawn", true) then
 end
 
 -- Call the mapgen function vmg.generate on mapgen.
-minetest.register_on_generated(vmg.generate)
+--  Inserting helps to ensure that vmg operates first.
+table.insert(minetest.registered_on_generateds, 1, vmg.generate)
 
 if vmg.loglevel >= 2 then
 	print("[Valleys Mapgen] Loading nodes ...")
