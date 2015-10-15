@@ -60,6 +60,8 @@
 #plant_density = 32
 #leaves_colors = true
 #    5 different colors for apple trees
+#simple_caves = false
+# Use a faster, sparser cave algorithm
 #cave_stuff = false
 # Add mushrooms and water features to caves.
 

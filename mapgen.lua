@@ -58,6 +58,12 @@ vmg.noises = {
 -- Noise 18 : Humidity							2D
 {offset = 0, scale = 1, seed = -5787, spread = {x = 243, y = 243, z = 243}, octaves = 4, persist = 0.5, lacunarity = 3},
 
+-- Noise 19 : Simple Caves 1							3D
+{offset = 0, scale = 1, seed = -8402, spread = {x = 64, y = 64, z = 64}, octaves = 3, persist = 0.5, lacunarity = 2},
+
+-- Noise 20 : Simple Caves 2							3D
+{offset = 0, scale = 1, seed = 3944, spread = {x = 64, y = 64, z = 64}, octaves = 3, persist = 0.5, lacunarity = 2},
+
 }
 
 -- function to get noisemaps
@@ -97,6 +103,7 @@ local lava_depth = vmg.define("lava_depth", 2000)
 local lava_max_height = vmg.define("lava_max_height", -1)
 local altitude_chill = vmg.define("altitude_chill", 90)
 local do_caves = vmg.define("caves", true)
+local simple_caves = vmg.define("simple_caves", false)
 local do_cave_stuff = vmg.define("cave_stuff", false)
 
 local average_stone_level = vmg.define("average_stone_level", 180)
@@ -271,12 +278,19 @@ function vmg.generate(minp, maxp, seed)
 	local n10
 	local n11
 	local n12
+	local n19  -- It's more convenient to put these here with the other caves.
+	local n20
 	if do_caves then
-		n8 = vmg.noisemap(8, minp, chulens)
-		n9 = vmg.noisemap(9, minp, chulens)
-		n10 = vmg.noisemap(10, minp, chulens)
-		n11 = vmg.noisemap(11, minp, chulens)
-		n12 = vmg.noisemap(12, minp, chulens)
+		if simple_caves then
+			n19 = vmg.noisemap(19, minp, chulens)
+			n20 = vmg.noisemap(20, minp, chulens)
+		else
+			n8 = vmg.noisemap(8, minp, chulens)
+			n9 = vmg.noisemap(9, minp, chulens)
+			n10 = vmg.noisemap(10, minp, chulens)
+			n11 = vmg.noisemap(11, minp, chulens)
+			n12 = vmg.noisemap(12, minp, chulens)
+		end
 	end
 	local n13 = vmg.noisemap(13, minp2d, chulens)
 	local n14 = vmg.noisemap(14, minp2d, chulens)
@@ -376,9 +390,18 @@ function vmg.generate(minp, maxp, seed)
 				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
 				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], -1, -1, -1, -1, -1 -- take the noise values for 3D noises
 				local is_cave = false
+				local sr
 				if do_caves then
-					v8, v9, v10, v11, v12 = n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d] -- take the noise values for 3D noises
-					is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size -- The 4 cave noises must be close to zero to produce a cave. The square is used for 2 reasons : we need positive values, and, for mathematical reasons, it results in more circular caves.
+					if simple_caves then
+						v19, v20 = n19[i3d], n20[i3d] -- take the noise values for 3D noises
+						local n1 = (math.abs(v19) < 0.07)
+						local n2 = (math.abs(v20) < 0.07)
+						is_cave = n1 and n2
+						sr = math.floor((v19 + v20) * 100000) % 1000
+					else
+						v8, v9, v10, v11, v12 = n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d] -- take the noise values for 3D noises
+						is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size -- The 4 cave noises must be close to zero to produce a cave. The square is used for 2 reasons : we need positive values, and, for mathematical reasons, it results in more circular caves.
+					end
 				end
 
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
@@ -555,7 +578,9 @@ function vmg.generate(minp, maxp, seed)
 								data[ivm] = c_stone
 							end
 						end
-					elseif v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
+					elseif simple_caves and y <= lava_max_height and sr < math.ceil(-y/10000) and y > minp.y and data[ivm - ystride] == c_stone then
+						data[ivm] = c_lava
+					elseif (not simple_caves) and v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
 						data[ivm] = c_lava
 					elseif do_cave_stuff then
 						-- mushrooms and water in caves -- djr
