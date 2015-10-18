@@ -95,6 +95,15 @@ function vmg.execute_after_mapgen()
 	vmg.after_mapgen = {}
 end
 
+-- Mapgen time stats
+local mapgen_times = {
+	preparation = {},
+	noises = {},
+	collecting = {},
+	writing = {},
+	total = {},
+}
+
 -- Define parameters
 local river_depth = vmg.define("river_depth", 3) + 1
 local river_size = vmg.define("river_size", 5) / 100
@@ -679,7 +688,67 @@ function vmg.generate(minp, maxp, seed)
 	if vmg.loglevel >= 1 then
 		print("[Valleys Mapgen] Mapgen finished in " .. displaytime(t4-t0)) 
 	end
+
+	table.insert(mapgen_times.preparation, t1 - t0)
+	table.insert(mapgen_times.noises, t2 - t1)
+	table.insert(mapgen_times.collecting, t3 - t2)
+	table.insert(mapgen_times.writing, t4 - t3)
+	table.insert(mapgen_times.total, t4 - t0)
 end
+
+-- Display mapgen stats on shutdown
+local function stats(t)
+	local n = #t
+
+	local sum = 0
+	local sum_sq = 0
+	for _, k in ipairs(t) do
+		sum = sum + k
+		sum_sq = sum_sq + k^2
+	end
+	local average = sum / n
+	local variance = sum_sq / n - average^2
+	local standard_dev = math.sqrt(variance)
+
+	return average, standard_dev
+end
+
+minetest.register_on_shutdown(function()
+	if #mapgen_times.total == 0 then
+		return
+	end
+
+	if vmg.loglevel >= 1 then
+		local average, standard_dev
+		print("[Valleys Mapgen] Mapgen statistics:")
+
+		if vmg.loglevel >= 2 then
+			average, standard_dev = stats(mapgen_times.preparation)
+			print("[Valleys Mapgen] Mapgen preparation step:")
+			print("                               average " .. displaytime(average))
+			print("                    standard deviation " .. displaytime(standard_dev))
+		
+			average, standard_dev = stats(mapgen_times.noises)
+			print("[Valleys Mapgen] Noises calculation step:")
+			print("                               average " .. displaytime(average))
+			print("                    standard deviation " .. displaytime(standard_dev))
+		
+			average, standard_dev = stats(mapgen_times.collecting)
+			print("[Valleys Mapgen] Data collecting step:")
+			print("                               average " .. displaytime(average))
+			print("                    standard deviation " .. displaytime(standard_dev))
+		
+			average, standard_dev = stats(mapgen_times.writing)
+			print("[Valleys Mapgen] Data writing step:")
+			print("                               average " .. displaytime(average))
+			print("                    standard deviation " .. displaytime(standard_dev))
+		end
+		average, standard_dev = stats(mapgen_times.total)
+		print("[Valleys Mapgen] TOTAL:")
+		print("                               average " .. displaytime(average))
+		print("                    standard deviation " .. displaytime(standard_dev))
+	end
+end)
 
 -- Trees are registered in a separate file
 dofile(vmg.path .. "/trees.lua")
