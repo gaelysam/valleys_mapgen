@@ -1,0 +1,64 @@
+vmg.registered_plants = {}
+
+function vmg.register_plant(params)
+	local n = #vmg.registered_plants + 1
+	params.priority = math.floor(params.priority) + 1 / n
+
+	vmg.registered_plants[n] = params
+end
+
+vmg.register_on_first_mapgen(function()
+	table.sort(vmg.registered_plants,
+		function(a, b)
+			return a.priority > b.priority
+		end
+	)
+
+	for _, plant in ipairs(vmg.registered_plants) do -- convert 'nodes' into content IDs
+		local nodes = plant.nodes
+		if type(nodes) == "string" then
+			plant.nodes = minetest.get_content_id(nodes)
+		else
+			for k, node in pairs(nodes) do
+				if type(node) == "string" then
+					nodes[k] = minetest.get_content_id(node)
+				end
+			end
+		end
+	end
+end)
+
+function vmg.choose_generate_plant(conditions, pos, data, area, ivm)
+	local rand = math.random() -- Random number to choose the plant
+	for _, plant in ipairs(vmg.registered_plants) do -- for each registered plant
+		local cover = plant.cover
+		if plant.check(conditions) then -- Place this plant, or do not place anything (see Cover parameter)
+			if rand < cover then
+				if rand < plant.density then
+					local grow = plant.grow
+					local nodes = plant.nodes
+
+					if grow then -- if a grow function is defined, then run it
+						grow(nodes, pos, data, area, ivm)
+					else
+						if type(nodes) == "number" then -- 'nodes' is just a number
+							data[ivm] = nodes
+						else -- 'nodes' is an array
+							local node = nodes[math.random(#nodes)]
+							local n = nodes.n or 1
+							local ystride = area.ystride
+
+							for h = 1, n do
+								data[ivm] = node
+								ivm = ivm + ystride
+							end
+						end
+					end
+				end
+				break
+			else
+				rand = (rand - cover) / (1 - cover)
+			end
+		end
+	end
+end
