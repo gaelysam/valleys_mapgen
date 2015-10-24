@@ -39,6 +39,14 @@ vmg.noises = {
 }
 
 function vmg.generate(minp, maxp, seed)
+	if vmg.registered_on_first_mapgen then -- Run callbacks
+		for _, f in ipairs(vmg.registered_on_first_mapgen) do
+			f()
+		end
+		vmg.registered_on_first_mapgen = nil
+		vmg.register_on_first_mapgen = nil
+	end
+
 	local minps, maxps = minetest.pos_to_string(minp), minetest.pos_to_string(maxp)
 	if vmg.loglevel >= 2 then
 		print("[Valleys Mapgen] Preparing to generate map from " .. minps .. " to " .. maxps .. " ...")

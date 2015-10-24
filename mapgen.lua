@@ -150,6 +150,14 @@ end
 
 -- THE MAPGEN FUNCTION
 function vmg.generate(minp, maxp, seed)
+	if vmg.registered_on_first_mapgen then -- Run callbacks
+		for _, f in ipairs(vmg.registered_on_first_mapgen) do
+			f()
+		end
+		vmg.registered_on_first_mapgen = nil
+		vmg.register_on_first_mapgen = nil
+	end
+
 	-- minp and maxp strings, used by logs
 	local minps, maxps = minetest.pos_to_string(minp), minetest.pos_to_string(maxp)
 	if vmg.loglevel >= 2 then

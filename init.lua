@@ -47,6 +47,12 @@ function pos3d(pos, alt)
 	end
 end
 
+vmg.registered_on_first_mapgen = {}
+
+function vmg.register_on_first_mapgen(func) -- Callback
+	table.insert(vmg.registered_on_first_mapgen, func)
+end
+
 -- Modify a node to add a group
 function minetest.add_group(node, groups)
 	local def = minetest.registered_items[node]
