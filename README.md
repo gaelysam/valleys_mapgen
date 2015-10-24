@@ -57,3 +57,22 @@ Mod created by Gael-de-Sailly and now mainly developed by duane-r.
 
 ### 1.0 (Saturday March 7, 2015)
 * Created mapgen (using 7 noises at the moment).
+
+## Plants API
+The Plants API has been introduced on October 24th, 2015. It allow mods to generate plants directly on the map.
+
+### How to use it ?
+First, make sure that you've added the `valleys_mapgen` dependancy in your depends.txt (followed by a quotation mark if optionnal)
+The only function is `vmg.register_plant`. It registers a plant that will be generated during mapgen.
+
+### Parameters
+Syntax (example for apple tree)
+
+    vmg.register_plant({
+    	nodes = {tree = "default:tree", leaves = "default:leaves", fruit = "default:apple"},
+    	priority = 54,
+	cover = 0.4,
+	density = 0.05,
+	check_func = function(),
+	grow_func = function(),
+    })

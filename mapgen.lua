@@ -465,7 +465,7 @@ function vmg.generate(minp, maxp, seed)
 									data[ivm2] = c_snow_layer -- set node above to snow
 								end
 
-								if trees and math.random() < tree_density and above > 0 then -- make a tree
+								--[[if trees and math.random() < tree_density and above > 0 then -- make a tree
 
 									-- choose a tree from climatic and geological conditions
 									if v14 < 0 and temp < 1.5 and temp >= 0.90 and humidity < 1 and v15 < 0.8 and math.abs(v13) < 0.2 and math.random() < 0.3 then -- Pine Tree
@@ -571,7 +571,40 @@ function vmg.generate(minp, maxp, seed)
 											data[ivm2] = c_mushroom_fertile_brown
 										end
 									end
+								end]]
+								if above > 0 then
+									local conditions = { -- pack it in a table, for plants API
+										v1 = v1,
+										v2 = v2,
+										v3 = v3,
+										v4 = v4,
+										v5 = v5,
+										v6 = v6,
+										v7 = v7,
+										v8 = v8,
+										v9 = v9,
+										v10 = v10,
+										v11 = v11,
+										v12 = v12,
+										v13 = v13,
+										v14 = v14,
+										v15 = v15,
+										v16 = v16,
+										v17 = v17,
+										v18 = v18,
+										v19 = v19,
+										v20 = v20,
+										temp = temp,
+										humidity = humidity,
+										sea_water = sea_water,
+										river_water = river_water,
+										water = water,
+										thickness = thickness
+									}
+
+									vmg.choose_generate_plant(conditions, pos, data, a, ivm2)
 								end
+
 								y = y - 1
 							end
 						elseif n6[i3d_sup+above*i3d_incrY] * slopes <= y + above - mountain_ground then -- if node at "above" nodes up is not in the ground, make dirt
@@ -760,6 +793,8 @@ end)
 
 -- Trees are registered in a separate file
 dofile(vmg.path .. "/trees.lua")
+dofile(vmg.path .. "/plants_api.lua")
+dofile(vmg.path .. "/plants.lua")
 
 function vmg.get_humidity_raw(pos)
 	local v13 = vmg.get_noise(pos, 13) -- Clayey soil : wetter

@@ -32,7 +32,7 @@ function vmg.choose_generate_plant(conditions, pos, data, area, ivm)
 	local rand = math.random() -- Random number to choose the plant
 	for _, plant in ipairs(vmg.registered_plants) do -- for each registered plant
 		local cover = plant.cover
-		if plant.check(conditions) then -- Place this plant, or do not place anything (see Cover parameter)
+		if plant.check(conditions, pos) then -- Place this plant, or do not place anything (see Cover parameter)
 			if rand < cover then
 				if rand < plant.density then
 					local grow = plant.grow
