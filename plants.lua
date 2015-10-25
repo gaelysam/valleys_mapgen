@@ -29,7 +29,7 @@ vmg.register_plant({
 })
 
 vmg.register_plant({
-	nodes = "valleys_mapgen:calla_lilly",
+	nodes = "valleys_mapgen:calla_lily",
 	cover = 0.32,
 	density = 0.06,
 	priority = 63,
@@ -50,7 +50,7 @@ vmg.register_plant({
 
 vmg.register_plant({
 	nodes = {"default:junglegrass"},
-	cover = 0.65,
+	cover = 0.65, --0.65
 	density = 0.40,
 	priority = 60,
 	check = function(t, pos)
@@ -60,8 +60,8 @@ vmg.register_plant({
 
 vmg.register_plant({
 	nodes = {"valleys_mapgen:bird_of_paradise"},
-	cover = 0.001,
-	density = 0.0003,
+	cover = 0.001, --0.001
+	density = 0.0003, --0.0003
 	priority = 52,
 	check = function(t, pos)
 		return t.v15 > 0 and t.temp >= 2 and t.humidity > 2.1 and t.v16 > 1.8
@@ -70,8 +70,8 @@ vmg.register_plant({
 
 vmg.register_plant({
 	nodes = {"valleys_mapgen:orchid"},
-	cover = 0.002,
-	density = 0.0005,
+	cover = 0.02,
+	density = 0.005,
 	priority = 45,
 	check = function(t, pos)
 		return t.v15 < 0.7 and t.temp >= 1.9 and t.humidity > 2 and t.v16 > 2
@@ -165,5 +165,174 @@ vmg.register_plant({
 	priority = 61,
 	check = function(t, pos)
 		return t.temp > 1.2 and t.temp < 1.6 and t.humidity > 0.5 and t.v13 < 0.5 and t.v14 < 0.5 and t.v15 < 0.5
+	end,
+})
+
+---------
+--Trees--
+---------
+
+vmg.register_plant({ -- Pine tree
+	nodes = {
+		trunk = "default:pine_tree",
+		leaves = "default:pine_needles",
+		air = "air", ignore = "ignore",
+	},
+	cover = 0.4,
+	density = 0.015,
+	priority = 80,
+	check = function(t, pos)
+		return t.v14 < 0 and t.temp < 1.5 and t.temp >= 0.90 and t.humidity < 1 and t.v15 < 0.8 and math.abs(t.v13) < 0.2
+	end,
+	grow = function(nodes, pos, data, area)
+		local rand = math.random()
+		local height = math.floor(9 + 6 * rand)
+		local radius = 4 + 2 * rand
+
+		vmg.make_pine_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
+	end,
+})
+
+vmg.register_plant({ -- Jungle tree
+	nodes = {
+		trunk = "default:jungletree",
+		leaves = "default:jungleleaves",
+		air = "air", ignore = "ignore",
+	},
+	cover = 0.5,
+	density = 0.06,
+	priority = 73,
+	check = function(t, pos)
+		return t.v15 < 0.7 and t.temp >= 1.9 and t.humidity > 2 and t.v16 > 2
+	end,
+	grow = function(nodes, pos, data, area)
+		local rand = math.random()
+		local height = math.floor(8 + 4 * rand)
+		local radius = 5 + 3 * rand
+
+		vmg.make_jungle_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
+	end,
+})
+
+local leaves_colors = vmg.define("leaves_colors", true)
+
+vmg.register_plant({ -- Apple tree
+	nodes = {
+		trunk = "default:tree",
+		leaves = { -- get some varied leaves
+			"default:leaves",
+			"valleys_mapgen:leaves2",
+			"valleys_mapgen:leaves3",
+			"valleys_mapgen:leaves4",
+			"valleys_mapgen:leaves5"
+		},
+		fruit = "default:apple",
+		air = "air", ignore = "ignore",
+	},
+	cover = 0.3,
+	density = 0.05,
+	priority = 66,
+	check = function(t, pos)
+		return t.v15 < 0.6 and t.temp >= 0.85 and t.temp < 2.3 and t.humidity < 3 and t.v16 < 2 and t.v14 > -0.5 and t.v13 < 0.8
+	end,
+	grow = function(nodes, pos, data, area)
+		local rand = math.random()
+		local height = math.floor(4 + 2.5 * rand)
+		local radius = 3 + rand
+		local leaves = nodes.leaves[1]
+		if leaves_colors then
+			leaves = nodes.leaves[math.random(#nodes.leaves)]
+		end
+
+		if math.random(4) == 1 then
+			vmg.make_apple_tree(pos, data, area, height, radius, nodes.trunk, leaves, nodes.fruit, nodes.air, nodes.ignore)
+		else
+			vmg.make_tree(pos, data, area, height, radius, nodes.trunk, leaves, nodes.air, nodes.ignore)
+		end
+	end,
+})
+
+vmg.register_plant({ -- Banana tree
+	nodes = {
+		trunk = "valleys_mapgen:banana_tree",
+		leaves = "valleys_mapgen:banana_leaves",
+		fruit = "valleys_mapgen:banana",
+		air = "air", ignore = "ignore",
+	},
+	cover = 0.18,
+	density = 0.005,
+	priority = 70,
+	check = function(t, pos)
+		return t.v15 > -0.6 and t.temp >= 1.8 and t.humidity > 2.2 and t.v16 > 1.8
+	end,
+	grow = function(nodes, pos, data, area)
+		local rand = math.random()
+		local height = math.floor(4 + 2.5 * rand)
+		local radius = 3 + rand
+
+		vmg.make_banana_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.fruit, nodes.air, nodes.ignore)
+	end,
+})
+
+vmg.register_plant({ -- Fir tree
+	nodes = {
+		trunk = "valleys_mapgen:fir_tree",
+		leaves = "valleys_mapgen:fir_needles",
+		air = "air", ignore = "ignore",
+	},
+	cover = 0.7,
+	density = 0.045,
+	priority = 71,
+	check = function(t, pos)
+		return t.temp > 0.38 and t.temp < 1 and t.humidity > 0.9 and t.v15 > 0 and t.v15 < 0.55
+	end,
+	grow = function(nodes, pos, data, area)
+		local rand = math.random()
+		local height = math.floor(9 + 6 * rand)
+		local radius = 4 + 2 * rand
+
+		vmg.make_fir_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
+	end,
+})
+
+vmg.register_plant({ -- Cherry blossom tree
+	nodes = {
+		trunk = "valleys_mapgen:cherry_blossom_tree",
+		leaves = "valleys_mapgen:cherry_blossom_leaves",
+		air = "air", ignore = "ignore",
+	},
+	cover = 0.13,
+	density = 0.005,
+	priority = 38,
+	check = function(t, pos)
+		return t.temp > 0.6 and t.temp < 1 and t.humidity < 1.4 and t.v15 > 0 and t.v15 < 0.55 and pos.y > 30
+	end,
+	grow = function(nodes, pos, data, area)
+		local rand = math.random()
+		local height = math.floor(4 + 2.5 * rand)
+		local radius = 3 + rand
+
+		vmg.make_cherry_blossom_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
+	end,
+})
+
+vmg.register_plant({ -- Cherry blossom tree
+	nodes = {
+		trunk = "valleys_mapgen:birch_tree",
+		leaves = "valleys_mapgen:birch_leaves",
+		air = "air", ignore = "ignore",
+	},
+	cover = 0.07,
+	density = 0.05,
+	priority = 69,
+	check = function(t, pos)
+		return t.temp > 0.5 and t.temp < 1 and t.humidity < 1.4 and t.v13 < 1 and t.v14 < 0.1 and t.v15 < 0.75 and pos.y > 10
+	end,
+	grow = function(nodes, pos, data, area)
+		local rand = math.random()
+		local height = math.floor(6 + 2.5 * rand)
+		local radius = 2 + rand
+
+		vmg.make_birch_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
 	end,
 })

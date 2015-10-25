@@ -7,6 +7,20 @@ function vmg.register_plant(params)
 	vmg.registered_plants[n] = params
 end
 
+local function get_content_id(value) -- get content ID recursively from a table.
+	local typeval = type(value)
+
+	if typeval == "string" then
+		return minetest.get_content_id(value)
+	elseif typeval == "table" then
+		for k, v in pairs(value) do
+			value[k] = get_content_id(v)
+		end
+	end
+
+	return value
+end
+
 vmg.register_on_first_mapgen(function()
 	table.sort(vmg.registered_plants,
 		function(a, b)
@@ -15,16 +29,7 @@ vmg.register_on_first_mapgen(function()
 	)
 
 	for _, plant in ipairs(vmg.registered_plants) do -- convert 'nodes' into content IDs
-		local nodes = plant.nodes
-		if type(nodes) == "string" then
-			plant.nodes = minetest.get_content_id(nodes)
-		else
-			for k, node in pairs(nodes) do
-				if type(node) == "string" then
-					nodes[k] = minetest.get_content_id(node)
-				end
-			end
-		end
+		plant.nodes = get_content_id(plant.nodes)
 	end
 end)
 

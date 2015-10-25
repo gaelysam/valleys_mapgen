@@ -131,7 +131,6 @@ local tree_density = vmg.define("tree_density", 5) / 100
 local trees = vmg.define("trees", true)
 local plant_density = vmg.define("plant_density", 32) / 100
 local plants = vmg.define("plants", true)
-local leaves_colors = vmg.define("leaves_colors", true)
 
 local water_level = vmg.define("water_level", 1)
 local river_water = vmg.define("river_water", true)
