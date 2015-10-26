@@ -56,8 +56,9 @@
 #    If false, no trees, of course !
 #plants = true
 #tree_density = 5
-#    Percent of the lawn nodes that are covered by trees.
+#    DEPRECATED since mapgen 2.3. Percent of the lawn nodes that are covered by trees.
 #plant_density = 32
+#    DEPRECATED since mapgen 2.3. Percent of the lawn nodes that are covered by plants.
 #leaves_colors = true
 #    5 different colors for apple trees
 #simple_caves = false

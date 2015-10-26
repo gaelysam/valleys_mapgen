@@ -127,10 +127,10 @@ local silt_threshold = vmg.define("silt_threshold", 1)
 local sand_threshold = vmg.define("sand_threshold", 0.75)
 local dirt_threshold = vmg.define("dirt_threshold", 0.5)
 
-local tree_density = vmg.define("tree_density", 5) / 100
+--[[local tree_density = vmg.define("tree_density", 5) / 100
 local trees = vmg.define("trees", true)
 local plant_density = vmg.define("plant_density", 32) / 100
-local plants = vmg.define("plants", true)
+local plants = vmg.define("plants", true)]]
 
 local water_level = vmg.define("water_level", 1)
 local river_water = vmg.define("river_water", true)
