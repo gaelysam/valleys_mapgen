@@ -68,26 +68,28 @@ The only function is `vmg.register_plant`. It registers a plant that will be gen
 ### Parameters
 Syntax (example for jungle tree)
 
-	vmg.register_plant({
-		nodes = {
-			trunk = "default:jungletree",
-			leaves = "default:jungleleaves",
-			air = "air", ignore = "ignore",
-		},
-		cover = 0.5,
-		density = 0.06,
-		priority = 73,
-		check = function(t, pos)
-			return t.v15 < 0.7 and t.temp >= 1.9 and t.humidity > 2 and t.v16 > 2
-		end,
-		grow = function(nodes, pos, data, area)
-			local rand = math.random()
-			local height = math.floor(8 + 4 * rand)
-			local radius = 5 + 3 * rand
+```
+vmg.register_plant({
+	nodes = {
+		trunk = "default:jungletree",
+		leaves = "default:jungleleaves",
+		air = "air", ignore = "ignore",
+	},
+	cover = 0.5,
+	density = 0.06,
+	priority = 73,
+	check = function(t, pos)
+		return t.v15 < 0.7 and t.temp >= 1.9 and t.humidity > 2 and t.v16 > 2
+	end,
+	grow = function(nodes, pos, data, area)
+		local rand = math.random()
+		local height = math.floor(8 + 4 * rand)
+		local radius = 5 + 3 * rand
 
-			vmg.make_jungle_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
-		end,
-	})
+		vmg.make_jungle_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
+	end,
+})
+```
 
 #### nodes
 List of nodes that will be used, could be a table or a simple string. In this table, all strings are converted into content IDs.
@@ -107,22 +109,23 @@ Number between 0 and 1, which determines the proportion of surface nodes that ar
 Number between 0 and cover. Proportion of nodes that are effectively covered by the plant.
 
 Examples:
-`cover = 0.8 ; density = 0.8`: the plant is present on 80% nodes, so extremely dense. Other plants can't take more than the remaining 20% if they have a lower `priority`.
-`cover = 0.8 ; density = 0.1`: the plant is present on 10% nodes, so more scattered, but other plants can't take more than 20% if they have a lower `priority`. Params like this are suitable for a plant that naturally needs much space.
-`cover = 0.1 ; density = 0.1`: the plant is present on 10% nodes like on the previous case, but other plants are much more common (max 90% of the nodes).
+* `cover = 0.8 ; density = 0.8`: the plant is present on 80% nodes, so extremely dense. Other plants can't take more than the remaining 20% if they have a lower `priority`.
+* `cover = 0.8 ; density = 0.1`: the plant is present on 10% nodes, so more scattered, but other plants can't take more than 20% if they have a lower `priority`. Params like this are suitable for a plant that naturally needs much space.
+* `cover = 0.1 ; density = 0.1`: the plant is present on 10% nodes like on the previous case, but other plants are much more common (max 90% of the nodes).
 
 #### priority
 Integer generally between 0 and 100 (no strict rule :) to determine which plants are dominating the others. The dominant plants (with higher priority) impose their *cover* to the others.
 
 #### check
 Function to check the conditions. Should return a boolean: true, the plant can spawn here ; false, the plant can't spawn and don't impose its *cover*. It takes 2 parameters:
-* `t`: table containing all possible conditions: all noises (`t.v1` to `t.v20`), dirt thickness `t.thickness`, temperature `t.temp`, humidity `t.humidity`, humidity from sea `t.sea_water`, from rivers `t.river_water`, from sea and rivers `water`.
+* `t`: table containing all possible conditions: all noises (`t.v1` to `t.v20`), dirt thickness `t.thickness`, temperature `t.temp`, humidity `t.humidity`, humidity from sea `t.sea_water`, from rivers `t.river_water`, from sea and rivers `t.water`.
 * `pos`: position of the future plant, above the dirt node.
 
-	check = function(t, pos)
-		return t.v15 < 0.7 and t.temp >= 1.9 and t.humidity > 2 and t.v16 > 2
-	end,
-`
+```
+check = function(t, pos)
+	return t.v15 < 0.7 and t.temp >= 1.9 and t.humidity > 2 and t.v16 > 2
+end,
+```
 
 #### grow
 Optionnal function to override the default behaviour (see *nodes*) for complex plants like trees.
@@ -134,10 +137,12 @@ It takes 5 parameters:
 * `area`: VoxelArea
 * `i`: index of the data array matching the position `pos`. In other terms, `area:indexp(pos) = i`.
 
-	grow = function(nodes, pos, data, area)
-		local rand = math.random()
-		local height = math.floor(8 + 4 * rand)
-		local radius = 5 + 3 * rand
+```
+grow = function(nodes, pos, data, area)
+	local rand = math.random()
+	local height = math.floor(8 + 4 * rand)
+	local radius = 5 + 3 * rand
 
-		vmg.make_jungle_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
-	end,
+	vmg.make_jungle_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
+end,
+```
