@@ -66,13 +66,78 @@ First, make sure that you've added the `valleys_mapgen` dependancy in your depen
 The only function is `vmg.register_plant`. It registers a plant that will be generated during mapgen.
 
 ### Parameters
-Syntax (example for apple tree)
+Syntax (example for jungle tree)
 
-    vmg.register_plant({
-    	nodes = {tree = "default:tree", leaves = "default:leaves", fruit = "default:apple"},
-    	priority = 54,
-	cover = 0.4,
-	density = 0.05,
-	check_func = function(),
-	grow_func = function(),
-    })
+	vmg.register_plant({
+		nodes = {
+			trunk = "default:jungletree",
+			leaves = "default:jungleleaves",
+			air = "air", ignore = "ignore",
+		},
+		cover = 0.5,
+		density = 0.06,
+		priority = 73,
+		check = function(t, pos)
+			return t.v15 < 0.7 and t.temp >= 1.9 and t.humidity > 2 and t.v16 > 2
+		end,
+		grow = function(nodes, pos, data, area)
+			local rand = math.random()
+			local height = math.floor(8 + 4 * rand)
+			local radius = 5 + 3 * rand
+
+			vmg.make_jungle_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
+		end,
+	})
+
+#### nodes
+List of nodes that will be used, could be a table or a simple string. In this table, all strings are converted into content IDs.
+
+Many syntaxes are possible, with their default behaviour (see *grow*):
+* `nodes = "default:dry_shrub"`: simply generate a dry shrub.
+* `nodes = {"default:papyrus", n=4}`: generate 4 papyrus nodes vertically.
+* `nodes = {"default:grass_1", "default:grass_2", "default:grass_3", "default:grass_4", "default:grass_5"}`: generate one grass node, randomly chosen between the 5 nodes.
+* `nodes = {"default:grass_1", "default:grass_2", "default:grass_3", "default:grass_4", "default:grass_5, n=3"}`: generate 3 grass nodes vertically (my example is a bit silly…), randomly chosen between the 5 nodes (chosen once, not 3 times).
+
+All cases are possible, but other cases can't be managed by default and needs a grow function (see *grow*), like the example above with jungle tree. Anyway, the strings in this table are recursively converted into map content IDs.
+
+#### cover
+Number between 0 and 1, which determines the proportion of surface nodes that are "reserved" for the plant. This don't necessarily mean that there is a plant on the node (see *density*), but this "cover" prevents other plants with lower priority from spawning on the said nodes.
+
+#### density
+Number between 0 and cover. Proportion of nodes that are effectively covered by the plant.
+
+Examples:
+`cover = 0.8 ; density = 0.8`: the plant is present on 80% nodes, so extremely dense. Other plants can't take more than the remaining 20% if they have a lower `priority`.
+`cover = 0.8 ; density = 0.1`: the plant is present on 10% nodes, so more scattered, but other plants can't take more than 20% if they have a lower `priority`. Params like this are suitable for a plant that naturally needs much space.
+`cover = 0.1 ; density = 0.1`: the plant is present on 10% nodes like on the previous case, but other plants are much more common (max 90% of the nodes).
+
+#### priority
+Integer generally between 0 and 100 (no strict rule :) to determine which plants are dominating the others. The dominant plants (with higher priority) impose their *cover* to the others.
+
+#### check
+Function to check the conditions. Should return a boolean: true, the plant can spawn here ; false, the plant can't spawn and don't impose its *cover*. It takes 2 parameters:
+* `t`: table containing all possible conditions: all noises (`t.v1` to `t.v20`), dirt thickness `t.thickness`, temperature `t.temp`, humidity `t.humidity`, humidity from sea `t.sea_water`, from rivers `t.river_water`, from sea and rivers `water`.
+* `pos`: position of the future plant, above the dirt node.
+
+	check = function(t, pos)
+		return t.v15 < 0.7 and t.temp >= 1.9 and t.humidity > 2 and t.v16 > 2
+	end,
+`
+
+#### grow
+Optionnal function to override the default behaviour (see *nodes*) for complex plants like trees.
+It should "simply" generate the plant.
+It takes 5 parameters:
+* `nodes`: table of map content IDs, see *nodes*.
+* `pos`: position of the future plant, above the dirt node.
+* `data`: VoxelManip data (array of content IDs)
+* `area`: VoxelArea
+* `i`: index of the data array matching the position `pos`. In other terms, `area:indexp(pos) = i`.
+
+	grow = function(nodes, pos, data, area)
+		local rand = math.random()
+		local height = math.floor(8 + 4 * rand)
+		local radius = 5 + 3 * rand
+
+		vmg.make_jungle_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
+	end,
