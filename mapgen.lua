@@ -127,11 +127,6 @@ local silt_threshold = vmg.define("silt_threshold", 1)
 local sand_threshold = vmg.define("sand_threshold", 0.75)
 local dirt_threshold = vmg.define("dirt_threshold", 0.5)
 
---[[local tree_density = vmg.define("tree_density", 5) / 100
-local trees = vmg.define("trees", true)
-local plant_density = vmg.define("plant_density", 32) / 100
-local plants = vmg.define("plants", true)]]
-
 local water_level = vmg.define("water_level", 1)
 local river_water = vmg.define("river_water", true)
 
@@ -199,62 +194,12 @@ function vmg.generate(minp, maxp, seed)
 	local c_stalactite = minetest.get_content_id("valleys_mapgen:stalactite")
 	local c_stalagmite = minetest.get_content_id("valleys_mapgen:stalagmite")
 
-	-- Tree nodes
-	local c_tree = minetest.get_content_id("default:tree")
-
-	-- Get some varied leaves.
-	local c_leaves = {
-		minetest.get_content_id("default:leaves"),
-		minetest.get_content_id("valleys_mapgen:leaves2"),
-		minetest.get_content_id("valleys_mapgen:leaves3"),
-		minetest.get_content_id("valleys_mapgen:leaves4"),
-		minetest.get_content_id("valleys_mapgen:leaves5"),
-	}
-
-	local c_apple = minetest.get_content_id("default:apple")
-	local c_banana_tree = minetest.get_content_id("valleys_mapgen:banana_tree")
-	local c_banana_leaves = minetest.get_content_id("valleys_mapgen:banana_leaves")
-	local c_banana = minetest.get_content_id("valleys_mapgen:banana")
-	local c_birch_tree = minetest.get_content_id("valleys_mapgen:birch_tree")
-	local c_birch_leaves = minetest.get_content_id("valleys_mapgen:birch_leaves")
-	local c_cherryblossom_tree = minetest.get_content_id("valleys_mapgen:cherry_blossom_tree")
-	local c_cherryblossom_leaves = minetest.get_content_id("valleys_mapgen:cherry_blossom_leaves")
-	local c_jungletree = minetest.get_content_id("default:jungletree")
-	local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
-	local c_pinetree = minetest.get_content_id("default:pinetree")
-	local c_pineleaves = minetest.get_content_id("default:pine_needles")
-	local c_firtree = minetest.get_content_id("valleys_mapgen:fir_tree")
-	local c_firleaves = minetest.get_content_id("valleys_mapgen:fir_needles")
-
-	-- Plants
-	local c_grass = { -- Use an array instead of defining 5 variables. More useful: c_grass[i] is the content ID of default:grass_i.
-		minetest.get_content_id("default:grass_1"),
-		minetest.get_content_id("default:grass_2"),
-		minetest.get_content_id("default:grass_3"),
-		minetest.get_content_id("default:grass_4"),
-		minetest.get_content_id("default:grass_5"),
-	}
-	local c_junglegrass = minetest.get_content_id("default:junglegrass")
-	local c_dryshrub = minetest.get_content_id("default:dry_shrub")
-	local c_cactus = minetest.get_content_id("default:cactus")
-	local c_papyrus = minetest.get_content_id("default:papyrus")
-	local c_geranium = minetest.get_content_id("flowers:geranium")
-	local c_rose = minetest.get_content_id("flowers:rose")
-	local c_tulip = minetest.get_content_id("flowers:tulip")
-	local c_viola = minetest.get_content_id("flowers:viola")
-	local c_gerbera = minetest.get_content_id("valleys_mapgen:gerbera")
-	local c_dandelion_white = minetest.get_content_id("flowers:dandelion_white")
-	local c_dandelion_yellow = minetest.get_content_id("flowers:dandelion_yellow")
-	local c_mushroom_fertile_brown = minetest.get_content_id("flowers:mushroom_fertile_brown")
-	local c_mushroom_fertile_red = minetest.get_content_id("flowers:mushroom_fertile_red")
+	-- Mushrooms
 	local c_huge_mushroom_cap = minetest.get_content_id("valleys_mapgen:huge_mushroom_cap")
 	local c_giant_mushroom_cap = minetest.get_content_id("valleys_mapgen:giant_mushroom_cap")
 	local c_giant_mushroom_stem = minetest.get_content_id("valleys_mapgen:giant_mushroom_stem")
-	local c_arrow_arum = minetest.get_content_id("valleys_mapgen:arrow_arum")
-	local c_bird_of_paradise = minetest.get_content_id("valleys_mapgen:bird_of_paradise")
-	local c_calla_lily = minetest.get_content_id("valleys_mapgen:calla_lily")
-	local c_hibiscus = minetest.get_content_id("valleys_mapgen:hibiscus")
-	local c_orchid = minetest.get_content_id("valleys_mapgen:orchid")
+	local c_mushroom_fertile_red = minetest.get_content_id("flowers:mushroom_fertile_red")
+	local c_mushroom_fertile_brown = minetest.get_content_id("flowers:mushroom_fertile_brown")
 
 	-- Air and Ignore
 	local c_air = minetest.get_content_id("air")
@@ -464,113 +409,6 @@ function vmg.generate(minp, maxp, seed)
 									data[ivm2] = c_snow_layer -- set node above to snow
 								end
 
-								--[[if trees and math.random() < tree_density and above > 0 then -- make a tree
-
-									-- choose a tree from climatic and geological conditions
-									if v14 < 0 and temp < 1.5 and temp >= 0.90 and humidity < 1 and v15 < 0.8 and math.abs(v13) < 0.2 and math.random() < 0.3 then -- Pine Tree
-										local rand = math.random()
-										local height = math.floor(9 + 6 * rand)
-										local radius = 4 + 2 * rand
-										vmg.make_pine_tree(pos, data, a, height, radius, c_pinetree, c_pineleaves, c_air, c_ignore)
-									elseif v15 < 0.6 and temp >= 0.85 and temp < 2.3 and humidity < 3 and v16 < 2 and v14 > -0.5 and v13 < 0.8 then -- Apple Tree
-										local rand = math.random()
-										local height = math.floor(4 + 2.5 * rand)
-										local radius = 3 + rand
-										local leaves = c_leaves[1]
-										if leaves_colors then
-											leaves = c_leaves[math.random(#c_leaves)]
-										end
-											
-										if math.random(1, 4) == 1 then
-											vmg.make_apple_tree(pos, data, a, height, radius, c_tree, leaves, c_apple, c_air, c_ignore)
-										else
-											vmg.make_tree(pos, data, a, height, radius, c_tree, leaves, c_air, c_ignore)
-										end
-									elseif v15 < 0.7 and temp >= 1.9 and humidity > 2 and v16 > 2 then -- Jungle Tree
-										local rand = math.random()
-										local height = math.floor(8 + 4 * rand)
-										local radius = 5 + 3 * rand
-										vmg.make_jungle_tree(pos, data, a, height, radius, c_jungletree, c_jungleleaves, c_air, c_ignore)
-									elseif v15 > -0.6 and temp >= 1.8 and humidity > 2.2 and v16 > 1.8 then -- banana tree
-										local rand = math.random()
-										local height = math.floor(4 + 2.5 * rand)
-										local radius = 3 + rand
-										if math.random(100) <= 10 then
-											vmg.make_banana_tree(pos, data, a, height, radius, c_banana_tree, c_banana_leaves, c_banana, c_air, c_ignore)
-										end
-									elseif temp > 0.38 and temp < 1 and humidity > 0.9 and v15 > 0 and v15 < 0.55 then -- Fir Tree
-										local rand = math.random()
-										local height = math.floor(9 + 6 * rand)
-										local radius = 4 + 2 * rand
-										vmg.make_fir_tree(pos, data, a, height, radius, c_firtree, c_firleaves, c_air, c_ignore)
-									elseif temp > 0.6 and temp < 1 and humidity < 1.4 and v15 > 0 and v15 < 0.55 and y > 30 then -- cherry blossom Tree
-										local rand = math.random()
-										local height = math.floor(4 + 2.5 * rand)
-										local radius = 3 + rand
-										if math.random(100) <= 10 then
-											vmg.make_cherry_blossom_tree(pos, data, a, height, radius, c_cherryblossom_tree, c_cherryblossom_leaves, c_air, c_ignore)
-										end
-									elseif temp > 0.5 and temp < 1 and humidity < 1.4 and v13 < 1 and v14 < 0.1 and v15 < 0.75 and y > 10 then -- birch tree
-										local rand = math.random()
-										local height = math.floor(6 + 2.5 * rand)
-										local radius = 2 + rand
-										vmg.make_birch_tree(pos, data, a, height, radius, c_birch_tree, c_birch_leaves, c_air, c_ignore)
-									end
-								elseif plants and math.random() < plant_density and above > 0 then -- make a plant
-									if temp > 1 and temp < 1.8 and water > 0.7 and humidity > 3 and v13 > -0.4 and math.random() < 0.04 then -- Papyrus
-										for i = 1, 4 do
-											data[ivm+i*ystride] = c_papyrus
-										end
-									elseif humidity > 1 and v2 < 0.01 and v13 > 0.1 and v15 < 0.25 and y > 3 then -- arrow arum on river banks
-										data[ivm2] = c_arrow_arum
-									elseif temp > 1 and temp < 1.6 and v2 < 0.05 and math.random(100) <= 2 and y > 3 and y < 60 then -- hibiscus along rivers
-										data[ivm2] = c_hibiscus
-									elseif temp > 1.2 and v2 < 0.02 and v13 < 1 and v14 < 0.1 and v15 < 0.75 and math.random(100) <= 20 and y > 3 then -- calla lily on river banks
-										data[ivm2] = c_calla_lily
-									elseif v15 < 0.65 and temp >= 0.65 and temp < 1.5 and humidity < 2.6 and v16 < 1.5 and v13 < 0.8 and math.random() < 0.7 then -- Grass
-										data[ivm2] = c_grass[math.random(1, 5)]
-									elseif v15 > -0.6 and temp >= 1.8 and humidity > 2.2 and v16 > 1.8 then -- jungle plants
-										if math.random(100) <= 2 then
-											data[ivm2] = c_bird_of_paradise
-										else
-											data[ivm2] = c_junglegrass
-										end
-									elseif v15 < 0.7 and temp >= 1.9 and humidity > 2 and v16 > 2 then -- orchids amongst jungle trees
-										if math.random(100) <= 2 then
-											data[ivm2] = c_orchid
-										end
-									elseif v15 > 0.65 and humidity < 0.5 and math.random() < 0.2 then
-										if v16 > 0 and temp > 1.6 and math.random() < 0.12 then -- Cactus
-											for i = 1, 4 do
-												data[ivm+i*ystride] = c_cactus
-											end
-										elseif temp > 1.2 then -- Dry Shrub
-											data[ivm2] = c_dryshrub
-										end
-									elseif math.random() < 0.04 and temp > 0.98 and temp < 1.8 and humidity < 1.7 and v14 >= -0.1 and v15 < 0.4 and v15 >= -0.6 and v13 < 0.82 then -- Flowers
-										if temp > 1.2 and math.random() < 0.3 then
-											data[ivm2] = c_rose
-										elseif temp > 1.2 and math.random() < 0.2 then
-											data[ivm2] = c_gerbera
-										elseif thickness <= 1.3 and math.random() < 0.4 then
-											data[ivm2] = c_geranium
-										elseif v16 < 1.6 and math.random() < 0.7 then
-											data[ivm2] = c_viola
-										elseif temp > 1.3 and humidity < 1.5 and math.random() < 0.2 then
-											data[ivm2] = c_tulip
-										elseif math.random() < 0.5 then
-											data[ivm2] = c_dandelion_white
-										else
-											data[ivm2] = c_dandelion_yellow
-										end
-									elseif math.random() < 0.02 and temp > 1.2 and temp < 1.6 and humidity > 0.5 and v13 < 0.5 and v14 < 0.5 and v15 < 0.5 then -- Mushrooms -- djr
-										if math.random() < 0.5 then
-											data[ivm2] = c_mushroom_fertile_red
-										else
-											data[ivm2] = c_mushroom_fertile_brown
-										end
-									end
-								end]]
 								if above > 0 then
 									local conditions = { -- pack it in a table, for plants API
 										v1 = v1,
