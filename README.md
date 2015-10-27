@@ -62,7 +62,7 @@ Mod created by Gael-de-Sailly and now mainly developed by duane-r.
 The Plants API has been introduced on October 24th, 2015. It allow mods to generate plants directly on the map.
 
 ### How to use it ?
-First, make sure that you've added the `valleys_mapgen` dependancy in your depends.txt (followed by a quotation mark if optionnal)
+First, make sure that you've added the `valleys_mapgen` dependancy in your depends.txt (followed by a question mark if optional)
 The only function is `vmg.register_plant`. It registers a plant that will be generated during mapgen.
 
 ### Parameters
@@ -100,24 +100,24 @@ Many syntaxes are possible, with their default behaviour (see *grow*):
 * `nodes = {"default:grass_1", "default:grass_2", "default:grass_3", "default:grass_4", "default:grass_5"}`: generate one grass node, randomly chosen between the 5 nodes.
 * `nodes = {"default:grass_1", "default:grass_2", "default:grass_3", "default:grass_4", "default:grass_5, n=3"}`: generate 3 grass nodes vertically (my example is a bit silly…), randomly chosen between the 5 nodes (chosen once, not 3 times).
 
-All cases are possible, but other cases can't be managed by default and needs a grow function (see *grow*), like the example above with jungle tree. Anyway, the strings in this table are recursively converted into map content IDs.
+All cases are possible, but other cases can't be managed by default and need a grow function (see *grow*), like the example above with jungle tree. Anyway, the strings in this table are recursively converted into map content IDs.
 
 #### cover
-Number between 0 and 1, which determines the proportion of surface nodes that are "reserved" for the plant. This don't necessarily mean that there is a plant on the node (see *density*), but this "cover" prevents other plants with lower priority from spawning on the said nodes.
+Number between 0 and 1, which determines the proportion of surface nodes that are "reserved" for the plant. This doesn't necessarily mean that there is a plant on the node (see *density*), but this "cover" prevents other plants with lower priority from spawning on said nodes.
 
 #### density
 Number between 0 and cover. Proportion of nodes that are effectively covered by the plant.
 
 Examples:
-* `cover = 0.8 ; density = 0.8`: the plant is present on 80% nodes, so extremely dense. Other plants can't take more than the remaining 20% if they have a lower `priority`.
-* `cover = 0.8 ; density = 0.1`: the plant is present on 10% nodes, so more scattered, but other plants can't take more than 20% if they have a lower `priority`. Params like this are suitable for a plant that naturally needs much space.
-* `cover = 0.1 ; density = 0.1`: the plant is present on 10% nodes like on the previous case, but other plants are much more common (max 90% of the nodes).
+* `cover = 0.8 ; density = 0.8`: the plant is present on 80% of the nodes, so extremely dense. Other plants can't take more than the remaining 20% if they have a lower `priority`.
+* `cover = 0.8 ; density = 0.1`: the plant is present on 10% of the nodes, so more scattered, but other plants can't take more than 20% if they have a lower `priority`. Params like this are suitable for a plant that naturally needs much space.
+* `cover = 0.1 ; density = 0.1`: the plant is present on 10% of the nodes as in the previous case, but other plants are much more common (max 90% of the nodes).
 
 #### priority
-Integer generally between 0 and 100 (no strict rule :) to determine which plants are dominating the others. The dominant plants (with higher priority) impose their *cover* to the others.
+Integer generally between 0 and 100 (no strict rule :) to determine which plants are dominating the others. The dominant plants (with higher priority) impose their *cover* on the others.
 
 #### check
-Function to check the conditions. Should return a boolean: true, the plant can spawn here ; false, the plant can't spawn and don't impose its *cover*. It takes 2 parameters:
+Function to check the conditions. Should return a boolean: true, the plant can spawn here ; false, the plant can't spawn and doesn't impose its *cover*. It takes 2 parameters:
 * `t`: table containing all possible conditions: all noises (`t.v1` to `t.v20`), dirt thickness `t.thickness`, temperature `t.temp`, humidity `t.humidity`, humidity from sea `t.sea_water`, from rivers `t.river_water`, from sea and rivers `t.water`.
 * `pos`: position of the future plant, above the dirt node.
 
@@ -128,7 +128,7 @@ end,
 ```
 
 #### grow
-Optionnal function to override the default behaviour (see *nodes*) for complex plants like trees.
+Optional function to override the default behaviour (see *nodes*) for complex plants like trees.
 It should "simply" generate the plant.
 It takes 5 parameters:
 * `nodes`: table of map content IDs, see *nodes*.
