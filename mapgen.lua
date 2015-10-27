@@ -351,7 +351,7 @@ function vmg.generate(minp, maxp, seed)
 				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
 				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], -1, -1, -1, -1, -1 -- take the noise values for 3D noises
 				local is_cave = false
-				local sr
+				local sr, v19, v20
 				if do_caves then
 					if simple_caves then
 						v19, v20 = n19[i3d], n20[i3d] -- take the noise values for 3D noises
