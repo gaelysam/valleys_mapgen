@@ -319,7 +319,7 @@ if vmg.define("trees", true) then
 		end,
 	})
 
-	vmg.register_plant({ -- Cherry blossom tree
+	vmg.register_plant({ -- Birch tree
 		nodes = {
 			trunk = "valleys_mapgen:birch_tree",
 			leaves = "valleys_mapgen:birch_leaves",
