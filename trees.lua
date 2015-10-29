@@ -75,6 +75,22 @@ minetest.register_abm({
 	end
 })
 
+-- Willow sapling growth
+minetest.register_abm({
+	nodenames = {"valleys_mapgen:willow_sapling"},
+	interval = 20,
+	chance = 50,
+	action = function(pos, node)
+		if not can_grow(pos) then
+			return
+		end
+
+		minetest.log("action", "A willow sapling grows into a tree at "..
+				minetest.pos_to_string(pos))
+		vmg.grow_willow_tree(pos)
+	end
+})
+
 local leaf_types = {"default:leaves", "valleys_mapgen:leaves2", "valleys_mapgen:leaves3", "valleys_mapgen:leaves4", "valleys_mapgen:leaves5"}
 local leaves_colors = vmg.define("leaves_colors", true)
 
@@ -221,6 +237,27 @@ function vmg.grow_fir_tree(pos)
 	local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
 	local data = vm:get_data()
 	vmg.make_fir_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
+	vm:set_data(data)
+	vm:write_to_map()
+	vm:update_map()
+end
+
+function vmg.grow_willow_tree(pos)
+	-- individual parameters
+	local rand = math.random()
+	local height = math.floor(5 + 2.5 * rand)
+	local radius = 5 + rand
+
+	-- VoxelManip stuff
+	local leaves = minetest.get_content_id("valleys_mapgen:willow_leaves")
+	local trunk = minetest.get_content_id("valleys_mapgen:willow_tree")
+	local air = minetest.get_content_id("air")
+	local ignore = minetest.get_content_id("ignore")
+	local vm = minetest.get_voxel_manip()
+	local emin, emax = vm:read_from_map({x = pos.x - 4, y = pos.y, z = pos.z - 4}, {x = pos.x + 4, y = pos.y + height + 4, z = pos.z + 4})
+	local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
+	local data = vm:get_data()
+	vmg.make_willow_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
 	vm:set_data(data)
 	vm:write_to_map()
 	vm:update_map()
@@ -408,6 +445,21 @@ function vmg.make_pine_tree(pos, data, area, height, radius, trunk, leaves, air,
 		vmg.make_leavesblob(bpos, data, area, leaves, air, ignore, {x = midradius, y = 1.5, z = midradius}, np)
 		pos.y = pos.y - math.random(1, 2)
 	end
+end
+
+function vmg.make_willow_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
+	if vmg.loglevel >= 3 then
+		print("[Valleys Mapgen] Generating willow tree at " .. minetest.pos_to_string(pos) .. " ...")
+	end
+	local ystride = area.ystride -- Useful to get the index above
+	local iv = area:indexp(pos)
+	for i = 1, height do -- Build the trunk
+		data[iv] = trunk
+		iv = iv + ystride -- increment by one node up
+	end
+	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.5}
+	pos.y = pos.y + height - 1
+	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius, z = radius}, np)
 end
 
 function vmg.make_leavesblob(pos, data, area, leaves, air, ignore, radius, np, fruit_chance, fruit)

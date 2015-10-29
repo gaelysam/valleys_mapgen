@@ -125,9 +125,10 @@ register_dirts("Sandy")
 
 -- Credits / Notes
 -- Banana tree: textures by demon_boy
--- Birch tree: textures by Gael-de-Sailly
+-- Birch tree: textures from Forest mod by Gael-de-Sailly
 -- Cherry Blossom tree: textures by demon_boy
 -- Fir tree: Fir trees don't exist in the default game. Textures from Forest mod by Gael-de-Sailly
+-- Willow tree: textures from Forest mod by Gael-de-Sailly
 
 -- a list of tree descriptions
 vmg.treelist = {
@@ -161,6 +162,13 @@ vmg.treelist = {
 	 leaf="needles",
 	 leaf_desc="Needles",
 	 leaf_tile="fir_leaves",
+	 drop_rarity=20,
+	 trunk_dia=1.0},
+	{name="willow",
+	 desc="Willow",
+	 leaf="leaves",
+	 leaf_desc="Leaves",
+	 leaf_tile="willow_leaves",
 	 drop_rarity=20,
 	 trunk_dia=1.0},
 }

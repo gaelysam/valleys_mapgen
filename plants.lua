@@ -339,4 +339,25 @@ if vmg.define("trees", true) then
 			vmg.make_birch_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
 		end,
 	})
+
+	vmg.register_plant({ -- Willow tree
+		nodes = {
+			trunk = "valleys_mapgen:willow_tree",
+			leaves = "valleys_mapgen:willow_leaves",
+			air = "air", ignore = "ignore",
+		},
+		cover = 0.05,
+		density = 0.02,
+		priority = 70,
+		check = function(t, pos)
+			return t.temp < 1.5 and t.humidity > 1 and t.humidity < 2 and t.v2 < 0.03 and pos.y > 3
+		end,
+		grow = function(nodes, pos, data, area)
+			local rand = math.random()
+			local height = math.floor(5 + 2.5 * rand)
+			local radius = 5 + rand
+
+			vmg.make_willow_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.air, nodes.ignore)
+		end,
+	})
 end
