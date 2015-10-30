@@ -70,6 +70,16 @@ if vmg.define("plants", true) then
 	})
 
 	vmg.register_plant({
+		nodes = {"valleys_mapgen:mangrove_fern"},
+		cover = 0.1,
+		density = 0.05,
+		priority = 50,
+		check = function(t, pos)
+			return t.v2 < 0.03 and t.temp >= 1.7 and t.humidity > 1.5 and pos.y < 6
+		end,
+	})
+
+	vmg.register_plant({
 		nodes = {"valleys_mapgen:orchid"},
 		cover = 0.02,
 		density = 0.005,
@@ -217,6 +227,28 @@ if vmg.define("trees", true) then
 		end,
 	})
 
+	vmg.register_plant({ -- Mangrove tree
+		nodes = {
+			trunk = "valleys_mapgen:mangrove_tree",
+			leaves = "valleys_mapgen:mangrove_leaves",
+			roots = "valleys_mapgen:mangrove_roots",
+			air = "air", ignore = "ignore",
+		},
+		cover = 0.3,
+		density = 0.2,
+		priority = 72,
+		check = function(t, pos)
+			return t.v2 < 0.03 and t.temp >= 1.7 and t.humidity > 1.5 and pos.y < 5
+		end,
+		grow = function(nodes, pos, data, area)
+			local rand = math.random()
+			local height = math.floor(3 + 1.5 * rand)
+			local radius = 2 + 1.5 * rand
+
+			vmg.make_mangrove_tree(pos, data, area, height, radius, nodes.trunk, nodes.leaves, nodes.roots, nodes.air, nodes.ignore)
+		end,
+	})
+
 	local leaves_colors = vmg.define("leaves_colors", true)
 
 	vmg.register_plant({ -- Apple tree
@@ -236,7 +268,7 @@ if vmg.define("trees", true) then
 		density = 0.05,
 		priority = 66,
 		check = function(t, pos)
-			return t.v15 < 0.6 and t.temp >= 0.85 and t.temp < 2.3 and t.humidity < 3 and t.v16 < 2 and t.v14 > -0.5 and t.v13 < 0.8
+			return t.v15 < 0.6 and t.temp >= 0.85 and t.temp < 2.3 and t.humidity < 3 and t.v16 < 2 and t.v14 > -0.5 and t.v13 < 0.8 and pos.y > 2
 		end,
 		grow = function(nodes, pos, data, area)
 			local rand = math.random()

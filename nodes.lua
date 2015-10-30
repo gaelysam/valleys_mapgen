@@ -127,6 +127,7 @@ register_dirts("Sandy")
 -- Banana tree: textures by demon_boy
 -- Birch tree: textures from Forest mod by Gael-de-Sailly
 -- Cherry Blossom tree: textures by demon_boy
+-- Mangrove tree: textures by demon_boy
 -- Fir tree: Fir trees don't exist in the default game. Textures from Forest mod by Gael-de-Sailly
 -- Willow tree: textures from Forest mod by Gael-de-Sailly
 
@@ -164,6 +165,13 @@ vmg.treelist = {
 	 leaf_tile="fir_leaves",
 	 drop_rarity=20,
 	 trunk_dia=1.0},
+	{name="mangrove",
+	 desc="Mangrove",
+	 leaf="leaves",
+	 leaf_desc="Leaves",
+	 leaf_tile="mangrove_leaves",
+	 drop_rarity=20,
+	 trunk_dia=0.5},
 	{name="willow",
 	 desc="Willow",
 	 leaf="leaves",
@@ -323,6 +331,7 @@ end
 -- Calla Lily: texture by demon_boy
 -- Gerbera: texture by demon_boy
 -- Hibiscus: texture by demon_boy
+-- Mangrove Fern: texture by demon_boy
 -- Orchid: texture by demon_boy
 
 vmg.plantlist = {
@@ -332,6 +341,7 @@ vmg.plantlist = {
 	{"calla_lily",			"Calla Lily",		1,			"true",		"flowerwhitedye",	{-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5}},
 	{"gerbera",				"Gerbera",			0,			"true",		"flowerpinkdye",	{-0.15, -0.5, -0.15, 0.15, 0.2, 0.15}},
 	{"hibiscus",			"Hibiscus",			1,			"false",	"flowerwhitedye",	{-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5}},
+	{"mangrove_fern",		"Mangrove Fern",	1,			"false",	"flowernodye",		{-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5}},
 	{"orchid",				"Orchid",			1,			"true",		"flowerwhitedye",	{-0.5, -0.5, -0.5, 0.5, -0.3125, 0.5}},
 }
 
@@ -373,6 +383,16 @@ for i in ipairs(vmg.plantlist) do
 
 end
 
+
+minetest.register_node("valleys_mapgen:mangrove_roots", {
+	description = "Mangrove Roots",
+	drawtype = "plantlike",
+	tiles = {"vmg_mangrove_roots.png"},
+	paramtype = "light",
+	is_ground_content = true,
+	groups = {snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
+	sounds = default.node_sound_wood_defaults(),
+})
 
 minetest.register_node("valleys_mapgen:huge_mushroom_cap", {
 	description = "Huge Mushroom Cap",

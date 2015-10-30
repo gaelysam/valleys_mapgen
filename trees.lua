@@ -75,6 +75,22 @@ minetest.register_abm({
 	end
 })
 
+-- Mangrove sapling growth
+minetest.register_abm({
+	nodenames = {"valleys_mapgen:mangrove_sapling"},
+	interval = 20,
+	chance = 50,
+	action = function(pos, node)
+		if not can_grow(pos) then
+			return
+		end
+
+		minetest.log("action", "A mangrove sapling grows into a tree at "..
+				minetest.pos_to_string(pos))
+		vmg.grow_mangrove_tree(pos)
+	end
+})
+
 -- Willow sapling growth
 minetest.register_abm({
 	nodenames = {"valleys_mapgen:willow_sapling"},
@@ -198,6 +214,26 @@ function default.grow_jungle_tree(pos)
 	local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
 	local data = vm:get_data()
 	vmg.make_jungle_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
+	vmg.execute_after_mapgen()
+	vm:set_data(data)
+	vm:write_to_map()
+	vm:update_map()
+end
+
+function default.grow_mangrove_tree(pos)
+	local rand = math.random()
+	local height = math.floor(3 + 2 * rand)
+	local radius = 3 + 2 * rand
+
+	local leaves = minetest.get_content_id("default:mangrove_leaves")
+	local trunk = minetest.get_content_id("default:mangrove_tree")
+	local air = minetest.get_content_id("air")
+	local ignore = minetest.get_content_id("ignore")
+	local vm = minetest.get_voxel_manip()
+	local emin, emax = vm:read_from_map({x = pos.x - 2, y = pos.y - 1, z = pos.z - 2}, {x = pos.x + 3, y = pos.y + height + 2, z = pos.z + 3})
+	local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
+	local data = vm:get_data()
+	vmg.make_mangrove_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
 	vmg.execute_after_mapgen()
 	vm:set_data(data)
 	vm:write_to_map()
@@ -360,6 +396,28 @@ local function make_jungle_root(x0, y0, z0, data, area, tree, air)
 	end
 end
 
+local function make_mangrove_root(x0, y0, z0, data, area, roots, air)
+	local ystride = area.ystride
+	local ybot = y0 - 1
+	for x = x0 - 1, x0 + 1 do
+		for z = z0 - 1, z0 + 1 do -- iterate in a 3x3 square around the trunk
+			local iv = area:index(x, ybot, z)
+			for i = 0, 5 do
+				if data[iv] == air then -- find the ground level
+					if math.random() < 0.6 then
+						data[iv-ystride] = roots -- make mangrove root below
+						if math.random() < 0.6 then
+							data[iv] = roots -- make mangrove root at this air node
+						end
+					end
+					break
+				end
+				iv = iv + ystride -- increment by one node up
+			end
+		end
+	end
+end
+
 function vmg.make_jungle_tree(pos, data, area, height, radius, trunk, leaves, air, ignore)
 	if vmg.loglevel >= 3 then
 		print("[Valleys Mapgen] Generating jungle tree at " .. minetest.pos_to_string(pos) .. " ...")
@@ -371,6 +429,22 @@ function vmg.make_jungle_tree(pos, data, area, height, radius, trunk, leaves, ai
 		iv = iv + ystride -- increment by one node up
 	end
 	vmg.register_after_mapgen(make_jungle_root, pos.x, pos.y, pos.z, data, area, trunk, air)
+	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.8}
+	pos.y = pos.y + height
+	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius * 0.5, z = radius}, np)
+end
+
+function vmg.make_mangrove_tree(pos, data, area, height, radius, trunk, leaves, roots, air, ignore)
+	if vmg.loglevel >= 3 then
+		print("[Valleys Mapgen] Generating mangrove tree at " .. minetest.pos_to_string(pos) .. " ...")
+	end
+	local ystride = area.ystride -- Useful to get the index above
+	local iv = area:indexp(pos)
+	for i = 1, height do -- Build the trunk
+		data[iv] = trunk
+		iv = iv + ystride -- increment by one node up
+	end
+	vmg.register_after_mapgen(make_mangrove_root, pos.x, pos.y, pos.z, data, area, roots, air)
 	local np = {offset = 0.8, scale = 0.4, spread = {x = 8, y = 4, z = 8}, octaves = 3, persist = 0.8}
 	pos.y = pos.y + height
 	vmg.make_leavesblob(pos, data, area, leaves, air, ignore, {x = radius, y = radius * 0.5, z = radius}, np)
