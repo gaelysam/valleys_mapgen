@@ -1,0 +1,248 @@
+#    ABOUT SETTINGS
+
+#    Settings are presents twice :
+#   -- In every world :
+#      world_directory/vmg.conf
+
+#      Format in vmg.conf:
+#      flags aren't preceded by "vmg_", like this:
+
+#      version = 2.3
+#      water_level = 1
+
+#   -- In the main directory :
+#      usually main_directory/minetest.conf
+
+#      Format in minetest.conf:
+#      Unlike in vmg.conf, flags are preceded by "vmg_"
+
+#      vmg_version = 2.3
+#      vmg_water_level = 1
+
+#    HOW TO CHANGE IT
+
+#    You can simply change it in minetest.conf (will affect new worlds only) or in vmg.conf (will affect the involved world only)
+#    But the recent builds (since October 24th 2015) provide a GUI setting system, thanks to PilzAdam, for which Valleys Mapgen has been made compatible.
+
+[General]
+#    Valleys Mapgen version used
+vmg_version (Version) enum 2.3 2.3,2.2,2.1,2.0,1.3,1.2,1.1,1.0
+
+#    Valleys Mapgen logs
+#    0 = Not any log from Valleys Mapgen
+#    1 = Total mapgen time
+#    2 = Detailed mapgen time (step by step)
+#    3 = Detailed mapgen time + trees
+vmg_log_level (Log level) int 0 0 3
+
+[Spawn]
+#    Maximal distance from (0;0) at which the player will appear
+#    if possible (if it's in a big ocean, it might be farther)
+vmg_max_distance (Max spawn distance) int 450
+
+#    New players are randomely spawned by the mod
+#    disable it to spawn the player another way.
+vmg_spawn (Spawn) bool true
+
+#    After death, players are respawned by the mod
+#    disable it to respawn the player another way.
+vmg_respawn (Respawn) bool true
+
+[Mapgen]
+#    Simply water level
+vmg_water_level (Water level) int 1 -31000 31000
+
+#    Temperature is divided by 2 by climbing this many nodes up
+vmg_altitude_chill (Altitude chill) int 90
+
+[*Dirt and Stone]
+#    height at which the half of the surface is made solely of stone.
+vmg_average_stone_level (Average stone level) int 180
+
+#    if noise 13 is above this value, make pure clay instead of clayey dirt.
+vmg_clay_threshold (Clay threshold) float 1.0
+
+#    if noise 14 is above this value, make pure silt instead of silty dirt.
+vmg_silt_threshold (Silt threshold) float 1.0
+
+#    if noise 15 is above this value, make desert sand instead of sandy dirt.
+vmg_sand_threshold (Sand threshold) float 0.7
+
+#    if not any of noises 13, 14 and 15 is above this value, make normal dirt
+#    else make special dirt.
+vmg_dirt_threshold (Normal dirt threshold) float 0.5
+
+#    height at which the half of the surface is covered by snow.
+vmg_average_snow_level (Average snow level) int 100
+
+[*Rivers]
+#    Simply the depth of the rivers
+vmg_river_depth (River depth) int 3
+
+#    Width of the rivers (arbitrary units)
+vmg_river_size (River size) float 5.0 0.0 100.0
+
+#    Use river water instead of normal water in rivers.
+vmg_river_water (River Water) bool true
+
+#    maximal length of a river water flowing.
+vmg_waterflow (Waterflow) int 3 2 8
+
+[*Caves]
+#    Disable it to turn caves off. This saves significant processing time.
+vmg_caves (Caves) bool true
+
+#    Size of the caves (arbitrary units)
+vmg_caves_size (Caves size) float 7.0 0.0 100.0
+
+[**Lava]
+#    To manage lava amount increasing by going deep underground
+#    lower values = bigger increasing.
+vmg_lava_depth (Lava depth) int 2000 1 31000
+
+#    No longer supported since mapgen version 2.0. Use lava_max_height instead.
+vmg_surface_lava (Surface lava for VMG < 2.0) bool false
+
+#    Lava can't be generated above this height
+#    use 31000 to disable this restriction, or -31000 to fully disable lava.
+vmg_lava_max_height (Lava max height) int -1 -31000 31000
+
+[**Features]
+#    Use a faster, sparser cave algorithm
+vmg_simple_caves (Simple caves) bool false
+
+#    Add mushrooms and water features to caves.
+vmg_cave_stuff (Cave stuff) bool false
+
+[*Ores]
+#    Spawn ores from minetest.register_ore() and from darkage mod by CraigyDavi
+vmg_ores (Ores) bool true
+
+#    Enable sandstone and desert stone layers
+vmg_stone_ores (Stone ores) bool true
+
+[*Plants]
+#    Enable trees
+vmg_trees (Trees) bool true
+
+#    Enable plants
+vmg_plants (Plants) bool true
+
+#    DEPRECATED since mapgen 2.3. Percent of the lawn nodes that are covered by trees.
+tree_density (Trees density for VMG < 2.3) float 5.0 0.0 100.0
+
+#    DEPRECATED since mapgen 2.3. Percent of the lawn nodes that are covered by plants.
+vmg_plant_density (Plants density for VMG < 2.3) float 32.0 0.0 100.0
+
+#    5 different colors for apple trees
+vmg_leaves_colors (Leaves colors) bool true
+
+[*Noises]
+
+[**Base ground noises #1-6]
+#    Base ground height
+#    large and smooth noise
+#    2D noise
+vmg_noise_1 (#1: Base ground height) noise_params -10, 50, (1024,1024,1024), 5202, 6, 0.4, 2
+
+#    Valleys noise
+#    place a river where around zero
+#    2D noise
+vmg_noise_2 (#2: Valleys) noise_params 0, 1, (256,256,256), -6050, 5, 0.6, 2
+
+#    Valleys depth
+#    significant influence on terrain height
+#    this value will be squared
+#    2D noise
+vmg_noise_3 (#3: Valleys depth) noise_params 5, 4, (512,512,512), -1914, 1, 1, 2
+
+#    Valleys profile
+#    higher values = larger valleys
+#    2D noise
+vmg_noise_4 (#4: Valleys profile) noise_params 0.6, 0.5, (512,512,512), 777, 1, 1, 2
+
+#    Inter-valleys slopes
+#    determines how much the 3D noise #6 impacts the terrain.
+#    The most apparent effect is on mountain peaks
+#    low values = smooth terrain, round and wide mountain tops
+#    high values = steep terrain, sharp mountains peaks
+#    2D noise
+vmg_noise_5 (#5: Inter-valleys slopes) noise_params 0.5, 0.5, (128,128,128), 746, 1, 1, 2
+
+#    Inter-valleys filling
+#    3D noise
+vmg_noise_6 (#6: Inter-valleys filling) noise_params 0, 1, (256,512,256), 1993, 6, 0.8, 2
+
+[**Caves noises #8-12]
+#    First cave noise
+#    3D noise
+vmg_noise_8 (#8: Caves I) noise_params 0, 1, (32,32,32), -4640, 4, 0.5, 2
+
+#    Second cave noise
+#    3D noise
+vmg_noise_9 (#9: Caves II) noise_params 0, 1, (32,32,32), 8804, 4, 0.5, 2
+
+#    Third cave noise
+#    3D noise
+vmg_noise_10 (#10: Caves III) noise_params 0, 1, (32,32,32), -4780, 4, 0.5, 2
+
+#    Fourth cave noise, also determines lava
+#    3D noise
+vmg_noise_11 (#11: Caves IV and Lava) noise_params 0, 1, (32,32,32), -9969, 4, 0.5, 2
+
+#    Lava can only spawn when this noise is up to a certain threshold
+#    that depends on Y coordinate and Lava depth parameter
+#    3D noise
+vmg_noise_12 (#12: Geological heat) noise_params 0, 1, (64,64,64), 3314, 4, 0.5, 2
+
+[**Dirt noises #7 #13-16]
+#    Dirt thickness at y=0
+#    reduced by elevation according to Average stone level parameter
+#    2D noise
+vmg_noise_7 (#7: Dirt thickness) noise_params 3, 1.75, (256,256,256), 1605, 3, 0.5, 2
+
+#    Clay noise
+#    above Normal dirt threshold parameter, make clayey dirt
+#    above Clay threshold parameter, make pure clay
+#    significant influence on plants
+#    2D noise
+vmg_noise_13 (#13: Clay) noise_params 0, 1, (256,256,256), 2835, 5, 0.5, 4
+
+#    Silt noise
+#    above Normal dirt threshold parameter, make silty dirt
+#    above Silt threshold parameter, make pure silt
+#    significant influence on plants
+#    2D noise
+vmg_noise_14 (#14: Silt) noise_params 0, 1, (256,256,256), 6674, 5, 0.5, 4
+
+#    Sand noise
+#    above Normal dirt threshold parameter, make sandy dirt
+#    above Sand threshold parameter, make pure desert sand
+#    significant influence on plants
+#    2D noise
+vmg_noise_15 (#15: Sand) noise_params 0, 1, (256,256,256), 6940, 5, 0.5, 4
+
+#    Beaches
+#    also used as abstract biome parameter by plants
+#    2D noise
+vmg_noise_16 (#16: Beaches) noise_params 2, 8, (256,256,256), 2349, 3, 0.5, 2
+
+[**Climate noises #17-18]
+#    Temperature
+#    decreased by elevation
+#    3D noise
+vmg_noise_17 (#17: Temperature) noise_params 0, 1, (768,256,768), -1805, 4, 0.5, 4
+
+#    Humidity
+#    modified by dirt type and water proximity
+#    2D noise
+vmg_noise_18 (#18: Humidity) noise_params 0, 1, (243,243,243), -5787, 4, 0.5, 3
+
+[**Simple caves noises #19-20]
+#    Simple caves I
+#    3D noise
+vmg_noise_19 (#19: Simple caves I) noise_params 0, 1, (64,64,64), -8402, 3, 0.5, 2
+
+#    Simple caves II
+#    3D noise
+vmg_noise_20 (#20: Simple caves II) noise_params 0, 1, (64,64,64), 3944, 3, 0.5, 2

@@ -7,6 +7,15 @@ Mod created by Gael-de-Sailly and now mainly developed by duane-r.
 [Discussion on Minetest Forums](https://forum.minetest.net/viewtopic.php?f=9&t=11430)
 
 ## Changelog
+### 2.2 ~> Latest
+* Changed `vmg.conf.example` to `settingtypes.txt` to be compatible with settings API (for recent builds)
+* Added willow tree
+* Added plants API to allow external mods registering plants for VMG
+* Added simple caves for quicker mapgen (optional, disabled by default)
+* Made ores optional
+* Added optional 5 leaves colors for default tree
+* Slimmer trunks for banana, cherry and birch tree
+
 ### 2.1 ~> 2.2 (Saturday September 26, 2015)
 * Added support for darkage ores
 * Added birch tree, cherry tree and banana tree
