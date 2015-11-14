@@ -199,7 +199,7 @@ vmg_noise_12 (#12: Geological heat) noise_params 0, 1, (64,64,64), 3314, 4, 0.5,
 #    Dirt thickness at y=0
 #    reduced by elevation according to Average stone level parameter
 #    2D noise
-vmg_noise_7 (#7: Dirt thickness) noise_params 3, 1.75, (256,256,256), 1605, 3, 0.5, 2
+vmg_noise_7 (#7: Dirt thickness) noise_params 4, 1.75, (256,256,256), 1605, 3, 0.5, 2
 
 #    Clay noise
 #    above Normal dirt threshold parameter, make clayey dirt

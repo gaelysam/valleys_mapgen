@@ -23,7 +23,7 @@ vmg.noises = {
 {offset = 0, scale = 1, seed = 1993, spread = {x = 256, y = 512, z = 256}, octaves = 6, persist = 0.8, lacunarity = 2},
 
 -- Noise 7 : Dirt thickness						2D
-{offset = 3, scale = 1.75, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5, lacunarity = 2},
+{offset = 4, scale = 1.75, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5, lacunarity = 2},
 
 -- Noise 8 : Caves I							3D
 {offset = 0, scale = 1, seed = -4640, spread = {x = 32, y = 32, z = 32}, octaves = 4, persist = 0.5, lacunarity = 2},
@@ -116,7 +116,7 @@ local simple_caves = vmg.define("simple_caves", false)
 local do_cave_stuff = vmg.define("cave_stuff", false)
 
 local average_stone_level = vmg.define("average_stone_level", 180)
-local dirt_thickness = math.sqrt(average_stone_level) / (vmg.noises[7].offset + 0.5)
+local dirt_reduction = math.sqrt(average_stone_level) / (vmg.noises[7].offset - 0.5) -- Calculate dirt_reduction such as v7 - sqrt(average_stone_level) / dirt_reduction = 0.5 on average. This means that, on average at y = average_stone_level, dirt_thickness = 0.5 (half of the surface is bare stone)
 local average_snow_level = vmg.define("average_snow_level", 100)
 local snow_threshold = vmg.noises[17].offset * 0.5 ^ (average_snow_level / altitude_chill)
 
@@ -367,8 +367,8 @@ function vmg.generate(minp, maxp, seed)
 
 				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
 					if not is_cave then -- if pos is not inside a cave
-						local thickness = v7 - math.sqrt(math.abs(y)) / dirt_thickness -- Calculate dirt thickness, according to noise #7, dirt thickness parameter, and elevation (y coordinate)
-						local above = math.ceil(thickness + math.random()) -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness. An "above" of zero = bare stone.
+						local thickness = v7 - math.sqrt(math.abs(y)) / dirt_reduction -- Calculate dirt thickness, according to noise #7, dirt reduction parameter, and elevation (y coordinate)
+						local above = math.floor(thickness + math.random()) -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness. An "above" of zero = bare stone.
 						above = math.max(above, 0) -- must be positive
 
 						if y >= water_level and n6[i3d_sup+i3d_incrY] * slopes <= y + 1 - mountain_ground and not river then -- If node above is in the ground
@@ -377,10 +377,12 @@ function vmg.generate(minp, maxp, seed)
 							else -- place lawn
 
 								-- calculate humidity, see below at vmg.get_humidity
+								local soil_humidity = hraw * (1 - math.exp(-thickness - 0.5))
+
 								local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
 								local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0)
 								local water = sea_water + (1 - sea_water) * river_water
-								local humidity = hraw + water
+								local humidity = soil_humidity + water
 
 								local ivm2 = ivm + ystride -- index of the node above
 								y = y + 1
@@ -645,6 +647,11 @@ function vmg.get_humidity(pos)
 	local flatpos = pos2d(pos)
 	local hraw = vmg.get_humidity_raw(flatpos)
 
+	-- Another influence on humidity: Dirt thickness, because when the dirt layer is very thin, the soil is drained.
+	local v7 = vmg.get_noise(flatpos, 7)
+	local thickness = math.max(v7 - math.sqrt(math.abs(y)) / dirt_reduction, 0) -- Positive
+	local soil_humidity = hraw * (1 - math.exp(-thickness - 0.5)) -- Yes I love exponential-like functions. You can modelize whatever you want with exponentials !!!
+
 	-- Get base ground level to know the river level that influences humidity
 	local v1 = vmg.get_noise(flatpos, 1)
 	local v3 = vmg.get_noise(flatpos, 3) ^ 2
@@ -652,7 +659,7 @@ function vmg.get_humidity(pos)
 	local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0) -- At the sea level, sea_water is 1. Every 6 nodes height divide it by 2.
 	local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0) -- At the river level, river_water is 1. Every 3 nodes height divide it by 2.
 	local water = sea_water + (1 - sea_water) * river_water -- A simple sum is not satisfactory, because it may be bigger than 1.
-	return hraw + water
+	return soil_humidity + water
 end
 
 function vmg.get_temperature(pos)
@@ -662,7 +669,7 @@ function vmg.get_temperature(pos)
 	if y > 0 then
 		return v17 * 0.5 ^ (y / altitude_chill) -- Divide v17 by 2 by climbing "altitude_chill" nodes
 	else
-		return v17 * 0.5 ^ (-y / altitude_chill) + 20 * v12 * (1 - 2 ^ (y / lava_depth)) -- Underground, v17 less and less matter. So, gradually replace it by another calculation method, based on lava. Sorry: I don't remember the sense ofthis code :/
+		return v17 * 0.5 ^ (-y / altitude_chill) + 20 * v12 * (1 - 2 ^ (y / lava_depth)) -- Underground, v17 less and less matter. So, gradually replace it by another calculation method, based on lava. Sorry: I don't remember the sense of this code :/
 	end
 end
 
