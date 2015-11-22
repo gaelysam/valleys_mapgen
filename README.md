@@ -1,6 +1,6 @@
 # Valleys Mapgen
 Mapgen mod for Minetest 0.4.12+. Work in progress, not finished.
-Mod created by Gael-de-Sailly and now devloped by **Gael-de-Sailly**, **duane-r** and **vlapsley**.
+Mod created by Gael-de-Sailly and now developed by **Gael-de-Sailly**, **duane-r** and **vlapsley**.
 
 ![Screenshot](https://raw.githubusercontent.com/Gael-de-Sailly/valleys_mapgen/master/screenshot.png)
 
@@ -14,21 +14,21 @@ Mod created by Gael-de-Sailly and now devloped by **Gael-de-Sailly**, **duane-r*
 
 #### Download using Git
 [Git](https://en.wikipedia.org/wiki/Git_%28software%29) is a very useful tool to manage repositories such as Valleys Mapgen.
-Open the terminal (on Linux) or the Git shell (Windows), and set the working directory (the *mods* folder) using `cd`: for example `cd /home/gael/.minetest/mods` or `cd C:\Users\gael\minetest-0.4.13\mods`.
+Open the terminal (in Linux) or the Git shell (Windows), and set the working directory (the *mods* folder) using `cd`: for example `cd /home/gael/.minetest/mods` or `cd C:\Users\gael\minetest-0.4.13\mods`.
 Download Valleys Mapgen: `git clone https://github.com/Gael-de-Sailly/valleys_mapgen.git`.
-Next times you can automatically update VMG with the same `cd` command, and `git pull origin master`.
+Next time, you can automatically update VMG with the same `cd` command, and `git pull origin master`.
 
 ### Use
 #### Mods compatibility
-Keep in mind that mapgen mods as this one are very powerful mods, that may interfere with some other mods. So, be careful when enabling many mods, it might be unplayable. Valleys Mapgen is incompatible with all other "complete" mapgens like *Watershed*, *Ethereal*, Nore's *Mg*. Some mods that only rewrite partially the terrain can work with VMG: (*Cave Realms*, *Darkage*, *More Ores*, *Nether* (in this case you must add `valleys_mapgen?` in *nether/depends.txt*)). *Plantlife* and *More Trees* work but respective biomes of the plants are not respected.
+Keep in mind that mapgen mods as this one are very powerful mods, that may interfere with some other mods. So, be careful when enabling many mods, the result might be unplayable. Valleys Mapgen is incompatible with all other "complete" mapgens like *Watershed*, *Ethereal*, Nore's *Mg*. Some mods that only partially rewrite the terrain will work with VMG: (*Cave Realms*, *Darkage*, *More Ores*, *Nether* (in this case you must add `valleys_mapgen?` in *nether/depends.txt*)). *Plantlife* and *More Trees* work but the respective biomes of the plants are not respected.
 It's still compatible with most of the mods that don't affect mapgen (*Areas*, *World Edit*, *Mesecons*, *Home decor*, …)
 
 #### Settings
 There are many settings that can be changed by the user.
 There are 3 ways to change the settings:
-* In the *minetest.conf* file that is generally directly in the Minetest directory. All the settings of the game are here. For example if you want to change the river size to 8 (default is 5) to get bigger rivers, open the file with a text editor (avoid Notepad on Windows), and add a new line. The setting is named `vmg_river_size`, so you need to write: `vmg_river_size = 8`. If this setting is already present, simply modify it instead of adding a new line. **It will work ONLY for new worlds**.
+* In the *minetest.conf* file that is generally in the Minetest directory. All the settings of the game are here. For example if you want to change the river size to 8 (default is 5) to get bigger rivers, open the file with a text editor (avoid Notepad on Windows), and add a new line. The setting is named `vmg_river_size`, so you need to write: `vmg_river_size = 8`. If this setting is already present, simply modify it instead of adding a new line. **It will work ONLY for new worlds**.
 * In the *vmg.conf* file that is in the world folders (for example `minetest/worlds/test_world`). If this file doesn't exist you can create it. It works the same way, except than we don't write the `vmg_` prefix, like `river_size = 8`. **It will work ONLY for this world.**
-* In recent Minetest versions (0.4.13-dev after October 24th), it can be set in the Minetest main menu (*Settings* tab, in *Mods / valleys_mapgen*). It simply changes the settings in minetest.conf, so it has the same effect than directly writing in minetest.conf (works only for new worlds).
+* In recent Minetest versions (0.4.13-dev after October 24th), it can be set in the Minetest main menu (*Settings* tab, in *Mods / valleys_mapgen*). It simply changes the settings in minetest.conf, so it has the same effect as writing in minetest.conf (works only for new worlds).
 You can find the full list of settings in the file *settingtypes.txt* (do NOT modify this file).
 
 ## Plants API for modders
@@ -76,7 +76,7 @@ Many syntaxes are possible, with their default behaviour (see *grow*):
 All cases are possible, but other cases can't be managed by default and need a `grow` function (see *grow*), like the example above with jungle tree. Anyway, the strings in this table are recursively converted into map content IDs.
 
 #### cover
-Number between 0 and 1, which determines the proportion of surface nodes that are "reserved" for the plant. This doesn't necessarily mean that there is a plant on the node (see *density*), but this "cover" prevents other plants with lower priority from spawning on said nodes.
+Decimal number between 0 and 1, which determines the proportion of surface nodes that are "reserved" for the plant. This doesn't necessarily mean that there is a plant on the node (see *density*), but this "cover" prevents other plants with lower priority from spawning on said nodes.
 
 #### density
 Number between 0 and cover. Proportion of nodes that are effectively covered by the plant.
