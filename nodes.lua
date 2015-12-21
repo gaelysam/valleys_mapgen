@@ -98,7 +98,7 @@ local function register_dirts(readname)
 			if nodedef and (nodedef.sunlight_propagates or nodedef.paramtype == "light")
 					and nodedef.liquidtype == "none"
 					and (minetest.get_node_light(above) or 0) >= 13 then
-				if name == "default:snow" or name == "default:snowblock" or (vmg.test_snow and vmg.test_snow(pos)) then
+				if name == "default:snow" or name == "default:snowblock" or (vmg.test_snow and vmg.test_snow({x=pos.x, y=pos.y+1, z=pos.z})) then
 					minetest.set_node(pos, {name = itemstr_snow})
 				elseif vmg.test_dry and vmg.test_dry(pos) then
 					minetest.set_node(pos, {name = itemstr_dry})
