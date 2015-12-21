@@ -172,15 +172,19 @@ function vmg.generate(minp, maxp, seed)
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_dirt = minetest.get_content_id("default:dirt")
 	local c_lawn = minetest.get_content_id("default:dirt_with_grass")
+	local c_dry = minetest.get_content_id("default:dirt_with_dry_grass")
 	local c_snow = minetest.get_content_id("default:dirt_with_snow")
 	local c_dirt_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey")
 	local c_lawn_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_grass")
+	local c_dry_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_dry_grass")
 	local c_snow_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_snow")
 	local c_dirt_silt = minetest.get_content_id("valleys_mapgen:dirt_silty")
 	local c_lawn_silt = minetest.get_content_id("valleys_mapgen:dirt_silty_with_grass")
+	local c_dry_silt = minetest.get_content_id("valleys_mapgen:dirt_silty_with_dry_grass")
 	local c_snow_silt = minetest.get_content_id("valleys_mapgen:dirt_silty_with_snow")
 	local c_dirt_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy")
 	local c_lawn_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_grass")
+	local c_dry_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_dry_grass")
 	local c_snow_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_snow")
 	local c_desert_sand = minetest.get_content_id("default:desert_sand")
 	local c_sand = minetest.get_content_id("default:sand")
@@ -307,6 +311,7 @@ function vmg.generate(minp, maxp, seed)
 			-- Choose biome, by default normal dirt
 			local dirt = c_dirt
 			local lawn = c_lawn
+			local dry = c_dry
 			local snow = c_snow
 			local max = math.max(v13, v14, v15) -- the biome is the maximal of these 3 values.
 			if max > dirt_threshold then -- if one of these values is bigger than dirt_threshold, make clayey, silty or sandy dirt, depending on the case. If none of clay, silt or sand is predominant, make normal dirt.
@@ -314,30 +319,36 @@ function vmg.generate(minp, maxp, seed)
 					if v13 > clay_threshold then
 						dirt = c_clay
 						lawn = c_clay
+						dry = c_clay
 						snow = c_clay
 					else
 						dirt = c_dirt_clay
 						lawn = c_lawn_clay
+						dry = c_dry_clay
 						snow = c_snow_clay
 					end
 				elseif v14 == max then
 					if v14 > silt_threshold then
 						dirt = c_silt
 						lawn = c_silt
+						dry = c_silt
 						snow = c_silt
 					else
 						dirt = c_dirt_silt
 						lawn = c_lawn_silt
+						dry = c_dry_silt
 						snow = c_snow_silt
 					end
 				else
 					if v15 > sand_threshold then
 						dirt = c_desert_sand
 						lawn = c_desert_sand
+						dry = c_desert_sand
 						snow = c_desert_sand
 					else
 						dirt = c_dirt_sand
 						lawn = c_lawn_sand
+						dry = c_dry_sand
 						snow = c_snow_sand
 					end
 				end
@@ -399,7 +410,11 @@ function vmg.generate(minp, maxp, seed)
 
 								if temp > snow_threshold then -- If temperature is too high for snow
 									if above > 0 then
-										data[ivm] = lawn
+										if humidity <= dry_dirt_threshold then
+											data[ivm] = dry
+										else
+											data[ivm] = lawn
+										end
 									else
 										data[ivm] = c_stone
 									end
