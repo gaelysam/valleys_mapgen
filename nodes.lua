@@ -41,6 +41,7 @@ local function register_dirts(readname)
 	local name = readname:lower()
 	local itemstr_dirt = "valleys_mapgen:dirt_" .. name
 	local itemstr_lawn = itemstr_dirt .. "_with_grass"
+	local itemstr_dry = itemstr_dirt .. "_with_dry_grass"
 	local itemstr_snow = itemstr_dirt .. "_with_snow"
 	local tilestr = "vmg_dirt_" .. name .. ".png"
 
@@ -60,6 +61,16 @@ local function register_dirts(readname)
 		drop = itemstr_dirt,
 		sounds = default.node_sound_dirt_defaults({
 			footstep = {name="default_grass_footstep", gain=0.25},
+		}),
+	})
+
+	minetest.register_node(itemstr_dry, {
+		description = readname .. " Dirt with Dry Grass",
+		tiles = {"default_dry_grass.png", tilestr, tilestr .. "^default_dry_grass_side.png"},
+		groups = {crumbly=3, soil=1},
+		drop = itemstr_dirt,
+		sounds = default.node_sound_dirt_defaults({
+			footstep = {name = "default_grass_footstep", gain=0.4},
 		}),
 	})
 
