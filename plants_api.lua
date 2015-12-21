@@ -44,7 +44,7 @@ function vmg.choose_generate_plant(conditions, pos, data, area, ivm)
 					local nodes = plant.nodes
 
 					if grow then -- if a grow function is defined, then run it
-						grow(nodes, pos, data, area, ivm)
+						grow(nodes, pos, data, area, ivm, conditions)
 					else
 						if type(nodes) == "number" then -- 'nodes' is just a number
 							data[ivm] = nodes

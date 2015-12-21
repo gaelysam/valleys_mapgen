@@ -109,6 +109,7 @@ It takes 5 parameters:
 * `data`: VoxelManip data (array of content IDs)
 * `area`: VoxelArea
 * `i`: index of the data array matching the position `pos`. In other terms, `area:indexp(pos) = i`.
+* `t`: table containing all possible conditions (the same `t` as above)
 
 ```
 grow = function(nodes, pos, data, area)
