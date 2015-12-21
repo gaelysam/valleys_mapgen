@@ -382,7 +382,7 @@ function vmg.generate(minp, maxp, seed)
 								local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
 								local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0)
 								local water = sea_water + (1 - sea_water) * river_water
-								local humidity = soil_humidity + water
+								local humidity = soil_humidity * (1 + water)
 
 								local ivm2 = ivm + ystride -- index of the node above
 								y = y + 1
@@ -659,7 +659,7 @@ function vmg.get_humidity(pos)
 	local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0) -- At the sea level, sea_water is 1. Every 6 nodes height divide it by 2.
 	local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0) -- At the river level, river_water is 1. Every 3 nodes height divide it by 2.
 	local water = sea_water + (1 - sea_water) * river_water -- A simple sum is not satisfactory, because it may be bigger than 1.
-	return soil_humidity + water
+	return soil_humidity * (1 + water)
 end
 
 function vmg.get_temperature(pos)
