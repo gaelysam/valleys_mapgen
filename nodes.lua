@@ -85,6 +85,8 @@ local function register_dirts(readname)
 		}),
 	})
 
+
+
 	minetest.register_abm({
 		nodenames = {itemstr_dirt},
 		interval = 2,
@@ -96,8 +98,10 @@ local function register_dirts(readname)
 			if nodedef and (nodedef.sunlight_propagates or nodedef.paramtype == "light")
 					and nodedef.liquidtype == "none"
 					and (minetest.get_node_light(above) or 0) >= 13 then
-				if name == "default:snow" or name == "default:snowblock" then
+				if name == "default:snow" or name == "default:snowblock" or (vmg.test_snow and vmg.test_snow(pos)) then
 					minetest.set_node(pos, {name = itemstr_snow})
+				elseif vmg.test_dry and vmg.test_dry(pos) then
+					minetest.set_node(pos, {name = itemstr_dry})
 				else
 					minetest.set_node(pos, {name = itemstr_lawn})
 				end
@@ -106,7 +110,7 @@ local function register_dirts(readname)
 	})
 
 	minetest.register_abm({
-		nodenames = {itemstr_lawn},
+		nodenames = {itemstr_lawn, itemstr_dry},
 		interval = 2,
 		chance = 20,
 		action = function(pos, node)

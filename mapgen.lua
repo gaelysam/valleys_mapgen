@@ -119,6 +119,7 @@ local average_stone_level = vmg.define("average_stone_level", 180)
 local dirt_reduction = math.sqrt(average_stone_level) / (vmg.noises[7].offset - 0.5) -- Calculate dirt_reduction such as v7 - sqrt(average_stone_level) / dirt_reduction = 0.5 on average. This means that, on average at y = average_stone_level, dirt_thickness = 0.5 (half of the surface is bare stone)
 local average_snow_level = vmg.define("average_snow_level", 100)
 local snow_threshold = vmg.noises[17].offset * 0.5 ^ (average_snow_level / altitude_chill)
+local dry_dirt_threshold = vmg.define("dry_dirt_threshold", 0.6)
 
 local player_max_distance = vmg.define("player_max_distance", 450)
 
@@ -662,6 +663,10 @@ function vmg.get_humidity(pos)
 	return soil_humidity * (1 + water)
 end
 
+function vmg.test_dry(pos)
+	return vmg.get_humidity(pos) <= dry_dirt_threshold
+end
+
 function vmg.get_temperature(pos)
 	local v12 = vmg.get_noise(pos, 12) + 1 -- Lava noise for underground
 	local v17 = vmg.get_noise(pos, 17) -- Climate noise
@@ -671,6 +676,10 @@ function vmg.get_temperature(pos)
 	else
 		return v17 * 0.5 ^ (-y / altitude_chill) + 20 * v12 * (1 - 2 ^ (y / lava_depth)) -- Underground, v17 less and less matter. So, gradually replace it by another calculation method, based on lava. Sorry: I don't remember the sense of this code :/
 	end
+end
+
+function vmg.test_snow(pos)
+	return vmg.get_temperature(pos) <= snow_threshold
 end
 
 function vmg.get_noise(pos, i)

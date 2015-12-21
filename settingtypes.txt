@@ -75,6 +75,9 @@ vmg_dirt_threshold (Normal dirt threshold) float 0.5
 #    height at which the half of the surface is covered by snow.
 vmg_average_snow_level (Average snow level) int 100
 
+#    if humidity is below this value, make dry dirt instead of lawn
+vmg_dry_dirt_threshold (Dry dirt threshold) float 0.6
+
 [*Rivers]
 #    Simply the depth of the rivers
 vmg_river_depth (River depth) int 3
