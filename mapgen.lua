@@ -699,11 +699,11 @@ end
 
 function vmg.get_noise(pos, i)
 	local n = vmg.noises[i]
-	local noise = minetest.get_perlin(n.seed, n.octaves, n.persist, 1)
+	local noise = minetest.get_perlin(n)
 	if not pos.z then -- 2D noise
-		return noise:get2d({x = pos.x / n.spread.x, y = pos.y / n.spread.y}) * n.scale + n.offset
+		return noise:get2d(pos)
 	else -- 3D noise
-		return noise:get3d({x = pos.x / n.spread.x, y = pos.y / n.spread.y, z = pos.z / n.spread.z}) * n.scale + n.offset
+		return noise:get3d(pos)
 	end
 end
 
