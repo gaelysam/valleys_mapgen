@@ -1,3 +1,5 @@
+local dry_dirt_threshold = vmg.define("dry_dirt_threshold", 0.6)
+
 local clay_threshold = vmg.define("clay_threshold", 1)
 local sand_threshold = vmg.define("sand_threshold", 0.75)
 local silt_threshold = vmg.define("silt_threshold", 1)
@@ -43,6 +45,8 @@ if vmg.define("plants", true) then
 		end,
 	})
 
+	-- Grass will be stunted in less ideal soil, but will grow on anything
+	-- but straight clay or sand as long as it's not dry.
 	for i = 1, 5 do
 		vmg.register_plant({
 			nodes = { "default:grass_"..i},
@@ -50,7 +54,7 @@ if vmg.define("plants", true) then
 			density = 0.24,
 			priority = 59,
 			check = function(t, pos)
-				return t.v15 < sand_threshold - (i - 1) * 0.1 and t.temp >= 1 and t.temp < 1.5 and t.humidity < 2.6 and t.v13 < clay_threshold - (i - 1) * 0.1
+				return t.v15 < sand_threshold - (i - 1) * 0.1 and t.temp >= 1 and t.temp < 1.5 and t.humidity < 2.6 and t.humidity > dry_dirt_threshold and t.v13 < clay_threshold - (i - 1) * 0.1
 			end,
 		})
 	end
