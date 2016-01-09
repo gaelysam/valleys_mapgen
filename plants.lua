@@ -59,6 +59,19 @@ if vmg.define("plants", true) then
 		})
 	end
 
+	-- Replaced by dry grass on dry dirt
+	for i = 1, 5 do
+		vmg.register_plant({
+			nodes = { "default:dry_grass_"..i},
+			cover = 0.60,
+			density = 0.24,
+			priority = 59,
+			check = function(t, pos)
+				return t.v15 < sand_threshold - (i - 1) * 0.1 and t.temp >= 1 and t.temp < 1.5 and t.humidity < 2.6 and t.humidity <= dry_dirt_threshold and t.v13 < clay_threshold - (i - 1) * 0.1
+			end,
+		})
+	end
+
 	vmg.register_plant({
 		nodes = {"default:junglegrass"},
 		cover = 0.65, --0.65
