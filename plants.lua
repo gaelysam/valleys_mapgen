@@ -1,3 +1,7 @@
+local clay_threshold = vmg.define("clay_threshold", 1)
+local sand_threshold = vmg.define("sand_threshold", 0.75)
+local silt_threshold = vmg.define("silt_threshold", 1)
+
 if vmg.define("plants", true) then
 	vmg.register_plant({
 		nodes = {"default:papyrus", n=4},
@@ -39,15 +43,17 @@ if vmg.define("plants", true) then
 		end,
 	})
 
-	vmg.register_plant({
-		nodes = {"default:grass_1", "default:grass_2", "default:grass_3", "default:grass_4", "default:grass_5"},
-		cover = 0.60,
-		density = 0.24,
-		priority = 59,
-		check = function(t, pos)
-			return t.v15 < 0.65 and t.temp >= 0.65 and t.temp < 1.5 and t.humidity < 2.6 and t.v16 < 1.5 and t.v13 < 0.8
-		end,
-	})
+	for i = 1, 5 do
+		vmg.register_plant({
+			nodes = { "default:grass_"..i},
+			cover = 0.60,
+			density = 0.24,
+			priority = 59,
+			check = function(t, pos)
+				return t.v15 < sand_threshold - (i - 1) * 0.1 and t.temp >= 1 and t.temp < 1.5 and t.humidity < 2.6 and t.v13 < clay_threshold - (i - 1) * 0.1
+			end,
+		})
+	end
 
 	vmg.register_plant({
 		nodes = {"default:junglegrass"},
