@@ -123,7 +123,9 @@ end
 -- Choose the appropriate mapgen version
 
 local version = vmg.define("version", vmg.version)
-if version == vmg.version then
+if vmg.valleys_c then
+	dofile(vmg.path .. "/mapgen_c.lua")
+elseif version == vmg.version then
 	dofile(vmg.path .. "/mapgen.lua")
 else
 	dofile(vmg.path .. "/old_mapgens/" .. version .. ".lua")
