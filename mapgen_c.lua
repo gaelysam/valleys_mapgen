@@ -1,29 +1,36 @@
 -- Mapgen Valleys 2.3c
 print("*** using 2.3c")
 
--- Define perlin noises used in this mapgen by default
-vmg.noises = {}
 
--- Noise 2 : Valleys (River where around zero)				2D
 -- Read the noise parameters from the actual mapgen.
-do
-	local n = minetest.setting_get('mg_valleys_np_rivers') 
-	local n1, n2, n3, n4, n5, n6, n7, n8, n9
+local function getCppSettingNoise(name, default)
+	local noise
+	local n = minetest.setting_get(name)
 
 	if n then
-		parse = {}
-		parse.spread = {}
+		local parse = {spread = {}}
+		local n1, n2, n3, n4, n5, n6, n7, n8, n9
+
 		n1, n2, n3, n4, n5, n6, n7, n8, n9 = string.match(n, '([%d%.%-]+), ([%d%.%-]+), %(([%d%.%-]+), ([%d%.%-]+), ([%d%.%-]+)%), ([%d%.%-]+), ([%d%.%-]+), ([%d%.%-]+), ([%d%.%-]+)')
 		if n9 then
-			vmg.noises[2] = {offset = n1, scale = n2, seed = n6, spread = {x = n3, y = n4, z = n5}, octaves = n7, persist = n8, lacunarity = n9}
+			noise = {offset = tonumber(n1), scale = tonumber(n2), seed = tonumber(n6), spread = {x = tonumber(n3), y = tonumber(n4), z = tonumber(n5)}, octaves = tonumber(n7), persist = tonumber(n8), lacunarity = tonumber(n9)}
 		end
 	end
 
 	-- Use the default otherwise.
-	if not vmg.noises[2] then
-		vmg.noises[2] = {offset = 0, scale = 1, seed = -6050, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.6, lacunarity = 2}
+	if not noise then
+		noise = default
 	end
+
+	return noise
 end
+
+
+-- Define perlin noises used in this mapgen by default
+vmg.noises = {}
+
+-- Noise 2 : Valleys (River where around zero)				2D
+vmg.noises[2] = getCppSettingNoise('mg_valleys_np_rivers', {offset = 0, scale = 1, seed = -6050, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.6, lacunarity = 2})
 
 -- Noise 13 : Clayey dirt noise						2D
 vmg.noises[13] = {offset = 0, scale = 1, seed = 2835, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.5, lacunarity = 4}
@@ -69,6 +76,18 @@ function vmg.execute_after_mapgen()
 	vmg.after_mapgen = {}
 end
 
+local function getCppSettingNumeric(name, default)
+	local setting = minetest.setting_get(name) 
+
+	if setting and tonumber(setting) then
+		setting = tonumber(setting)
+	else
+		setting = default
+	end
+
+	return setting
+end
+
 -- Mapgen time stats
 local mapgen_times = {
 	preparation = {},
@@ -87,6 +106,10 @@ local clay_threshold = vmg.define("clay_threshold", 1)
 local silt_threshold = vmg.define("silt_threshold", 1)
 local sand_threshold = vmg.define("sand_threshold", 0.75)
 local dirt_threshold = vmg.define("dirt_threshold", 0.5)
+local average_snow_level = vmg.define("average_snow_level", 100)
+local altitude_chill = getCppSettingNumeric('mg_valleys_altitude_chill', 90) 
+local heat_multiplier = tonumber(getCppSettingNoise('mg_biome_np_heat', {offset=50}).offset) / 25
+local snow_threshold = heat_multiplier * 0.5 ^ (average_snow_level / altitude_chill)
 
 -- Register ores
 -- We need more types of stone than just gray. Fortunately, there are
@@ -338,7 +361,7 @@ function vmg.generate(minp, maxp, seed)
 						if data[ivm] == c_dirt then
 							data[ivm] = dirt
 						else
-							if temperature < 1 then
+							if temperature < snow_threshold then
 								data[ivm] = snow
 								data[ivm + ystride] = c_snow_layer
 							elseif humidity < dry_dirt_threshold then
