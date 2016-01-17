@@ -314,10 +314,15 @@ function vmg.generate(minp, maxp, seed)
 				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
 				local ground = math.max(heightmap[i2d], 0) - 5
 
+				if data[ivm] == c_snow_layer then
+					data[ivm] = c_air
+				end
+
 				-- Replace dirt and sand nodes appropriately.
 				if data[ivm] == c_dirt or data[ivm] == c_dry or data[ivm] == c_lawn or data[ivm] == c_snow or data[ivm] == c_sand then
+
 					-- a top node
-					if y >= ground and (data[ivm + ystride] == c_air or data[ivm + ystride] == c_snow_layer) then
+					if y >= ground and data[ivm + ystride] == c_air then
 						-- Humidity and temperature are simplified from the original,
 						-- and derived from the actual mapgen.
 						local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] / 25) - 2)
@@ -327,6 +332,20 @@ function vmg.generate(minp, maxp, seed)
 						-- Add sea humidity (the mapgen doesn't)
 						if humidity < 1.8 and y < 5 then
 							humidity = humidity * (1 + (5 - y) * 10)
+						end
+
+						-- Replace the nodes.
+						if data[ivm] == c_dirt then
+							data[ivm] = dirt
+						else
+							if temperature < 1 then
+								data[ivm] = snow
+								data[ivm + ystride] = c_snow_layer
+							elseif humidity < dry_dirt_threshold then
+								data[ivm] = dry
+							else
+								data[ivm] = lawn
+							end
 						end
 
 						v2 = math.abs(v2) - river_size -- v2 represents the distance from the river, in arbitrary units.
@@ -360,20 +379,7 @@ function vmg.generate(minp, maxp, seed)
 						water = 0,
 						thickness = 0 }
 
-						vmg.choose_generate_plant(conditions, {x=x,y=y+1,z=z}, data, a, ivm + ystride)
-
-						-- Replace the nodes.
-						if data[ivm] == c_dirt then
-							data[ivm] = dirt
-						else
-							if temperature < 1 then
-								data[ivm] = snow
-							elseif humidity < dry_dirt_threshold then
-								data[ivm] = dry
-							else
-								data[ivm] = lawn
-							end
-						end
+						vmg.choose_generate_plant(conditions, {x=x,y=y,z=z}, data, a, ivm + ystride)
 					else
 						if data[ivm] == c_dirt or data[ivm] == c_sand then
 							data[ivm] = dirt
