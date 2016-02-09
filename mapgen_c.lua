@@ -349,6 +349,9 @@ function vmg.generate(minp, maxp, seed)
 						-- Humidity and temperature are simplified from the original,
 						-- and derived from the actual mapgen.
 						local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] / 25) - 2)
+						-- Closer?
+						--local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] - 50) / 20)
+						--
 						--humidity = humidity * (1 - math.exp(-math.max(4 - math.sqrt(math.abs(y)) / 4, 0) - 0.5))
 						local temperature = (heatmap[i2d] - 32) / 60 + 1
 
@@ -395,6 +398,7 @@ function vmg.generate(minp, maxp, seed)
 						v18 = 0,
 						v19 = 0,
 						v20 = 0,
+						shade = 0,
 						temp = temperature,
 						humidity = humidity,
 						sea_water = 0,
@@ -402,6 +406,12 @@ function vmg.generate(minp, maxp, seed)
 						water = 0,
 						thickness = 0 }
 
+						for y1 = 1, math.min(10, maxp.y - y) do
+							if data[ivm + 1 + y1 * ystride] ~= c_air then
+								conditions.shade = y1
+								break
+							end
+						end
 						vmg.choose_generate_plant(conditions, {x=x,y=y,z=z}, data, a, ivm + ystride)
 					else
 						if data[ivm] == c_dirt or data[ivm] == c_sand then

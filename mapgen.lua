@@ -449,6 +449,7 @@ function vmg.generate(minp, maxp, seed)
 										v18 = v18,
 										v19 = v19,
 										v20 = v20,
+										shade = 0,
 										temp = temp,
 										humidity = humidity,
 										sea_water = sea_water,
@@ -457,6 +458,12 @@ function vmg.generate(minp, maxp, seed)
 										thickness = thickness
 									}
 
+									for y1 = 1, math.min(10, maxp.y - y) do
+										if data[ivm2 + y1 * ystride] ~= c_air then
+											conditions.shade = y1
+											break
+										end
+									end
 									vmg.choose_generate_plant(conditions, pos, data, a, ivm2)
 								end
 
