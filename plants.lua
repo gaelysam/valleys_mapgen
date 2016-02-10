@@ -61,7 +61,7 @@ if vmg.define("plants", true) then
 			density = 0.24,
 			priority = 10,
 			check = function(t, pos)
-				return t.v15 < sand_threshold - (i - 1) * 0.1 and t.temp >= 1 and t.temp < 1.5 and t.humidity < 2.6 and t.humidity <= dry_dirt_threshold and t.v13 < clay_threshold - (i - 1) * 0.1
+				return t.v15 < sand_threshold - (i - 1) * 0.1 and t.temp >= 1 and t.temp < 1.5 and t.humidity <= dry_dirt_threshold and t.v13 < clay_threshold - (i - 1) * 0.1
 			end,
 		})
 	end
@@ -71,7 +71,7 @@ if vmg.define("plants", true) then
 		density = 0.40,
 		priority = 10,
 		check = function(t, pos)
-			return t.v15 > -0.6 and t.temp >= 1.8 and t.humidity > 2.2 and t.v16 > 1.8
+			return t.v15 > -0.6 and t.temp >= 1.8 and t.humidity > 2.2 and t.v16 > 1.8 and t.v13 < clay_threshold and t.v15 < sand_threshold
 		end,
 	})
 
@@ -107,7 +107,7 @@ if vmg.define("plants", true) then
 		density = 0.008,
 		priority = 10,
 		check = function(t, pos)
-			return t.v15 > 0.65 and t.humidity < 0.5 and t.v16 > 0 and t.temp > 1.6
+			return t.v15 > 0.65 and t.humidity < dry_dirt_threshold and t.v16 > 0 and t.temp > 1.6
 		end,
 	})
 
@@ -116,7 +116,7 @@ if vmg.define("plants", true) then
 		density = 0.064,
 		priority = 54,
 		check = function(t, pos)
-			return t.v15 > 0.65 and t.humidity < 0.5
+			return t.v15 > 0.65 and t.humidity < dry_dirt_threshold
 		end,
 	})
 
@@ -125,7 +125,7 @@ if vmg.define("plants", true) then
 		density = 0.012,
 		priority = 47,
 		check = function(t, pos)
-			return t.temp > 1.2 and t.temp < 1.8 and t.humidity < 1.7 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82
+			return t.temp > 1.2 and t.temp < 1.8 and t.humidity > dry_dirt_threshold and t.humidity < 1.7 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82
 		end,
 	})
 
@@ -134,7 +134,7 @@ if vmg.define("plants", true) then
 		density = 0.008,
 		priority = 44,
 		check = function(t, pos)
-			return t.temp > 1.1 and t.temp < 1.8 and t.humidity < 1.7 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82
+			return t.temp > 1.1 and t.temp < 1.8 and t.humidity > dry_dirt_threshold and t.humidity < 1.7 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82
 		end,
 	})
 
@@ -143,7 +143,7 @@ if vmg.define("plants", true) then
 		density = 0.015,
 		priority = 48,
 		check = function(t, pos)
-			return t.temp > 0.98 and t.temp < 1.8 and t.humidity < 1.7 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82 and t.thickness <= 1.3
+			return t.temp > 0.98 and t.temp < 1.8 and t.humidity > dry_dirt_threshold and t.humidity < 1.7 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82 and t.thickness <= 1.3
 		end,
 	})
 
@@ -152,7 +152,7 @@ if vmg.define("plants", true) then
 		density = 0.012,
 		priority = 29,
 		check = function(t, pos)
-			return t.temp > 0.98 and t.temp < 1.8 and t.humidity < 1.7 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82 and t.v16 < 1.6
+			return t.temp > 0.98 and t.temp < 1.8 and t.humidity > dry_dirt_threshold and t.humidity < 1.7 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82 and t.v16 < 1.6
 		end,
 	})
 
@@ -161,7 +161,7 @@ if vmg.define("plants", true) then
 		density = 0.003,
 		priority = 50,
 		check = function(t, pos)
-			return t.temp > 1.3 and t.temp < 1.8 and t.humidity < 1.5 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82
+			return t.temp > 1.3 and t.temp < 1.8 and t.humidity > dry_dirt_threshold and t.humidity < 1.5 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82
 		end,
 	})
 
@@ -170,7 +170,7 @@ if vmg.define("plants", true) then
 		density = 0.006,
 		priority = 43,
 		check = function(t, pos)
-			return t.temp > 0.98 and t.temp < 1.8 and t.humidity < 1.7 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82
+			return t.temp > 0.98 and t.temp < 1.8 and t.humidity > dry_dirt_threshold - 0.2 and t.humidity < 1.7 and t.v14 >= -0.1 and t.v15 < 0.4 and t.v15 >= -0.6 and t.v13 < 0.82
 		end,
 	})
 
