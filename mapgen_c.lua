@@ -110,6 +110,15 @@ local average_snow_level = vmg.define("average_snow_level", 100)
 local altitude_chill = getCppSettingNumeric('mg_valleys_altitude_chill', 90) 
 local heat_multiplier = tonumber(getCppSettingNoise('mg_biome_np_heat', {offset=50}).offset) / 25
 local snow_threshold = heat_multiplier * 0.5 ^ (average_snow_level / altitude_chill)
+local water_level = getCppSettingNumeric('water_level', 1)
+
+-- This table holds the content IDs. They aren't available until
+-- the actual mapgen loop is run, but they can stay local to the
+-- file rather than having to load them for every map chunk.
+--
+local node = {}
+
+local soil_translate = {}
 
 -- Register ores
 -- We need more types of stone than just gray. Fortunately, there are
@@ -120,26 +129,6 @@ if vmg.define("stone_ores", true) then
 	minetest.register_ore({ore_type="sheet", ore="default:sandstone", wherein="default:stone", clust_num_ores=250, clust_scarcity=60, clust_size=10, y_min=-1000, y_max=31000, noise_threshhold=0.1, noise_params={offset=0, scale=1, spread={x=256, y=256, z=256}, seed=4130293965, octaves=5, persist=0.60}, random_factor=1.0})
 	minetest.register_ore({ore_type="sheet", ore="default:desert_stone", wherein="default:stone", clust_num_ores=250, clust_scarcity=60, clust_size=10, y_min=-1000, y_max=31000, noise_threshhold=0.1, noise_params={offset=0, scale=1, spread={x=256, y=256, z=256}, seed=163281090, octaves=5, persist=0.60}, random_factor=1.0})
 end
-
--- These variables hold the content IDs. They aren't available until
--- the actual mapgen loop is run, but they can stay local to the
--- file rather than having to load them for every map chunk.
---
--- Ground nodes
-local c_stone, c_dirt, c_lawn, c_dry, c_snow, c_dirt_clay, c_dry_clay
-local c_lawn_clay, c_snow_clay, c_dirt_silt, c_lawn_silt, c_dry_silt
-local c_snow_silt, c_dirt_sand, c_lawn_sand, c_dry_sand, c_snow_sand
-local c_desert_sand, c_sand, c_gravel, c_silt, c_clay, c_water
-local c_sandstone, c_desertstone
-local c_riverwater, c_lava, c_snow_layer, c_glowing_fungal_stone
-local c_stalagmite, c_stalactite
-
--- Mushrooms
-local c_huge_mushroom_cap, c_giant_mushroom_cap, c_giant_mushroom_stem
-local c_mushroom_fertile_red, c_mushroom_fertile_brown
-
--- Air and Ignore
-local c_air, c_ignore
 
 
 ---- Create a table of biome ids, so I can use the biomemap.
@@ -177,49 +166,58 @@ function vmg.generate(minp, maxp, seed)
 	-- Every nodename has its ID.
 	-- The VoxelManipulator uses content IDs instead of nodenames.
 
-	if not c_stone then
-		c_stone = minetest.get_content_id("default:stone")
-		c_sandstone = minetest.get_content_id("default:sandstone")
-		c_desertstone = minetest.get_content_id("default:desert_stone")
-		c_dirt = minetest.get_content_id("default:dirt")
-		c_lawn = minetest.get_content_id("default:dirt_with_grass")
-		c_dry = minetest.get_content_id("default:dirt_with_dry_grass")
-		c_snow = minetest.get_content_id("default:dirt_with_snow")
-		c_dirt_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey")
-		c_lawn_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_grass")
-		c_dry_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_dry_grass")
-		c_snow_clay = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_snow")
-		c_dirt_silt = minetest.get_content_id("valleys_mapgen:dirt_silty")
-		c_lawn_silt = minetest.get_content_id("valleys_mapgen:dirt_silty_with_grass")
-		c_dry_silt = minetest.get_content_id("valleys_mapgen:dirt_silty_with_dry_grass")
-		c_snow_silt = minetest.get_content_id("valleys_mapgen:dirt_silty_with_snow")
-		c_dirt_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy")
-		c_lawn_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_grass")
-		c_dry_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_dry_grass")
-		c_snow_sand = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_snow")
-		c_desert_sand = minetest.get_content_id("default:desert_sand")
-		c_sand = minetest.get_content_id("default:sand")
-		c_gravel = minetest.get_content_id("default:gravel")
-		c_silt = minetest.get_content_id("valleys_mapgen:silt")
-		c_clay = minetest.get_content_id("valleys_mapgen:red_clay")
-		c_water = minetest.get_content_id("default:water_source")
-		c_riverwater = minetest.get_content_id("default:river_water_source")
-		c_lava = minetest.get_content_id("default:lava_source")
-		c_snow_layer = minetest.get_content_id("default:snow")
-		c_glowing_fungal_stone = minetest.get_content_id("valleys_mapgen:glowing_fungal_stone")
-		c_stalactite = minetest.get_content_id("valleys_mapgen:stalactite")
-		c_stalagmite = minetest.get_content_id("valleys_mapgen:stalagmite")
+	if not node["stone"] then
+		node["stone"] = minetest.get_content_id("default:stone")
+		node["sandstone"] = minetest.get_content_id("default:sandstone")
+		node["desertstone"] = minetest.get_content_id("default:desert_stone")
+		node["dirt"] = minetest.get_content_id("default:dirt")
+		node["lawn"] = minetest.get_content_id("default:dirt_with_grass")
+		node["dry"] = minetest.get_content_id("default:dirt_with_dry_grass")
+		node["snow"] = minetest.get_content_id("default:dirt_with_snow")
+		node["dirt_clay"] = minetest.get_content_id("valleys_mapgen:dirt_clayey")
+		node["lawn_clay"] = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_grass")
+		node["dry_clay"] = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_dry_grass")
+		node["snow_clay"] = minetest.get_content_id("valleys_mapgen:dirt_clayey_with_snow")
+		node["dirt_silt"] = minetest.get_content_id("valleys_mapgen:dirt_silty")
+		node["lawn_silt"] = minetest.get_content_id("valleys_mapgen:dirt_silty_with_grass")
+		node["dry_silt"] = minetest.get_content_id("valleys_mapgen:dirt_silty_with_dry_grass")
+		node["snow_silt"] = minetest.get_content_id("valleys_mapgen:dirt_silty_with_snow")
+		node["dirt_sand"] = minetest.get_content_id("valleys_mapgen:dirt_sandy")
+		node["lawn_sand"] = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_grass")
+		node["dry_sand"] = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_dry_grass")
+		node["snow_sand"] = minetest.get_content_id("valleys_mapgen:dirt_sandy_with_snow")
+		node["desert_sand"] = minetest.get_content_id("default:desert_sand")
+		node["sand"] = minetest.get_content_id("default:sand")
+		node["gravel"] = minetest.get_content_id("default:gravel")
+		node["silt"] = minetest.get_content_id("valleys_mapgen:silt")
+		node["clay"] = minetest.get_content_id("valleys_mapgen:red_clay")
+		node["water"] = minetest.get_content_id("default:water_source")
+		node["riverwater"] = minetest.get_content_id("default:river_water_source")
+		node["lava"] = minetest.get_content_id("default:lava_source")
+		node["snow_layer"] = minetest.get_content_id("default:snow")
+		node["glowing_fungal_stone"] = minetest.get_content_id("valleys_mapgen:glowing_fungal_stone")
+		node["stalactite"] = minetest.get_content_id("valleys_mapgen:stalactite")
+		node["stalagmite"] = minetest.get_content_id("valleys_mapgen:stalagmite")
 
 		-- Mushrooms
-		c_huge_mushroom_cap = minetest.get_content_id("valleys_mapgen:huge_mushroom_cap")
-		c_giant_mushroom_cap = minetest.get_content_id("valleys_mapgen:giant_mushroom_cap")
-		c_giant_mushroom_stem = minetest.get_content_id("valleys_mapgen:giant_mushroom_stem")
-		c_mushroom_fertile_red = minetest.get_content_id("flowers:mushroom_fertile_red")
-		c_mushroom_fertile_brown = minetest.get_content_id("flowers:mushroom_fertile_brown")
+		node["huge_mushroom_cap"] = minetest.get_content_id("valleys_mapgen:huge_mushroom_cap")
+		node["giant_mushroom_cap"] = minetest.get_content_id("valleys_mapgen:giant_mushroom_cap")
+		node["giant_mushroom_stem"] = minetest.get_content_id("valleys_mapgen:giant_mushroom_stem")
+		node["mushroom_fertile_red"] = minetest.get_content_id("flowers:mushroom_fertile_red")
+		node["mushroom_fertile_brown"] = minetest.get_content_id("flowers:mushroom_fertile_brown")
 
 		-- Air and Ignore
-		c_air = minetest.get_content_id("air")
-		c_ignore = minetest.get_content_id("ignore")
+		node["air"] = minetest.get_content_id("air")
+		node["ignore"] = minetest.get_content_id("ignore")
+
+		-- This saves assigning a lot of variables during every loop,
+		-- most of which won't be used.
+		soil_translate["clay_over"] = { dirt = node["clay"], lawn = node["clay"], dry = node["clay"], snow = node["clay"], }
+		soil_translate["clay_under"] = { dirt = node["dirt_clay"], lawn = node["lawn_clay"], dry = node["dry_clay"], snow = node["snow_clay"], }
+		soil_translate["silt_over"] = { dirt = node["silt"], lawn = node["silt"], dry = node["silt"], snow = node["silt"], }
+		soil_translate["silt_under"] = { dirt = node["dirt_silt"], lawn = node["lawn_silt"], dry = node["dry_silt"], snow = node["snow_silt"], }
+		soil_translate["sand"] = { dirt = node["dirt_sand"], lawn = node["lawn_sand"], dry = node["dry_sand"], snow = node["snow_sand"], }
+		soil_translate["dirt"] = { dirt = node["dirt"], lawn = node["lawn"], dry = node["dry"], snow = node["snow"], }
 	end
 
 	-- The VoxelManipulator, a complicated but speedy method to set many nodes at the same time
@@ -288,48 +286,23 @@ function vmg.generate(minp, maxp, seed)
 			local v2, v13, v14, v15, v16 = n2[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d] -- take the noise values for 2D noises
 
 			-- Choose biome, by default normal dirt
-			local dirt = c_dirt
-			local lawn = c_lawn
-			local dry = c_dry
-			local snow = c_snow
+			local soil = "dirt"
 			local max = math.max(v13, v14, v15) -- the biome is the maximal of these 3 values.
 			if max > dirt_threshold then -- if one of these values is bigger than dirt_threshold, make clayey, silty or sandy dirt, depending on the case. If none of clay, silt or sand is predominant, make normal dirt.
 				if v13 == max then
 					if v13 > clay_threshold then
-						dirt = c_clay
-						lawn = c_clay
-						dry = c_clay
-						snow = c_clay
+						soil = "clay_over"
 					else
-						dirt = c_dirt_clay
-						lawn = c_lawn_clay
-						dry = c_dry_clay
-						snow = c_snow_clay
+						soil = "clay_under"
 					end
 				elseif v14 == max then
 					if v14 > silt_threshold then
-						dirt = c_silt
-						lawn = c_silt
-						dry = c_silt
-						snow = c_silt
+						soil = "silt_over"
 					else
-						dirt = c_dirt_silt
-						lawn = c_lawn_silt
-						dry = c_dry_silt
-						snow = c_snow_silt
+						soil = "silt_under"
 					end
 				else
-					if v15 > sand_threshold then
-						dirt = c_desert_sand
-						lawn = c_desert_sand
-						dry = c_desert_sand
-						snow = c_desert_sand
-					else
-						dirt = c_dirt_sand
-						lawn = c_lawn_sand
-						dry = c_dry_sand
-						snow = c_snow_sand
-					end
+					soil = "sand"
 				end
 			end
 
@@ -337,18 +310,21 @@ function vmg.generate(minp, maxp, seed)
 				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
 				local ground = math.max(heightmap[i2d], 0) - 5
 
-				if data[ivm] == c_snow_layer then
-					data[ivm] = c_air
+				if data[ivm] == node["snow_layer"] then
+					data[ivm] = node["air"]
 				end
 
 				-- Replace dirt and sand nodes appropriately.
-				if data[ivm] == c_dirt or data[ivm] == c_dry or data[ivm] == c_lawn or data[ivm] == c_snow or data[ivm] == c_sand then
+				if data[ivm] == node["dirt"] or data[ivm] == node["dry"] or data[ivm] == node["lawn"] or data[ivm] == node["snow"] or data[ivm] == node["sand"] then
 
 					-- a top node
-					if y >= ground and data[ivm + ystride] == c_air then
+					if y >= ground and y >= water_level and data[ivm + ystride] == node["air"] then
 						-- Humidity and temperature are simplified from the original,
 						-- and derived from the actual mapgen.
 						local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] / 25) - 2)
+						-- Closer?
+						--local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] - 50) / 20)
+						--
 						--humidity = humidity * (1 - math.exp(-math.max(4 - math.sqrt(math.abs(y)) / 4, 0) - 0.5))
 						local temperature = (heatmap[i2d] - 32) / 60 + 1
 
@@ -358,16 +334,16 @@ function vmg.generate(minp, maxp, seed)
 						end
 
 						-- Replace the nodes.
-						if data[ivm] == c_dirt then
-							data[ivm] = dirt
+						if data[ivm] == node["dirt"] then
+							data[ivm] = soil_translate[soil].dirt
 						else
 							if temperature < snow_threshold then
-								data[ivm] = snow
-								data[ivm + ystride] = c_snow_layer
+								data[ivm] = soil_translate[soil].snow
+								data[ivm + ystride] = node["snow_layer"]
 							elseif humidity < dry_dirt_threshold then
-								data[ivm] = dry
+								data[ivm] = soil_translate[soil].dry
 							else
-								data[ivm] = lawn
+								data[ivm] = soil_translate[soil].lawn
 							end
 						end
 
@@ -395,6 +371,7 @@ function vmg.generate(minp, maxp, seed)
 						v18 = 0,
 						v19 = 0,
 						v20 = 0,
+						shade = 0,
 						temp = temperature,
 						humidity = humidity,
 						sea_water = 0,
@@ -402,62 +379,68 @@ function vmg.generate(minp, maxp, seed)
 						water = 0,
 						thickness = 0 }
 
+						--for y1 = 1, math.min(10, maxp.y - y) do
+						--	if data[ivm + 1 + y1 * ystride] ~= node["air"] then
+						--		conditions.shade = y1
+						--		break
+						--	end
+						--end
 						vmg.choose_generate_plant(conditions, {x=x,y=y,z=z}, data, a, ivm + ystride)
 					else
-						if data[ivm] == c_dirt or data[ivm] == c_sand then
-							data[ivm] = dirt
+						if data[ivm] == node["dirt"] or data[ivm] == node["sand"] then
+							data[ivm] = soil_translate[soil].dirt
 						end
 					end
 				end
 				
 				-- cave ceilings
-				if do_cave_stuff and y < maxp.y and data[ivm] == c_air and data[ivm + ystride] == c_stone then
+				if do_cave_stuff and y < maxp.y and data[ivm] == node["air"] and data[ivm + ystride] == node["stone"] then
 					local sr = math.random(20)
 					if sr == 1 then
-						data[ivm + ystride] = c_glowing_fungal_stone
+						data[ivm + ystride] = node["glowing_fungal_stone"]
 					elseif sr < 5 then
-						data[ivm] = c_stalactite
+						data[ivm] = node["stalactite"]
 					end
 				end
 
 				-- cave floors
-				if do_cave_stuff and y > minp.y and y < ground and data[ivm] == c_air then
+				if do_cave_stuff and y > minp.y and y < ground and data[ivm] == node["air"] then
 					air_count = air_count + 1
-					if data[ivm - ystride] == c_stone then
+					if data[ivm - ystride] == node["stone"] then
 						local sr = math.random(100)
 						if sr < 21 then
-							data[ivm] = c_stalagmite
+							data[ivm] = node["stalagmite"]
 						elseif sr < 24 then
-							data[ivm] = c_mushroom_fertile_red
-							data[ivm - ystride] = c_dirt
+							data[ivm] = node["mushroom_fertile_red"]
+							data[ivm - ystride] = node["dirt"]
 						elseif sr < 27 then
-							data[ivm] = c_mushroom_fertile_brown
-							data[ivm - ystride] = c_dirt
+							data[ivm] = node["mushroom_fertile_brown"]
+							data[ivm - ystride] = node["dirt"]
 						elseif air_count > 1 and sr < 29 then
-							data[ivm + ystride] = c_huge_mushroom_cap
-							data[ivm] = c_giant_mushroom_stem
-							data[ivm - ystride] = c_dirt
+							data[ivm + ystride] = node["huge_mushroom_cap"]
+							data[ivm] = node["giant_mushroom_stem"]
+							data[ivm - ystride] = node["dirt"]
 						elseif air_count > 2 and sr < 30 then
-							data[ivm + 2 * ystride] = c_giant_mushroom_cap
-							data[ivm + ystride] = c_giant_mushroom_stem
-							data[ivm] = c_giant_mushroom_stem
-							data[ivm - ystride] = c_dirt
+							data[ivm + 2 * ystride] = node["giant_mushroom_cap"]
+							data[ivm + ystride] = node["giant_mushroom_stem"]
+							data[ivm] = node["giant_mushroom_stem"]
+							data[ivm - ystride] = node["dirt"]
 						elseif sr < 34 then
-							data[ivm - ystride] = c_dirt
+							data[ivm - ystride] = node["dirt"]
 						end
 					end
 				end
 
---				if y > minp.y and data[ivm] == c_air and data[ivm - ystride] == c_river_water_source then
+--				if y > minp.y and data[ivm] == node["air"] and data[ivm - ystride] == node["river_water_source"] then
 --					local biome = vmg.biome_ids[biomemap[i2d]]
 --					-- I haven't figured out what the decoration manager is
 --					--  doing with the noise functions, but this works ok.
 --					if table.contains(water_lily_biomes, biome) and n21[i2d] > 0.5 and math.random(5) == 1 then
---						data[ivm] = c_waterlily
+--						data[ivm] = node["waterlily"]
 --					end
 --				end
 
-				if data[ivm] ~= c_air then
+				if data[ivm] ~= node["air"] then
 					air_count = 0
 				end
 
