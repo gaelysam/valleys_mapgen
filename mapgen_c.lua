@@ -318,7 +318,7 @@ function vmg.generate(minp, maxp, seed)
 				if data[ivm] == node["dirt"] or data[ivm] == node["dry"] or data[ivm] == node["lawn"] or data[ivm] == node["snow"] or data[ivm] == node["sand"] then
 
 					-- a top node
-					if y >= ground and y >= water_level and data[ivm + ystride] == node["air"] then
+					if y >= ground and data[ivm + ystride] == node["air"] then
 						-- Humidity and temperature are simplified from the original,
 						-- and derived from the actual mapgen.
 						local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] / 25) - 2)
@@ -385,7 +385,7 @@ function vmg.generate(minp, maxp, seed)
 						--		break
 						--	end
 						--end
-						vmg.choose_generate_plant(conditions, {x=x,y=y,z=z}, data, a, ivm + ystride)
+						vmg.choose_generate_plant(conditions, {x=x,y=y+1,z=z}, data, a, ivm + ystride)
 					else
 						if data[ivm] == node["dirt"] or data[ivm] == node["sand"] then
 							data[ivm] = soil_translate[soil].dirt
