@@ -71,7 +71,7 @@ if vmg.define("plants", true) then
 		density = 0.40,
 		priority = 10,
 		check = function(t, pos)
-			return t.v15 > -0.6 and t.temp >= 1.8 and t.humidity > 2.2 and t.v16 > 1.8 and t.v13 < clay_threshold and t.v15 < sand_threshold
+			return t.v15 > -0.6 and t.temp >= 1.8 and t.humidity > 2.2 and t.v13 < clay_threshold and t.v15 < sand_threshold
 		end,
 	})
 
