@@ -7,7 +7,6 @@ local silt_threshold = vmg.define("silt_threshold", 1)
 if vmg.define("plants", true) then
 	vmg.register_plant({
 		nodes = {"default:papyrus", n=4},
-		cover = 0.030,
 		density = 0.014,
 		priority = 75,
 		check = function(t)
@@ -17,7 +16,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = "valleys_mapgen:arrow_arum",
-		cover = 0.40,
 		density = 0.32,
 		priority = 68,
 		check = function(t, pos)
@@ -27,7 +25,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = "valleys_mapgen:hibiscus",
-		cover = 0.012,
 		density = 0.007,
 		priority = 65,
 		check = function(t, pos)
@@ -37,7 +34,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = "valleys_mapgen:calla_lily",
-		cover = 0.32,
 		density = 0.06,
 		priority = 63,
 		check = function(t, pos)
@@ -50,8 +46,7 @@ if vmg.define("plants", true) then
 	for i = 1, 5 do
 		vmg.register_plant({
 			nodes = { "default:grass_"..i},
-			cover = 0.60,
-			density = 0.30,
+			density = 0.24,
 			priority = 10,
 			check = function(t, pos)
 				return t.v15 < sand_threshold - (i - 1) * 0.1 and t.temp >= 1 and t.temp < 1.5 and t.humidity < 2.6 and t.humidity > dry_dirt_threshold and t.v13 < clay_threshold - (i - 1) * 0.1
@@ -63,9 +58,8 @@ if vmg.define("plants", true) then
 	for i = 1, 5 do
 		vmg.register_plant({
 			nodes = { "default:dry_grass_"..i},
-			cover = 0.60,
 			density = 0.24,
-			priority = 59,
+			priority = 10,
 			check = function(t, pos)
 				return t.v15 < sand_threshold - (i - 1) * 0.1 and t.temp >= 1 and t.temp < 1.5 and t.humidity < 2.6 and t.humidity <= dry_dirt_threshold and t.v13 < clay_threshold - (i - 1) * 0.1
 			end,
@@ -74,9 +68,8 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"default:junglegrass"},
-		cover = 0.65, --0.65
 		density = 0.40,
-		priority = 60,
+		priority = 10,
 		check = function(t, pos)
 			return t.v15 > -0.6 and t.temp >= 1.8 and t.humidity > 2.2 and t.v16 > 1.8
 		end,
@@ -84,7 +77,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"valleys_mapgen:bird_of_paradise"},
-		cover = 0.001, --0.001
 		density = 0.0003, --0.0003
 		priority = 52,
 		check = function(t, pos)
@@ -94,7 +86,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"valleys_mapgen:mangrove_fern"},
-		cover = 0.1,
 		density = 0.05,
 		priority = 50,
 		check = function(t, pos)
@@ -104,7 +95,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"valleys_mapgen:orchid"},
-		cover = 0.02,
 		density = 0.005,
 		priority = 45,
 		check = function(t, pos)
@@ -114,7 +104,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"default:cactus", n=4},
-		cover = 0.3,
 		density = 0.008,
 		priority = 10,
 		check = function(t, pos)
@@ -124,7 +113,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"default:dry_shrub"},
-		cover = 0.064,
 		density = 0.064,
 		priority = 54,
 		check = function(t, pos)
@@ -134,7 +122,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"flowers:rose"},
-		cover = 0.015,
 		density = 0.012,
 		priority = 47,
 		check = function(t, pos)
@@ -144,7 +131,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"valleys_mapgen:gerbera"},
-		cover = 0.010,
 		density = 0.008,
 		priority = 44,
 		check = function(t, pos)
@@ -154,7 +140,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"flowers:geranium"},
-		cover = 0.040,
 		density = 0.015,
 		priority = 48,
 		check = function(t, pos)
@@ -164,7 +149,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"flowers:viola"},
-		cover = 0.015,
 		density = 0.012,
 		priority = 29,
 		check = function(t, pos)
@@ -174,7 +158,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"flowers:tulip"},
-		cover = 0.020,
 		density = 0.003,
 		priority = 50,
 		check = function(t, pos)
@@ -184,7 +167,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"flowers:dandelion_white", "flowers:dandelion_yellow"},
-		cover = 0.010,
 		density = 0.006,
 		priority = 43,
 		check = function(t, pos)
@@ -194,7 +176,6 @@ if vmg.define("plants", true) then
 
 	vmg.register_plant({
 		nodes = {"flowers:mushroom_fertile_red", "flowers:mushroom_fertile_brown"},
-		cover = 0.006,
 		density = 0.006,
 		priority = 61,
 		check = function(t, pos)
@@ -214,7 +195,6 @@ if vmg.define("trees", true) then
 			leaves = "default:pine_needles",
 			air = "air", ignore = "ignore",
 		},
-		cover = 0.4,
 		density = 0.015,
 		priority = 80,
 		check = function(t, pos)
@@ -235,7 +215,6 @@ if vmg.define("trees", true) then
 			leaves = "default:jungleleaves",
 			air = "air", ignore = "ignore",
 		},
-		cover = 0.5,
 		density = 0.06,
 		priority = 73,
 		check = function(t, pos)
@@ -257,7 +236,6 @@ if vmg.define("trees", true) then
 			roots = "valleys_mapgen:mangrove_roots",
 			air = "air", ignore = "ignore",
 		},
-		cover = 0.3,
 		density = 0.2,
 		priority = 72,
 		check = function(t, pos)
@@ -287,7 +265,6 @@ if vmg.define("trees", true) then
 			fruit = "default:apple",
 			air = "air", ignore = "ignore",
 		},
-		cover = 0.3,
 		density = 0.05,
 		priority = 66,
 		check = function(t, pos)
@@ -317,7 +294,6 @@ if vmg.define("trees", true) then
 			fruit = "valleys_mapgen:banana",
 			air = "air", ignore = "ignore",
 		},
-		cover = 0.18,
 		density = 0.005,
 		priority = 70,
 		check = function(t, pos)
@@ -338,7 +314,6 @@ if vmg.define("trees", true) then
 			leaves = "valleys_mapgen:fir_needles",
 			air = "air", ignore = "ignore",
 		},
-		cover = 0.7,
 		density = 0.045,
 		priority = 71,
 		check = function(t, pos)
@@ -359,7 +334,6 @@ if vmg.define("trees", true) then
 			leaves = "valleys_mapgen:cherry_blossom_leaves",
 			air = "air", ignore = "ignore",
 		},
-		cover = 0.13,
 		density = 0.005,
 		priority = 38,
 		check = function(t, pos)
@@ -380,7 +354,6 @@ if vmg.define("trees", true) then
 			leaves = "valleys_mapgen:birch_leaves",
 			air = "air", ignore = "ignore",
 		},
-		cover = 0.07,
 		density = 0.05,
 		priority = 69,
 		check = function(t, pos)
@@ -401,7 +374,6 @@ if vmg.define("trees", true) then
 			leaves = "valleys_mapgen:willow_leaves",
 			air = "air", ignore = "ignore",
 		},
-		cover = 0.05,
 		density = 0.02,
 		priority = 70,
 		check = function(t, pos)
