@@ -110,6 +110,7 @@ local average_snow_level = vmg.define("average_snow_level", 100)
 local altitude_chill = getCppSettingNumeric('mg_valleys_altitude_chill', 90) 
 local heat_multiplier = tonumber(getCppSettingNoise('mg_biome_np_heat', {offset=50}).offset) / 25
 local snow_threshold = heat_multiplier * 0.5 ^ (average_snow_level / altitude_chill)
+local water_level = getCppSettingNumeric('water_level', 1)
 
 -- This table holds the content IDs. They aren't available until
 -- the actual mapgen loop is run, but they can stay local to the
@@ -317,7 +318,7 @@ function vmg.generate(minp, maxp, seed)
 				if data[ivm] == node["dirt"] or data[ivm] == node["dry"] or data[ivm] == node["lawn"] or data[ivm] == node["snow"] or data[ivm] == node["sand"] then
 
 					-- a top node
-					if y >= ground and data[ivm + ystride] == node["air"] then
+					if y >= ground and y >= water_level and data[ivm + ystride] == node["air"] then
 						-- Humidity and temperature are simplified from the original,
 						-- and derived from the actual mapgen.
 						local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] / 25) - 2)
