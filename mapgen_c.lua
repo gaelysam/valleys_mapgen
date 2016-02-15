@@ -325,7 +325,7 @@ function vmg.generate(minp, maxp, seed)
 						-- Closer?
 						--local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] - 50) / 20)
 						--
-						--humidity = humidity * (1 - math.exp(-math.max(4 - math.sqrt(math.abs(y)) / 4, 0) - 0.5))
+						humidity = humidity * (1 - math.exp(-math.max(4 - math.sqrt(math.abs(y)) / 4, 0) - 0.5))
 						local temperature = (heatmap[i2d] - 32) / 60 + 1
 
 						-- Add sea humidity (the mapgen doesn't)
