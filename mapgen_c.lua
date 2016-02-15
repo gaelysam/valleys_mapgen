@@ -322,10 +322,10 @@ function vmg.generate(minp, maxp, seed)
 						-- Humidity and temperature are simplified from the original,
 						-- and derived from the actual mapgen.
 						local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] / 25) - 2)
-						-- Closer?
-						--local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] - 50) / 20)
-						--
-						--humidity = humidity * (1 - math.exp(-math.max(4 - math.sqrt(math.abs(y)) / 4, 0) - 0.5))
+						-- This compensates for the soil humidity handling in the
+						-- original, but it's a very subtle effect.
+						-- Hopefully, changes in the C++ will make this unecessary.
+						humidity = humidity * (1 - math.exp(-math.max(4 - math.sqrt(math.abs(y)) / 4, 0) - 0.5))
 						local temperature = (heatmap[i2d] - 32) / 60 + 1
 
 						-- Add sea humidity (the mapgen doesn't)
