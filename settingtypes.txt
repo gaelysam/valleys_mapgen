@@ -79,6 +79,9 @@ vmg_average_snow_level (Average snow level) int 100
 vmg_dry_dirt_threshold (Dry dirt threshold) float 0.6
 
 [*Rivers]
+#    Produce dry riverbeds in dry regions.
+vmg_dry_rivers (Dry Rivers) bool false
+
 #    Simply the depth of the rivers
 vmg_river_depth (River depth) int 3
 
