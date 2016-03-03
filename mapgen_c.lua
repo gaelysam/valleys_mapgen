@@ -141,6 +141,9 @@ end
 --end
 
 
+local data = {}
+
+
 -- THE MAPGEN FUNCTION
 function vmg.generate(minp, maxp, seed)
 	if vmg.registered_on_first_mapgen then -- Run callbacks
@@ -222,7 +225,7 @@ function vmg.generate(minp, maxp, seed)
 
 	-- The VoxelManipulator, a complicated but speedy method to set many nodes at the same time
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	local data = vm:get_data() -- data is the original array of content IDs (solely or mostly air)
+	vm:get_data(data) -- data is the original array of content IDs (solely or mostly air)
 	-- Be careful: emin ≠ minp and emax ≠ maxp !
 	-- The data array is not limited by minp and maxp. It exceeds it by 16 nodes in the 6 directions.
 	-- The real limits of data array are emin and emax.
@@ -322,16 +325,12 @@ function vmg.generate(minp, maxp, seed)
 						-- Humidity and temperature are simplified from the original,
 						-- and derived from the actual mapgen.
 						local humidity = 2 ^ (v13 - v15 + (humiditymap[i2d] / 25) - 2)
-						-- This compensates for the soil humidity handling in the
-						-- original, but it's a very subtle effect.
-						-- Hopefully, changes in the C++ will make this unecessary.
-						humidity = humidity * (1 - math.exp(-math.max(4 - math.sqrt(math.abs(y)) / 4, 0) - 0.5))
 						local temperature = (heatmap[i2d] - 32) / 60 + 1
 
 						-- Add sea humidity (the mapgen doesn't)
-						if humidity < 1.8 and y < 5 then
-							humidity = humidity * (1 + (5 - y) * 10)
-						end
+						--if humidity < 1.8 and y < 5 then
+						--	humidity = humidity * (1 + (5 - y) * 10)
+						--end
 
 						-- Replace the nodes.
 						if data[ivm] == node["dirt"] then

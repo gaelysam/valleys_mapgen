@@ -143,6 +143,10 @@ if vmg.define("stone_ores", true) then
 	minetest.register_ore({ore_type="sheet", ore="default:desert_stone", wherein="default:stone", clust_num_ores=250, clust_scarcity=60, clust_size=10, y_min=-1000, y_max=31000, noise_threshhold=0.1, noise_params={offset=0, scale=1, spread={x=256, y=256, z=256}, seed=163281090, octaves=5, persist=0.60}, random_factor=1.0})
 end
 
+
+local data = {}
+
+
 -- THE MAPGEN FUNCTION
 function vmg.generate(minp, maxp, seed)
 	if vmg.registered_on_first_mapgen then -- Run callbacks
@@ -212,7 +216,7 @@ function vmg.generate(minp, maxp, seed)
 
 	-- The VoxelManipulator, a complicated but speedy method to set many nodes at the same time
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	local data = vm:get_data() -- data is the original array of content IDs (solely or mostly air)
+	vm:get_data(data) -- data is the original array of content IDs (solely or mostly air)
 	-- Be careful: emin ≠ minp and emax ≠ maxp !
 	-- The data array is not limited by minp and maxp. It exceeds it by 16 nodes in the 6 directions.
 	-- The real limits of data array are emin and emax.
