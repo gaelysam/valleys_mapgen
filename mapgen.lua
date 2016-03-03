@@ -114,6 +114,7 @@ local altitude_chill = vmg.define("altitude_chill", 90)
 local do_caves = vmg.define("caves", true)
 local simple_caves = vmg.define("simple_caves", false)
 local do_cave_stuff = vmg.define("cave_stuff", false)
+local dry_rivers = vmg.define("dry_rivers", false)
 
 local average_stone_level = vmg.define("average_stone_level", 180)
 local dirt_reduction = math.sqrt(average_stone_level) / (vmg.noises[7].offset - 0.5) -- Calculate dirt_reduction such as v7 - sqrt(average_stone_level) / dirt_reduction = 0.5 on average. This means that, on average at y = average_stone_level, dirt_thickness = 0.5 (half of the surface is bare stone)
@@ -362,6 +363,12 @@ function vmg.generate(minp, maxp, seed)
 
 			-- raw humidity, see below at vmg.get_humidity
 			local hraw = 2 ^ (v13 - v15 + v18 * 2)
+
+			-- After base_ground is used for terrain, modify it by humidity
+			-- to make rivers dry up in deserts.
+			if dry_rivers and hraw < 1 then  -- average humidity?
+				base_ground = base_ground + (hraw - 1) * river_depth
+			end
 
 			for y = minp.y, maxp.y do -- for each node in vertical line
 				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
