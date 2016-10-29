@@ -36,6 +36,10 @@ else
 	end
 end
 
+function math.round(n)
+	return math.floor(n + 0.5)
+end
+
 -- useful function to convert a 3D pos to 2D
 function pos2d(pos)
 	if type(pos) == "number" then
@@ -94,6 +98,21 @@ end
 -- Settings are handled by a separate file, settings.lua
 -- This file will also run the appropriate mapgen file, according to the vmg_version setting
 dofile(vmg.path .. "/settings.lua")
+
+if vmg.loglevel >= 2 then
+	print("[Valleys Mapgen] Loading mapgen ...")
+end
+
+-- Load the appropriate mapgen version
+
+local version = vmg.define("version", vmg.version)
+if vmg.valleys_c then
+	dofile(vmg.path .. "/mapgen_c.lua")
+elseif version == vmg.version then
+	dofile(vmg.path .. "/mapgen.lua")
+else
+	dofile(vmg.path .. "/old_mapgens/" .. version .. ".lua")
+end
 
 if not vmg.valleys_c then
 	-- The mapgen file contains a mapgen function and a spawnplayer function. So, set the spawnplayer function on newplayer and on respawnplayer.

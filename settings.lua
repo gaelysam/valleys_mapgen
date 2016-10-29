@@ -116,20 +116,5 @@ function vmg.string_to_noise(str)
 	}
 end
 
-if vmg.loglevel >= 2 then
-	print("[Valleys Mapgen] Loading mapgen ...")
-end
-
--- Choose the appropriate mapgen version
-
-local version = vmg.define("version", vmg.version)
-if vmg.valleys_c then
-	dofile(vmg.path .. "/mapgen_c.lua")
-elseif version == vmg.version then
-	dofile(vmg.path .. "/mapgen.lua")
-else
-	dofile(vmg.path .. "/old_mapgens/" .. version .. ".lua")
-end
-
 -- Write settings after loading
 minetest.after(0, function() vmg.settings:write() end)
