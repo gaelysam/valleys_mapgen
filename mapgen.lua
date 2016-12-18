@@ -64,6 +64,12 @@ vmg.noises = {
 -- Noise 20 : Simple Caves 2							3D
 {offset = 0, scale = 1, seed = 3944, spread = {x = 64, y = 64, z = 64}, octaves = 3, persist = 0.5, lacunarity = 2},
 
+-- Noise 21 : Volcanic zones							2D
+{offset = 0, scale = 3, seed = -6458, spread = {x = 1024, y = 1024, z = 1024}, octaves = 5, persist = 0.5, lacunarity = 2},
+
+-- Noise 22 : Volcanoes							2D
+{offset = 0, scale = 1, seed = 6221, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.3, lacunarity = 4, flags = "absvalue, noeased"},
+
 }
 
 -- function to get noisemaps
@@ -133,6 +139,9 @@ local water_level = vmg.define("water_level", 1)
 local river_water = vmg.define("river_water", true)
 
 local ores = vmg.define("ores", true)
+
+local volcano_height = 30
+local volcano_slope = 120
 
 -- Register ores
 -- We need more types of stone than just gray. Fortunately, there are
@@ -269,6 +278,8 @@ function vmg.generate(minp, maxp, seed)
 	local n16 = vmg.noisemap(16, minp2d, chulens)
 	-- Noise #17 is not used this way
 	local n18 = vmg.noisemap(18, minp2d, chulens)
+	local n21 = vmg.noisemap(21, minp2d, chulens)
+	local n22 = vmg.noisemap(22, minp2d, chulens)
 
 	-- After noise calculation, check the timer
 	local t2 = os.clock()
@@ -296,14 +307,19 @@ function vmg.generate(minp, maxp, seed)
 
 	for x = minp.x, maxp.x do -- for each YZ plane
 		for z = minp.z, maxp.z do -- for each vertical line in this plane
-			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16, v18 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d] -- take the noise values for 2D noises
+			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16, v18, v21, v22 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d], n21[i2d], n22[i2d] -- take the noise values for 2D noises
 			v3 = v3 ^ 2 -- The square function changes the behaviour of this noise : very often small, and sometimes very high.
 			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher where valleys are deep (mountains). base_ground represents the height of the rivers, most of the surface is above.
 			v2 = math.abs(v2) - river_size -- v2 represents the distance from the river, in arbitrary units.
 			local river = v2 < 0 -- the rivers are placed where v2 is negative, so where the original v2 value is close to zero.
-			local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 changes the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4). This variable represents the height of the terrain, from the rivers.
-			local mountain_ground = base_ground + valleys -- approximate height of the terrain at this point (could be slightly modified by the 3D noise #6)
-			local slopes = v5 * valleys -- This variable represents the maximal influence of the noise #6 on the elevation. v5 is the rate of the height from rivers (variable "valleys") that is concerned.
+			local v_coeff = 1 - math.exp(- (v2 / v4) ^ 2) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 changes the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4).
+			local valleys = v3 * v_coeff -- This variable represents the height of the terrain, from the rivers.
+			local volcanoes = math.min(math.abs(math.exp(- v21 ^ 2) * v_coeff * v22), 1)
+			local crater = volcanoes >= 1
+			volcanoes = (volcanoes - 1) * volcano_slope + volcano_height
+			volcanoes = math.min(math.max(volcanoes, 0), volcano_height)
+			local mountain_ground = base_ground + valleys + volcanoes -- approximate height of the terrain at this point (could be slightly modified by the 3D noise #6)
+			local slopes = v5 * valleys * (1 - volcanoes / volcano_height) -- This variable represents the maximal influence of the noise #6 on the elevation. v5 is the rate of the height from rivers (variable "valleys") that is concerned.
 
 			if river then
 				local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1−x²) which modelizes a circle.
@@ -311,6 +327,8 @@ function vmg.generate(minp, maxp, seed)
 					-- base_ground - depth : height of the bottom of the river
 					-- water_level - 6 : don't make rivers below 6 nodes under the surface
 				slopes = 0 -- noise #6 has not any influence on rivers
+			elseif crater then
+				mountain_ground = mountain_ground - 8
 			end
 
 			-- Choose biome, by default normal dirt
@@ -319,7 +337,13 @@ function vmg.generate(minp, maxp, seed)
 			local dry = c_dry
 			local snow = c_snow
 			local max = math.max(v13, v14, v15) -- the biome is the maximal of these 3 values.
-			if max > dirt_threshold then -- if one of these values is bigger than dirt_threshold, make clayey, silty or sandy dirt, depending on the case. If none of clay, silt or sand is predominant, make normal dirt.
+
+			if crater then
+				dirt = c_lava
+				lawn = c_lava
+				dry = c_lava
+				snow = c_lava
+			elseif max > dirt_threshold then -- if one of these values is bigger than dirt_threshold, make clayey, silty or sandy dirt, depending on the case. If none of clay, silt or sand is predominant, make normal dirt.
 				if v13 == max then
 					if v13 > clay_threshold then
 						dirt = c_clay
@@ -392,7 +416,11 @@ function vmg.generate(minp, maxp, seed)
 					if not is_cave then -- if pos is not inside a cave
 						local thickness = v7 - math.sqrt(math.abs(y)) / dirt_reduction -- Calculate dirt thickness, according to noise #7, dirt reduction parameter, and elevation (y coordinate)
 						local above = math.floor(thickness + math.random()) -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness. An "above" of zero = bare stone.
-						above = math.max(above, 0) -- must be positive
+						if crater then
+							above = 5
+						else
+							above = math.max(above, 0) -- must be positive
+						end
 
 						if y >= water_level and n6[i3d_sup+i3d_incrY] * slopes <= y + 1 - mountain_ground and not river then -- If node above is in the ground
 							if is_beach and y < beach then -- if beach, make sand
@@ -435,7 +463,9 @@ function vmg.generate(minp, maxp, seed)
 									else
 										data[ivm] = c_stone
 									end
-									data[ivm2] = c_snow_layer -- set node above to snow
+									if not crater then
+										data[ivm2] = c_snow_layer -- set node above to snow
+									end
 								end
 
 								if above > 0 then

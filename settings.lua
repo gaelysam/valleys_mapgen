@@ -60,12 +60,12 @@ end
 local function define_noise(flag, default, write_to_config)
 	local value = vmg.settings:get(flag)
 	if value then -- This flag exists in vmg.conf, return its value
-		return vmg.string_to_noise(value), true
+		return vmg.string_to_noise(value, default.flags), true
 	else
 		local on_config = minetest.setting_get("vmg_" .. flag) -- get this flag in minetest.conf
 		if on_config then -- This flag exists in minetest.conf, so return its value
 			vmg.settings:set(flag, on_config)
-			return vmg.string_to_noise(on_config), false
+			return vmg.string_to_noise(on_config, default.flags), false
 		else -- Flag don't exist anywhere, so the default value will be written in settings and returned
 			local str_default = vmg.noise_to_string(default)
 			if write_to_config then
@@ -100,7 +100,7 @@ function vmg.noise_to_string(n)
 		", " .. n.lacunarity
 end
 
-function vmg.string_to_noise(str)
+function vmg.string_to_noise(str, flags)
 	local t = {}
 	for line in str:gmatch("[%d%.%-e]+") do
 		table.insert(t, tonumber(line))
@@ -113,6 +113,7 @@ function vmg.string_to_noise(str)
 		octaves = t[7],
 		persist = t[8],
 		lacunarity = t[9],
+		flags = flags,
 	}
 end
 
