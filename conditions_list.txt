@@ -1,0 +1,26 @@
+v1          Noise 1
+v2          Noise 2
+v3          Noise 3
+v4          Noise 4
+v5          Noise 5
+v6          Noise 6
+v7          Noise 7
+v8          Noise 8
+v9          Noise 9
+v10         Noise 10
+v11         Noise 11
+v12         Noise 12
+v13         Noise 13
+v14         Noise 14
+v15         Noise 15
+v16         Noise 16
+v17         Noise 17
+v18         Noise 18
+v19         Noise 19
+v20         Noise 20
+temp        Temperature
+humidity    Humidity
+sea_water   Humidity due to sea water
+river_water Humidity due to river water
+water       Humidity due to water
+thickness   Dirt thickness

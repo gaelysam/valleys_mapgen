@@ -31,17 +31,112 @@ There are 3 ways to change the settings:
 * In recent Minetest versions (0.4.13-dev after October 24th), it can be set in the Minetest main menu (*Settings* tab, in *Mods / valleys_mapgen*). It simply changes the settings in minetest.conf, so it has the same effect as writing in minetest.conf (works only for new worlds).
 You can find the full list of settings in the file *settingtypes.txt* (do NOT modify this file).
 
+## Mapgen algorithms API for modders
+Valleys Mapgen has one mapgen algorithm by default. You can create others. A mapgen algorithm file is a Lua file like this:
+
+```lua
+local function mapgen_algorithm(minp, maxp, data, area, content_ids, t0)
+		-- minp, maxp: edges of the chunk
+		-- data: nodes data, usually empty at first
+		-- area: VoxelArea
+		-- content_ids: table of content IDs. See the file "content_id_list.txt"
+		-- t0: time when starting mapgen
+	-- Your algorithm here
+	-- Should fill 'data' with nodes IDs
+	return t1, t2 -- t1: time when finishing preparing mapgen ; t2: time when finishing calculating noises
+end
+
+local function get_elevation(pos)
+	-- Calculate elevation
+	return elevation
+end
+
+local function get_humidity(pos)
+	-- Calculate humidity
+	return humidity
+end
+
+local function get_temperature(pos)
+	-- Calculate temperature
+	return temperature
+end
+
+return mapgen_algorithm, get_elevation, get_humidity, get_temperature
+```
+
+See "mapgen_noiseval.lua" for example.
+
+### Available methods
+#### vmg.define
+Sets or gets a specific flag in `vmg.conf`. Sets the flag to default only if not already present.
+
+Arguments:
+- `flag`: the flag to set/get.
+- `default`: default value for the flag. Must be string, number, boolean or noiseparams table.
+- `write_to_config`: `false` by default. If `true`, writes in `minetest.conf`.
+
+Returns:
+- `value`
+
+#### vmg.noise
+Returns value of noise `i` at `pos`.
+
+Arguments:
+- `pos`
+- `i`
+
+Returns:
+- `value`
+
+#### vmg.noisemap
+Arguments:
+- `i`: number of the noise
+- `minp`: minimum coordinates of the chunk (min corner)
+- `chulens`: size of the chunk in 2 directions (for 2D noises) or 3 directions (3D noises)
+
+Returns:
+- `noise`: table with all noise values in the chunk
+
+#### vmg.choose_generate_plant
+Chooses and generates a plant at given position.
+
+Arguments:
+- `conditions`: table of conditions, see the file `conditions_list.txt`
+- `pos`: position of the node *above* the soil
+- `data`: array of content IDs
+- `area`: `VoxelArea`
+- `i`: index of `pos` in `area`
+
+Returns: *nothing*.
+
+#### vmg.register_after_mapgen
+Runs a function after mapgen algorithm, and before writing data to the map.
+
+Arguments:
+- `func`: function to be called after mapgen
+- `...`: optionnal, single or multiple parameters to be passed to the function
+
+Returns: *nothing*.
+
+#### displaytime
+Prints a time in the console.
+
+Arguments:
+- `t`: time
+
+Returns: *nothing*.
+
 ## Plants API for modders
 The Plants API has been introduced on October 24th, 2015. It allow mods to generate plants directly on the map.
 
 ### To begin
-First, make sure that you've added the `valleys_mapgen` dependancy in your depends.txt (followed by a question mark if optional)
+First, make sure that you've added the `valleys_mapgen` dependancy in your depends.txt (followed by a question mark if optional).
 The only function is `vmg.register_plant`. It registers a plant that will be generated during mapgen. All plant parameters are passed to this function.
 
 ### Parameters
 Syntax (example for jungle tree)
 
-```
+```lua
 vmg.register_plant({
 	nodes = {
 		trunk = "default:jungletree",
@@ -94,7 +189,7 @@ Function to check the conditions. Should return a boolean: true, the plant can s
 * `t`: table containing all possible conditions: all noises (`t.v1` to `t.v20`), dirt thickness `t.thickness`, temperature `t.temp`, humidity `t.humidity`, humidity from sea `t.sea_water`, from rivers `t.river_water`, from sea and rivers `t.water`.
 * `pos`: position of the future plant, above the dirt node.
 
-```
+```lua
 check = function(t, pos)
 	return t.v15 < 0.7 and t.temp >= 1.9 and t.humidity > 2 and t.v16 > 2
 end,
@@ -111,7 +206,7 @@ It takes 5 parameters:
 * `i`: index of the data array matching the position `pos`. In other terms, `area:indexp(pos) = i`.
 * `t`: table containing all possible conditions (the same `t` as above)
 
-```
+```lua
 grow = function(nodes, pos, data, area)
 	local rand = math.random()
 	local height = math.floor(8 + 4 * rand)

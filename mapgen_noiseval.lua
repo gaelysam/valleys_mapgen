@@ -24,7 +24,7 @@ local dirt_threshold = vmg.define("dirt_threshold", 0.5)
 local water_level = vmg.define("water_level", 1)
 local river_water = vmg.define("river_water", true)
 
-local function mapgen_algorithm(minp, maxp, data, a, c)
+local function mapgen_algorithm(minp, maxp, data, a, c, t0)
 	local ystride = a.ystride -- Tip : the ystride of a VoxelArea is the number to add to the array index to get the index of the position above. It's faster because it avoids to completely recalculate the index.
 
 	local chulens = vector.add(vector.subtract(maxp, minp), 1) -- Size of the generated area, used by noisemaps
@@ -165,7 +165,7 @@ local function mapgen_algorithm(minp, maxp, data, a, c)
 			local is_beach = v15 > 0 and v16 > 0 -- 2 conditions must been met to make possible the beach.
 			local beach = v15 * v16 + water_level -- the y coordinate below which dirt is replaced by beach sand. So if the terrain is higher, there is no beach.
 
-			-- raw humidity, see below at vmg.get_humidity
+			-- raw humidity, see below at get_humidity
 			local hraw = 2 ^ (v13 - v15 + v18 * 2)
 
 			-- After base_ground is used for terrain, modify it by humidity
@@ -203,7 +203,7 @@ local function mapgen_algorithm(minp, maxp, data, a, c)
 								data[ivm] = c.sand
 							else -- place lawn
 
-								-- calculate humidity, see below at vmg.get_humidity
+								-- calculate humidity, see below at get_humidity
 								local soil_humidity = hraw * (1 - math.exp(-thickness - 0.5))
 
 								local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
@@ -216,7 +216,7 @@ local function mapgen_algorithm(minp, maxp, data, a, c)
 								local pos = {x = x, y = y, z = z}
 
 								local v17 = vmg.get_noise(pos, 17) -- Noise #17 is used this way : that's a 3D noise, so a noisemap would be heavy, and less than 2% would be used, contrary to other 3D noises. So it's faster to calculate it node per node, only when needed.
-								local temp -- calculate_temperature for node above, see below at vmg.get_temperature
+								local temp -- calculate_temperature for node above, see below at get_temperature
 								if y > 0 then
 									temp = v17 * 0.5 ^ (y / altitude_chill) -- Divide temperature noise by 2 by climbing altitude_chill
 								else
@@ -384,7 +384,7 @@ local function get_elevation(pos)
 	end
 	local v4 = vmg.get_noise(pos, 4) -- valleys profile
 	local v5 = vmg.get_noise(pos, 5) -- inter-valleys slopes
-	-- Same calculation than in vmg.generate
+	-- Same calculation than in mapgen_algorithm
 	local base_ground = v1 + v3
 	local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2))
 	local mountain_ground = base_ground + valleys
@@ -416,7 +416,7 @@ end
 local function get_humidity(pos)
 	local y = pos.y
 	local flatpos = pos2d(pos)
-	local hraw = vmg.get_humidity_raw(flatpos)
+	local hraw = get_humidity_raw(flatpos)
 
 	-- Another influence on humidity: Dirt thickness, because when the dirt layer is very thin, the soil is drained.
 	local v7 = vmg.get_noise(flatpos, 7)

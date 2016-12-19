@@ -119,14 +119,33 @@ local water_level = vmg.define("water_level", 1)
 local ores = vmg.define("ores", true)
 
 local algo = vmg.define("algorithm", "noise")
+local mapgen_algorithm, get_elevation, get_humidity, get_temperature
+local algo_found = false
 
-local filename
-if algo == "noise" then
-	filename = vmg.path .. "/mapgen_noiseval.lua"
-	-- Other algorithms may come :)
+function vmg.register_algorithm(name, filename)
+	if name == algo then
+		mapgen_algorithm, get_elevation, get_humidity, get_temperature = dofile(filename)
+		algo_found = true
+		return true
+	end
+	return false
 end
 
-local mapgen_algorithm, get_elevation, get_humidity, get_temperature = dofile(filename)
+vmg.register_algorithm("noise", vmg.path .. "/mapgen_noiseval.lua")
+
+vmg.register_on_first_mapgen(function()
+	if not algo_found then
+		error("Mapgen algorithm \"" .. algo .. "\" not found.")
+	elseif not mapgen_algorithm then
+		error("No mapgen algorithm function in file.")
+	elseif not get_elevation then
+		error("No function to get elevation in file.")
+	elseif not get_humidity then
+		error("No function to get humidity in file.")
+	elseif not get_temperature then
+		error("No function to get temperature in file.")
+	end
+end)
 
 vmg.get_elevation = get_elevation
 vmg.get_humidity = get_humidity

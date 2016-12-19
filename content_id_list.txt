@@ -1,0 +1,40 @@
+Index in content_ids   Node
+
+stone                  default:stone
+dirt                   default:dirt
+lawn                   default:dirt_with_grass
+dry                    default:dirt_with_dry_grass
+snow                   default:dirt_with_snow
+dirt_clay              valleys_mapgen:dirt_clayey
+lawn_clay              valleys_mapgen:dirt_clayey_with_grass
+dry_clay               valleys_mapgen:dirt_clayey_with_dry_grass
+snow_clay              valleys_mapgen:dirt_clayey_with_snow
+dirt_silt              valleys_mapgen:dirt_silty
+lawn_silt              valleys_mapgen:dirt_silty_with_grass
+dry_silt               valleys_mapgen:dirt_silty_with_dry_grass
+snow_silt              valleys_mapgen:dirt_silty_with_snow
+dirt_sand              valleys_mapgen:dirt_sandy
+lawn_sand              valleys_mapgen:dirt_sandy_with_grass
+dry_sand               valleys_mapgen:dirt_sandy_with_dry_grass
+snow_sand              valleys_mapgen:dirt_sandy_with_snow
+desert_sand            default:desert_sand
+sand                   default:sand
+gravel                 default:gravel
+silt                   valleys_mapgen:silt
+clay                   valleys_mapgen:red_clay
+water                  default:water_source
+riverwater             default:river_water_source
+lava                   default:lava_source
+snow_layer             default:snow
+glowing_fungal_stone   valleys_mapgen:glowing_fungal_stone
+stalactite             valleys_mapgen:stalactite
+stalagmite             valleys_mapgen:stalagmite
+
+huge_mushroom_cap      valleys_mapgen:huge_mushroom_cap
+giant_mushroom_cap     valleys_mapgen:giant_mushroom_cap
+giant_mushroom_stem    valleys_mapgen:giant_mushroom_stem
+mushroom_fertile_red   flowers:mushroom_fertile_red
+mushroom_fertile_brown flowers:mushroom_fertile_brown
+
+air                    air
+ignore                 ignore
