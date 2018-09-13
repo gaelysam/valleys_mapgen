@@ -149,23 +149,23 @@ vmg_leaves_colors (Leaves colors) bool true
 #    Base ground height
 #    large and smooth noise
 #    2D noise
-vmg_noise_1 (#1: Base ground height) noise_params -10, 50, (1024,1024,1024), 5202, 6, 0.4, 2
+vmg_noise_1 (#1: Base ground height) noise_params_2d -10, 50, (1024,1024,1024), 5202, 6, 0.4, 2
 
 #    Valleys noise
 #    place a river where around zero
-#    2D noise
-vmg_noise_2 (#2: Valleys) noise_params 0, 1, (256,256,256), -6050, 5, 0.6, 2
+#    3D noise
+vmg_noise_2 (#2: Valleys) noise_params_3d 0, 1, (256,256,256), -6050, 5, 0.6, 2
 
 #    Valleys depth
 #    significant influence on terrain height
 #    this value will be squared
 #    2D noise
-vmg_noise_3 (#3: Valleys depth) noise_params 5, 4, (512,512,512), -1914, 1, 1, 2
+vmg_noise_3 (#3: Valleys depth) noise_params_2d 5, 4, (512,512,512), -1914, 1, 1, 2
 
 #    Valleys profile
 #    higher values = larger valleys
 #    2D noise
-vmg_noise_4 (#4: Valleys profile) noise_params 0.6, 0.5, (512,512,512), 777, 1, 1, 2
+vmg_noise_4 (#4: Valleys profile) noise_params_2d 0.6, 0.5, (512,512,512), 777, 1, 1, 2
 
 #    Inter-valleys slopes
 #    determines how much the 3D noise #6 impacts the terrain.
@@ -173,82 +173,82 @@ vmg_noise_4 (#4: Valleys profile) noise_params 0.6, 0.5, (512,512,512), 777, 1, 
 #    low values = smooth terrain, round and wide mountain tops
 #    high values = steep terrain, sharp mountains peaks
 #    2D noise
-vmg_noise_5 (#5: Inter-valleys slopes) noise_params 0.5, 0.5, (128,128,128), 746, 1, 1, 2
+vmg_noise_5 (#5: Inter-valleys slopes) noise_params_2d 0.5, 0.5, (128,128,128), 746, 1, 1, 2
 
 #    Inter-valleys filling
 #    3D noise
-vmg_noise_6 (#6: Inter-valleys filling) noise_params 0, 1, (256,512,256), 1993, 6, 0.8, 2
+vmg_noise_6 (#6: Inter-valleys filling) noise_params_3d 0, 1, (256,512,256), 1993, 6, 0.8, 2
 
 [**Caves noises #8-12]
 #    First cave noise
 #    3D noise
-vmg_noise_8 (#8: Caves I) noise_params 0, 1, (32,32,32), -4640, 4, 0.5, 2
+vmg_noise_8 (#8: Caves I) noise_params_3d 0, 1, (32,32,32), -4640, 4, 0.5, 2
 
 #    Second cave noise
 #    3D noise
-vmg_noise_9 (#9: Caves II) noise_params 0, 1, (32,32,32), 8804, 4, 0.5, 2
+vmg_noise_9 (#9: Caves II) noise_params_3d 0, 1, (32,32,32), 8804, 4, 0.5, 2
 
 #    Third cave noise
 #    3D noise
-vmg_noise_10 (#10: Caves III) noise_params 0, 1, (32,32,32), -4780, 4, 0.5, 2
+vmg_noise_10 (#10: Caves III) noise_params_3d 0, 1, (32,32,32), -4780, 4, 0.5, 2
 
 #    Fourth cave noise, also determines lava
 #    3D noise
-vmg_noise_11 (#11: Caves IV and Lava) noise_params 0, 1, (32,32,32), -9969, 4, 0.5, 2
+vmg_noise_11 (#11: Caves IV and Lava) noise_params_3d 0, 1, (32,32,32), -9969, 4, 0.5, 2
 
 #    Lava can only spawn when this noise is up to a certain threshold
 #    that depends on Y coordinate and Lava depth parameter
 #    3D noise
-vmg_noise_12 (#12: Geological heat) noise_params 0, 1, (64,64,64), 3314, 4, 0.5, 2
+vmg_noise_12 (#12: Geological heat) noise_params_3d 0, 1, (64,64,64), 3314, 4, 0.5, 2
 
 [**Dirt noises #7 #13-16]
 #    Dirt thickness at y=0
 #    reduced by elevation according to Average stone level parameter
 #    2D noise
-vmg_noise_7 (#7: Dirt thickness) noise_params 4, 1.75, (256,256,256), 1605, 3, 0.5, 2
+vmg_noise_7 (#7: Dirt thickness) noise_params_2d 4, 1.75, (256,256,256), 1605, 3, 0.5, 2
 
 #    Clay noise
 #    above Normal dirt threshold parameter, make clayey dirt
 #    above Clay threshold parameter, make pure clay
 #    significant influence on plants
 #    2D noise
-vmg_noise_13 (#13: Clay) noise_params 0, 1, (256,256,256), 2835, 5, 0.5, 4
+vmg_noise_13 (#13: Clay) noise_params_2d 0, 1, (256,256,256), 2835, 5, 0.5, 4
 
 #    Silt noise
 #    above Normal dirt threshold parameter, make silty dirt
 #    above Silt threshold parameter, make pure silt
 #    significant influence on plants
 #    2D noise
-vmg_noise_14 (#14: Silt) noise_params 0, 1, (256,256,256), 6674, 5, 0.5, 4
+vmg_noise_14 (#14: Silt) noise_params_2d 0, 1, (256,256,256), 6674, 5, 0.5, 4
 
 #    Sand noise
 #    above Normal dirt threshold parameter, make sandy dirt
 #    above Sand threshold parameter, make pure desert sand
 #    significant influence on plants
 #    2D noise
-vmg_noise_15 (#15: Sand) noise_params 0, 1, (256,256,256), 6940, 5, 0.5, 4
+vmg_noise_15 (#15: Sand) noise_params_2d 0, 1, (256,256,256), 6940, 5, 0.5, 4
 
 #    Beaches
 #    also used as abstract biome parameter by plants
 #    2D noise
-vmg_noise_16 (#16: Beaches) noise_params 2, 8, (256,256,256), 2349, 3, 0.5, 2
+vmg_noise_16 (#16: Beaches) noise_params_2d 2, 8, (256,256,256), 2349, 3, 0.5, 2
 
 [**Climate noises #17-18]
 #    Temperature
 #    decreased by elevation
 #    3D noise
-vmg_noise_17 (#17: Temperature) noise_params 0, 1, (768,256,768), -1805, 4, 0.5, 4
+vmg_noise_17 (#17: Temperature) noise_params_3d 0, 1, (768,256,768), -1805, 4, 0.5, 4
 
 #    Humidity
 #    modified by dirt type and water proximity
 #    2D noise
-vmg_noise_18 (#18: Humidity) noise_params 0, 1, (243,243,243), -5787, 4, 0.5, 3
+vmg_noise_18 (#18: Humidity) noise_params_2d 0, 1, (243,243,243), -5787, 4, 0.5, 3
 
 [**Simple caves noises #19-20]
 #    Simple caves I
 #    3D noise
-vmg_noise_19 (#19: Simple caves I) noise_params 0, 1, (64,64,64), -8402, 3, 0.5, 2
+vmg_noise_19 (#19: Simple caves I) noise_params_3d 0, 1, (64,64,64), -8402, 3, 0.5, 2
 
 #    Simple caves II
 #    3D noise
-vmg_noise_20 (#20: Simple caves II) noise_params 0, 1, (64,64,64), 3944, 3, 0.5, 2
+vmg_noise_20 (#20: Simple caves II) noise_params_3d 0, 1, (64,64,64), 3944, 3, 0.5, 2
