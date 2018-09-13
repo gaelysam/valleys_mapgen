@@ -238,7 +238,7 @@ function vmg.generate(minp, maxp, seed)
 
 	-- Calculate the noise values
 	local n1 = vmg.noisemap(1, minp2d, chulens)
-	local n2 = vmg.noisemap(2, minp2d, chulens)
+	local n2 = vmg.noisemap(2, minp, chulens_sup)
 	local n3 = vmg.noisemap(3, minp2d, chulens)
 	local n4 = vmg.noisemap(4, minp2d, chulens)
 	local n5 = vmg.noisemap(5, minp2d, chulens)
@@ -281,37 +281,25 @@ function vmg.generate(minp, maxp, seed)
 
 	-- indexes for noise arrays
 	local i2d = 1 -- index for 2D noises
-	local i3d_sup = 1 -- index for noise #6 which has a special size
-	local i3d = 1 -- index for 3D noises
+	local i3d_sup = 1 + chulens.x * (chulens.y+5) -- index for noise #2 and #6 which have a special size
+	local i3d = 1 + chulens.x * (chulens.y-1) -- index for other 3D noises
 
 	-- Calculate increments
-	local i2d_incrZ = chulens.z
-	local i2d_decrX = chulens.x * chulens.z - 1
-	local i3d_incrY = chulens.y
-	local i3d_sup_incrZ = 6 * chulens.y
-	local i3d_decrX = chulens.x * chulens.y * chulens.z - 1
-	local i3d_sup_decrX = chulens.x * (chulens.y + 6) * chulens.z - 1
+	local i2d_incrZ = chulens.x
+	local i2d_incrX = 1 - chulens.x * chulens.z
+	local i3d_incrY = - chulens.x
+	local i3d_incrZ = 2 * chulens.x * chulens.y
+	local i3d_sup_incrZ = 2 * chulens.x * (chulens.y+6)
+	local i3d_incrX = 1 - chulens.x * chulens.y * chulens.z
+	local i3d_sup_incrX = 1 - chulens.x * (chulens.y + 6) * chulens.z
 
 	local last_cave_block = {nil,nil,nil}
 
 	for x = minp.x, maxp.x do -- for each YZ plane
 		for z = minp.z, maxp.z do -- for each vertical line in this plane
-			local v1, v2, v3, v4, v5, v7, v13, v14, v15, v16, v18 = n1[i2d], n2[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d] -- take the noise values for 2D noises
+			local v1, v3, v4, v5, v7, v13, v14, v15, v16, v18 = n1[i2d], n3[i2d], n4[i2d], n5[i2d], n7[i2d], n13[i2d], n14[i2d], n15[i2d], n16[i2d], n18[i2d] -- take the noise values for 2D noises
 			v3 = v3 ^ 2 -- The square function changes the behaviour of this noise : very often small, and sometimes very high.
 			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher where valleys are deep (mountains). base_ground represents the height of the rivers, most of the surface is above.
-			v2 = math.abs(v2) - river_size -- v2 represents the distance from the river, in arbitrary units.
-			local river = v2 < 0 -- the rivers are placed where v2 is negative, so where the original v2 value is close to zero.
-			local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 changes the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4). This variable represents the height of the terrain, from the rivers.
-			local mountain_ground = base_ground + valleys -- approximate height of the terrain at this point (could be slightly modified by the 3D noise #6)
-			local slopes = v5 * valleys -- This variable represents the maximal influence of the noise #6 on the elevation. v5 is the rate of the height from rivers (variable "valleys") that is concerned.
-
-			if river then
-				local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1−x²) which modelizes a circle.
-				mountain_ground = math.min(math.max(base_ground - depth, water_level - 6), mountain_ground)
-					-- base_ground - depth : height of the bottom of the river
-					-- water_level - 6 : don't make rivers below 6 nodes under the surface
-				slopes = 0 -- noise #6 has not any influence on rivers
-			end
 
 			-- Choose biome, by default normal dirt
 			local dirt = c_dirt
@@ -370,199 +358,218 @@ function vmg.generate(minp, maxp, seed)
 				base_ground = base_ground + (hraw - 1) * river_depth
 			end
 
-			for y = minp.y, maxp.y do -- for each node in vertical line
+			local column = {}
+			for y = maxp.y + 6, minp.y, -1 do -- for each node in vertical line
 				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
-				local v6, v8, v9, v10, v11, v12 = n6[i3d_sup], -1, -1, -1, -1, -1 -- take the noise values for 3D noises
-				local is_cave = false
-				local sr, v19, v20
-				if do_caves then
-					if simple_caves then
-						v19, v20 = n19[i3d], n20[i3d] -- take the noise values for 3D noises
-						local n1 = (math.abs(v19) < 0.07)
-						local n2 = (math.abs(v20) < 0.07)
-						is_cave = n1 and n2
-						sr = math.floor((v19 + v20) * 100000) % 1000
-					else
-						v8, v9, v10, v11, v12 = n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d] -- take the noise values for 3D noises
-						is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size -- The 4 cave noises must be close to zero to produce a cave. The square is used for 2 reasons : we need positive values, and, for mathematical reasons, it results in more circular caves.
-					end
+				local v2, v6, v8, v9, v10, v11, v12 = n2[i3d_sup], n6[i3d_sup], -1, -1, -1, -1, -1 -- take the noise values for 3D noises
+				v2 = math.abs(v2) - river_size -- v2 represents the distance from the river, in arbitrary units.
+				local river = v2 < 0 -- the rivers are placed where v2 is negative, so where the original v2 value is close to zero.
+				local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 changes the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4). This variable represents the height of the terrain, from the rivers.
+				local mountain_ground = base_ground + valleys -- approximate height of the terrain at this point (could be slightly modified by the 3D noise #6)
+				local slopes = v5 * valleys -- This variable represents the maximal influence of the noise #6 on the elevation. v5 is the rate of the height from rivers (variable "valleys") that is concerned.
+
+				if river then
+					local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1−x²) which modelizes a circle.
+					mountain_ground = math.min(math.max(base_ground - depth, water_level - 6), mountain_ground)
+						-- base_ground - depth : height of the bottom of the river
+						-- water_level - 6 : don't make rivers below 6 nodes under the surface
+					slopes = 0 -- noise #6 has not any influence on rivers
 				end
 
-				if v6 * slopes > y - mountain_ground then -- if pos is in the ground
-					if not is_cave then -- if pos is not inside a cave
-						local thickness = v7 - math.sqrt(math.abs(y)) / dirt_reduction -- Calculate dirt thickness, according to noise #7, dirt reduction parameter, and elevation (y coordinate)
-						local above = math.floor(thickness + math.random()) -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness. An "above" of zero = bare stone.
-						above = math.max(above, 0) -- must be positive
+				local in_ground = v6 * slopes > y - mountain_ground
+				column[y] = in_ground
 
-						if y >= water_level and n6[i3d_sup+i3d_incrY] * slopes <= y + 1 - mountain_ground and not river then -- If node above is in the ground
-							if is_beach and y < beach then -- if beach, make sand
-								data[ivm] = c_sand
-							else -- place lawn
+				if y <= maxp.y then
+					if in_ground then -- if pos is in the ground
+						local is_cave = false
+						local sr, v19, v20
+						if do_caves then
+							if simple_caves then
+								v19, v20 = n19[i3d], n20[i3d] -- take the noise values for 3D noises
+								local n1 = (math.abs(v19) < 0.07)
+								local n2 = (math.abs(v20) < 0.07)
+								is_cave = n1 and n2
+								sr = math.floor((v19 + v20) * 100000) % 1000
+							else
+								v8, v9, v10, v11, v12 = n8[i3d], n9[i3d], n10[i3d], n11[i3d], n12[i3d] -- take the noise values for 3D noises
+								is_cave = v8 ^ 2 + v9 ^ 2 + v10 ^ 2 + v11 ^ 2 < caves_size -- The 4 cave noises must be close to zero to produce a cave. The square is used for 2 reasons : we need positive values, and, for mathematical reasons, it results in more circular caves.
+							end
+						end
 
-								-- calculate humidity, see below at vmg.get_humidity
-								local soil_humidity = hraw * (1 - math.exp(-thickness - 0.5))
+						if not is_cave then -- if pos is not inside a cave
+							local thickness = v7 - math.sqrt(math.abs(y)) / dirt_reduction -- Calculate dirt thickness, according to noise #7, dirt reduction parameter, and elevation (y coordinate)
+							local above = math.floor(thickness + math.random()) -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness. An "above" of zero = bare stone.
+							above = math.max(above, 0) -- must be positive
 
-								local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
-								local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0)
-								local water = sea_water + (1 - sea_water) * river_water
-								local humidity = soil_humidity * (1 + water)
+							if not column[y+1] and not river then -- If node above is not in the ground
+								if is_beach and y < beach then -- if beach, make sand
+									data[ivm] = c_sand
+								else -- place lawn
 
-								local ivm2 = ivm + ystride -- index of the node above
-								y = y + 1
-								local pos = {x = x, y = y, z = z}
+									-- calculate humidity, see below at vmg.get_humidity
+									local soil_humidity = hraw * (1 - math.exp(-thickness - 0.5))
 
-								local v17 = vmg.get_noise(pos, 17) -- Noise #17 is used this way : that's a 3D noise, so a noisemap would be heavy, and less than 2% would be used, contrary to other 3D noises. So it's faster to calculate it node per node, only when needed.
-								local temp -- calculate_temperature for node above, see below at vmg.get_temperature
-								if y > 0 then
-									temp = v17 * 0.5 ^ (y / altitude_chill) -- Divide temperature noise by 2 by climbing altitude_chill
-								else
-									temp = v17 * 0.5 ^ (-y / altitude_chill) + 20 * (v12 + 1) * (1 - 2 ^ (y / lava_depth))
-								end
+									local sea_water = 0.5 ^ math.max((y - water_level) / 6, 0)
+									local river_water = 0.5 ^ math.max((y - base_ground) / 3, 0)
+									local water = sea_water + (1 - sea_water) * river_water
+									local humidity = soil_humidity * (1 + water)
 
-								if temp > snow_threshold then -- If temperature is too high for snow
-									if above > 0 then
-										if humidity <= dry_dirt_threshold then
-											data[ivm] = dry
+									local ivm2 = ivm + ystride -- index of the node above
+									y = y + 1
+									local pos = {x = x, y = y, z = z}
+
+									local v17 = vmg.get_noise(pos, 17) -- Noise #17 is used this way : that's a 3D noise, so a noisemap would be heavy, and less than 2% would be used, contrary to other 3D noises. So it's faster to calculate it node per node, only when needed.
+									local temp -- calculate_temperature for node above, see below at vmg.get_temperature
+									if y > 0 then
+										temp = v17 * 0.5 ^ (y / altitude_chill) -- Divide temperature noise by 2 by climbing altitude_chill
+									else
+										temp = v17 * 0.5 ^ (-y / altitude_chill) + 20 * (v12 + 1) * (1 - 2 ^ (y / lava_depth))
+									end
+
+									if temp > snow_threshold then -- If temperature is too high for snow
+										if above > 0 then
+											if humidity <= dry_dirt_threshold then
+												data[ivm] = dry
+											else
+												data[ivm] = lawn
+											end
 										else
-											data[ivm] = lawn
+											data[ivm] = c_stone
 										end
-									else
-										data[ivm] = c_stone
+									else -- Snow
+										if above > 0 then
+											data[ivm] = snow -- dirt with snow
+										else
+											data[ivm] = c_stone
+										end
+										data[ivm2] = c_snow_layer -- set node above to snow
 									end
-								else -- Snow
+
 									if above > 0 then
-										data[ivm] = snow -- dirt with snow
-									else
-										data[ivm] = c_stone
+										local conditions = { -- pack it in a table, for plants API
+											v1 = v1,
+											v2 = v2,
+											v3 = v3,
+											v4 = v4,
+											v5 = v5,
+											v6 = v6,
+											v7 = v7,
+											v8 = v8,
+											v9 = v9,
+											v10 = v10,
+											v11 = v11,
+											v12 = v12,
+											v13 = v13,
+											v14 = v14,
+											v15 = v15,
+											v16 = v16,
+											v17 = v17,
+											v18 = v18,
+											v19 = v19,
+											v20 = v20,
+											temp = temp,
+											humidity = humidity,
+											sea_water = sea_water,
+											river_water = river_water,
+											water = water,
+											thickness = thickness
+										}
+
+										vmg.choose_generate_plant(conditions, pos, data, a, ivm2)
 									end
-									data[ivm2] = c_snow_layer -- set node above to snow
+
+									y = y - 1
 								end
-
-								if above > 0 then
-									local conditions = { -- pack it in a table, for plants API
-										v1 = v1,
-										v2 = v2,
-										v3 = v3,
-										v4 = v4,
-										v5 = v5,
-										v6 = v6,
-										v7 = v7,
-										v8 = v8,
-										v9 = v9,
-										v10 = v10,
-										v11 = v11,
-										v12 = v12,
-										v13 = v13,
-										v14 = v14,
-										v15 = v15,
-										v16 = v16,
-										v17 = v17,
-										v18 = v18,
-										v19 = v19,
-										v20 = v20,
-										temp = temp,
-										humidity = humidity,
-										sea_water = sea_water,
-										river_water = river_water,
-										water = water,
-										thickness = thickness
-									}
-
-									vmg.choose_generate_plant(conditions, pos, data, a, ivm2)
-								end
-
-								y = y - 1
-							end
-						elseif n6[i3d_sup+above*i3d_incrY] * slopes <= y + above - mountain_ground then -- if node at "above" nodes up is not in the ground, make dirt
-							if is_beach and y < beach then
-								data[ivm] = c_sand
-							else
-								data[ivm] = dirt
-							end
-						else
-							if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.13 then
-								if data[ivm - ystride] == c_air and math.random() < 0.75 then
-									data[ivm] = c_stone
-									data[ivm - ystride] = c_stalactite
+							elseif not column[y+above] then -- if node at "above" nodes up is not in the ground, make dirt
+								if is_beach and y < beach then
+									data[ivm] = c_sand
 								else
-									local temp = vmg.get_temperature({x=x, y=y, z=z})
-									if temp > 1.2 and temp < 1.6 then
-										data[ivm] = c_glowing_fungal_stone
+									data[ivm] = dirt
+								end
+							else
+								if do_cave_stuff and x == last_cave_block[1] and z == last_cave_block[3] and y == last_cave_block[2] + 1 and math.random() < 0.13 then
+									if data[ivm - ystride] == c_air and math.random() < 0.75 then
+										data[ivm] = c_stone
+										data[ivm - ystride] = c_stalactite
+									else
+										local temp = vmg.get_temperature({x=x, y=y, z=z})
+										if temp > 1.2 and temp < 1.6 then
+											data[ivm] = c_glowing_fungal_stone
+										end
 									end
+								else
+									data[ivm] = c_stone
 								end
-							else
-								data[ivm] = c_stone
 							end
-						end
-					elseif simple_caves and y <= lava_max_height and sr < math.ceil(-y/10000) and y > minp.y and data[ivm - ystride] == c_stone then
-						data[ivm] = c_lava
-					elseif (not simple_caves) and v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
-						data[ivm] = c_lava
-					elseif do_cave_stuff then
-						-- mushrooms and water in caves -- djr
-						last_cave_block = {x,y,z}
+						elseif simple_caves and y <= lava_max_height and sr < math.ceil(-y/10000) and y > minp.y and data[ivm - ystride] == c_stone then
+							data[ivm] = c_lava
+						elseif (not simple_caves) and v11 + v12 > 2 ^ (y / lava_depth) and y <= lava_max_height then
+							data[ivm] = c_lava
+						elseif do_cave_stuff then
+							-- mushrooms and water in caves -- djr
+							last_cave_block = {x,y,z}
 
-						-- check how much air we have til we reach stone
-						local air_to_stone = -1
-						for i = 1,3 do
-							local d = data[ivm - (ystride * i)]
-							if d ~= c_air then
-								if d == c_stone then
-									air_to_stone = i
+							-- check how much air we have til we reach stone
+							local air_to_stone = -1
+							for i = 1,3 do
+								local d = data[ivm - (ystride * i)]
+								if d ~= c_air then
+									if d == c_stone then
+										air_to_stone = i
+									end
+									break
 								end
-								break
 							end
-						end
 
-						local temp = vmg.get_temperature({x=x, y=y, z=z})
-						if air_to_stone == 1 and math.random() < 0.18 then
-							local r = math.random()
-							if r < 0.01 then
-								data[ivm] = c_riverwater
-							elseif r < 0.04 then
-								-- reserved
-							elseif r < 0.13 and temp > 1.2 and temp < 1.6 then
-								data[ivm - ystride] = c_dirt
-								data[ivm] = c_mushroom_fertile_red
-							elseif r < 0.22 and temp > 1.2 and temp < 1.6 then
-								data[ivm - ystride] = c_dirt
-								data[ivm] = c_mushroom_fertile_brown
-							elseif r < 0.44 then  -- leave some extra dirt, for appearances sake
-								data[ivm - ystride] = c_dirt
-							else
-								data[ivm] = c_stalagmite
+							local temp = vmg.get_temperature({x=x, y=y, z=z})
+							if air_to_stone == 1 and math.random() < 0.18 then
+								local r = math.random()
+								if r < 0.01 then
+									data[ivm] = c_riverwater
+								elseif r < 0.04 then
+									-- reserved
+								elseif r < 0.13 and temp > 1.2 and temp < 1.6 then
+									data[ivm - ystride] = c_dirt
+									data[ivm] = c_mushroom_fertile_red
+								elseif r < 0.22 and temp > 1.2 and temp < 1.6 then
+									data[ivm - ystride] = c_dirt
+									data[ivm] = c_mushroom_fertile_brown
+								elseif r < 0.44 then  -- leave some extra dirt, for appearances sake
+									data[ivm - ystride] = c_dirt
+								else
+									data[ivm] = c_stalagmite
+								end
+							elseif air_to_stone == 2 and temp > 1.2 and temp < 1.6 and math.random() < 0.01 then
+								data[ivm] = c_huge_mushroom_cap
+								data[ivm - ystride] = c_giant_mushroom_stem
+								data[ivm - (ystride * 2)] = c_dirt
+							elseif air_to_stone == 3 and temp > 1.2 and temp < 1.6 and math.random() < 0.005 then
+								data[ivm] = c_giant_mushroom_cap
+								data[ivm - ystride] = c_giant_mushroom_stem
+								data[ivm - (ystride * 2)] = c_giant_mushroom_stem
+								data[ivm - (ystride * 3)] = c_dirt
 							end
-						elseif air_to_stone == 2 and temp > 1.2 and temp < 1.6 and math.random() < 0.01 then
-							data[ivm] = c_huge_mushroom_cap
-							data[ivm - ystride] = c_giant_mushroom_stem
-							data[ivm - (ystride * 2)] = c_dirt
-						elseif air_to_stone == 3 and temp > 1.2 and temp < 1.6 and math.random() < 0.005 then
-							data[ivm] = c_giant_mushroom_cap
-							data[ivm - ystride] = c_giant_mushroom_stem
-							data[ivm - (ystride * 2)] = c_giant_mushroom_stem
-							data[ivm - (ystride * 3)] = c_dirt
 						end
-					end
-				elseif y <= water_level then -- if pos is not in the ground, and below water_level, it's an ocean
-					data[ivm] = c_water
-				elseif river and y + 1 < base_ground then
-					if river_water then
-						data[ivm] = c_riverwater
-					else
+					elseif y <= water_level then -- if pos is not in the ground, and below water_level, it's an ocean
 						data[ivm] = c_water
+					elseif river and y + 1 < base_ground then
+						if river_water then
+							data[ivm] = c_riverwater
+						else
+							data[ivm] = c_water
+						end
 					end
+					i3d = i3d + i3d_incrY -- decrement i3d by one line
 				end
-				
-				i3d = i3d + i3d_incrY -- increment i3d by one line
 				i3d_sup = i3d_sup + i3d_incrY -- idem
 			end
 			i2d = i2d + i2d_incrZ -- increment i2d by one Z
-			-- useless to increment i3d, because increment would be 0 !
+			i3d = i3d + i3d_incrZ -- idem for i3d
 			i3d_sup = i3d_sup + i3d_sup_incrZ -- for i3d_sup, just avoid the 6 supplemental lines
 		end
-		i2d = i2d - i2d_decrX -- decrement the Z line previously incremented and increment by one X (1)
-		i3d = i3d - i3d_decrX -- decrement the YZ plane previously incremented and increment by one X (1)
-		i3d_sup = i3d_sup - i3d_sup_decrX -- idem, including the supplemental lines
+		i2d = i2d + i2d_incrX -- decrement the Z line previously incremented and increment by one X (1)
+		i3d = i3d + i3d_incrX -- decrement the YZ plane previously incremented and increment by one X (1)
+		i3d_sup = i3d_sup + i3d_sup_incrX -- idem, including the supplemental lines
 	end
 	vmg.execute_after_mapgen() -- needed for jungletree roots
 
