@@ -401,7 +401,7 @@ function vmg.generate(minp, maxp, seed)
 							local above = math.floor(thickness + math.random()) -- The following code will look for air at this many nodes up. If any, make dirt, else, make stone. So, it's the dirt layer thickness. An "above" of zero = bare stone.
 							above = math.max(above, 0) -- must be positive
 
-							if not column[y+1] and not river then -- If node above is not in the ground
+							if y >= water_level and not column[y+1] and not river then -- If node above is not in the ground
 								if is_beach and y < beach then -- if beach, make sand
 									data[ivm] = c_sand
 								else -- place lawn
