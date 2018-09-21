@@ -5,22 +5,22 @@
 vmg.noises = {
 
 -- Noise 1 : Base Ground Height						2D
-{offset = -10, scale = 50, seed = 5202, spread = {x = 1024, y = 1024, z = 1024}, octaves = 6, persist = 0.4, lacunarity = 2},
+{offset = -10, scale = 50, seed = 5202, spread = {x = 1024, y = 1024, z = 1024}, octaves = 6, persist = 0.4, lacunarity = 2, flags="eased", conf="mgvalleys_np_terrain_height"},
 
 -- Noise 2 : Valleys (River where around zero)				2D
-{offset = 0, scale = 1, seed = -6050, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.6, lacunarity = 2},
+{offset = 0, scale = 1, seed = -6050, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.6, lacunarity = 2, flags="eased", conf="mgvalleys_np_rivers"},
 
 -- Noise 3 : Valleys Depth						2D
-{offset = 5, scale = 4, seed = -1914, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1, lacunarity = 2},
+{offset = 5, scale = 4, seed = -1914, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1, lacunarity = 2, flags="eased", conf="mgvalleys_np_valley_depth"},
 
 -- Noise 4 : Valleys Profile (Higher values = Larger valleys)		2D
-{offset = 0.6, scale = 0.5, seed = 777, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1, lacunarity = 2},
+{offset = 0.6, scale = 0.5, seed = 777, spread = {x = 512, y = 512, z = 512}, octaves = 1, persist = 1, lacunarity = 2, flags="eased", conf="mgvalleys_np_valley_profile"},
 
 -- Noise 5 : Inter-valleys slopes					2D
-{offset = 0.5, scale = 0.5, seed = 746, spread = {x = 128, y = 128, z = 128}, octaves = 1, persist = 1, lacunarity = 2},
+{offset = 0.5, scale = 0.5, seed = 746, spread = {x = 128, y = 128, z = 128}, octaves = 1, persist = 1, lacunarity = 2, flags="eased", conf="mgvalleys_np_inter_valley_slope"},
 
 -- Noise 6 : Inter-valleys filling					3D
-{offset = 0, scale = 1, seed = 1993, spread = {x = 256, y = 512, z = 256}, octaves = 6, persist = 0.8, lacunarity = 2},
+{offset = 0, scale = 1, seed = 1993, spread = {x = 256, y = 512, z = 256}, octaves = 6, persist = 0.8, lacunarity = 2, conf="mgvalleys_np_inter_valley_fill"},
 
 -- Noise 7 : Dirt thickness						2D
 {offset = 4, scale = 1.75, seed = 1605, spread = {x = 256, y = 256, z = 256}, octaves = 3, persist = 0.5, lacunarity = 2},
@@ -78,7 +78,7 @@ end
 
 -- If the noises are already defined in settings, use it instead of the noise parameters above.
 for i, n in ipairs(vmg.noises) do
-	vmg.noises[i] = vmg.define("noise_" .. i, n)
+	vmg.noises[i] = vmg.define("noise_" .. i, n, n.conf)
 end
 
 -- List of functions to run at the end of the mapgen procedure, used especially by jungle tree roots
@@ -106,13 +106,13 @@ local mapgen_times = {
 
 -- Define parameters
 local use_3d_rivers = vmg.define("3d_rivers", false)
-local river_depth = vmg.define("river_depth", 3) + 1
-local river_size = vmg.define("river_size", 5) / 100
+local river_depth = vmg.define("river_depth", 4, "mgvalleys_river_depth")
+local river_size = vmg.define("river_size", 5, "mgvalleys_river_size") / 100
 local caves_size = vmg.define("caves_size", 7) / 100
 local lava_depth = vmg.define("lava_depth", 2000)
-local lava_max_height = vmg.define("lava_max_height", -1)
-local altitude_chill = vmg.define("altitude_chill", 90)
-local do_caves = vmg.define("caves", true)
+local lava_max_height = vmg.define("lava_max_height", 1, "mgvalleys_lava_depth")
+local altitude_chill = vmg.define("altitude_chill", 90, "mgvalleys_altitude_chill")
+local do_caves = vmg.define("caves", nil, true)
 local simple_caves = vmg.define("simple_caves", false)
 local do_cave_stuff = vmg.define("cave_stuff", false)
 local dry_rivers = vmg.define("dry_rivers", false)
@@ -130,7 +130,7 @@ local silt_threshold = vmg.define("silt_threshold", 1)
 local sand_threshold = vmg.define("sand_threshold", 0.75)
 local dirt_threshold = vmg.define("dirt_threshold", 0.5)
 
-local water_level = vmg.define("water_level", 1)
+local water_level = vmg.define("water_level", 1, "water_level")
 local river_water = vmg.define("river_water", true)
 
 local ores = vmg.define("ores", true)

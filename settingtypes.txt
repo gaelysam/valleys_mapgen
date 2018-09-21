@@ -26,7 +26,7 @@
 
 [General]
 #    Valleys Mapgen version used
-vmg_version (Version) enum 2.3 2.3,2.2,2.1,2.0,1.3,1.2,1.1,1.0
+vmg_version (Version) enum 3.0 3.0
 
 #    Valleys Mapgen logs
 #    0 = Not any log from Valleys Mapgen
@@ -49,11 +49,6 @@ vmg_spawn (Spawn) bool true
 vmg_respawn (Respawn) bool true
 
 [Mapgen]
-#    Simply water level
-vmg_water_level (Water level) int 1 -31000 31000
-
-#    Temperature is divided by 2 by climbing this many nodes up
-vmg_altitude_chill (Altitude chill) int 90
 
 [*Dirt and Stone]
 #    height at which the half of the surface is made solely of stone.
@@ -82,12 +77,6 @@ vmg_dry_dirt_threshold (Dry dirt threshold) float 0.6
 #    Produce dry riverbeds in dry regions.
 vmg_dry_rivers (Dry Rivers) bool false
 
-#    Simply the depth of the rivers
-vmg_river_depth (River depth) int 3
-
-#    Width of the rivers (arbitrary units)
-vmg_river_size (River size) float 5.0 0.0 100.0
-
 #    Use river water instead of normal water in rivers.
 vmg_river_water (River Water) bool true
 
@@ -105,13 +94,6 @@ vmg_caves_size (Caves size) float 7.0 0.0 100.0
 #    To manage lava amount increasing by going deep underground
 #    lower values = bigger increasing.
 vmg_lava_depth (Lava depth) int 2000 1 31000
-
-#    No longer supported since mapgen version 2.0. Use lava_max_height instead.
-vmg_surface_lava (Surface lava for VMG < 2.0) bool false
-
-#    Lava can't be generated above this height
-#    use 31000 to disable this restriction, or -31000 to fully disable lava.
-vmg_lava_max_height (Lava max height) int -1 -31000 31000
 
 [**Features]
 #    Use a faster, sparser cave algorithm
@@ -134,12 +116,6 @@ vmg_trees (Trees) bool true
 #    Enable plants
 vmg_plants (Plants) bool true
 
-#    DEPRECATED since mapgen 2.3. Percent of the lawn nodes that are covered by trees.
-tree_density (Trees density for VMG < 2.3) float 5.0 0.0 100.0
-
-#    DEPRECATED since mapgen 2.3. Percent of the lawn nodes that are covered by plants.
-vmg_plant_density (Plants density for VMG < 2.3) float 32.0 0.0 100.0
-
 #    5 different colors for apple trees
 vmg_leaves_colors (Leaves colors) bool true
 
@@ -148,40 +124,6 @@ vmg_leaves_colors (Leaves colors) bool true
 #    This allows overhangs on canyons
 #    May slow down the mapgen a bit
 vmg_3d_rivers (3D noise rivers) bool false
-
-[**Base ground noises #1-6]
-#    Base ground height
-#    large and smooth noise
-#    2D noise
-vmg_noise_1 (#1: Base ground height) noise_params_2d -10, 50, (1024,1024,1024), 5202, 6, 0.4, 2
-
-#    Valleys noise
-#    place a river where around zero
-#    2D or 3D noise, see 3D noise rivers
-vmg_noise_2 (#2: Valleys) noise_params_3d 0, 1, (256,256,256), -6050, 5, 0.6, 2
-
-#    Valleys depth
-#    significant influence on terrain height
-#    this value will be squared
-#    2D noise
-vmg_noise_3 (#3: Valleys depth) noise_params_2d 5, 4, (512,512,512), -1914, 1, 1, 2
-
-#    Valleys profile
-#    higher values = larger valleys
-#    2D noise
-vmg_noise_4 (#4: Valleys profile) noise_params_2d 0.6, 0.5, (512,512,512), 777, 1, 1, 2
-
-#    Inter-valleys slopes
-#    determines how much the 3D noise #6 impacts the terrain.
-#    The most apparent effect is on mountain peaks
-#    low values = smooth terrain, round and wide mountain tops
-#    high values = steep terrain, sharp mountains peaks
-#    2D noise
-vmg_noise_5 (#5: Inter-valleys slopes) noise_params_2d 0.5, 0.5, (128,128,128), 746, 1, 1, 2
-
-#    Inter-valleys filling
-#    3D noise
-vmg_noise_6 (#6: Inter-valleys filling) noise_params_3d 0, 1, (256,512,256), 1993, 6, 0.8, 2
 
 [**Caves noises #8-12]
 #    First cave noise

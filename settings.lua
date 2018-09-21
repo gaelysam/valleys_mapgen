@@ -1,75 +1,63 @@
 vmg.settings = Settings(minetest.get_worldpath() .. "/vmg.conf") -- Create settings object
 
-local function define_str(flag, default, write_to_config)
+local function define_str(flag, default, config_name)
 	local value = vmg.settings:get(flag)
 	if value then -- This flag exists in vmg.conf, return its value
 		return value, true
 	else
-		local on_config = minetest.settings:get("vmg_" .. flag) -- get this flag in minetest.conf
+		local on_config = minetest.settings:get(config_name or "vmg_" .. flag) -- get this flag in minetest.conf
 		if on_config then -- This flag exists in minetest.conf, so return its value
 			vmg.settings:set(flag, on_config)
 			return on_config, false
 		else -- Flag don't exist anywhere, so the default value will be written in settings and returned
-			if write_to_config then
-				minetest.settings:set("vmg_" .. flag, default) -- write to minetest.conf if write_to_config is enabled (usually disabled)
-			end
 			vmg.settings:set(flag, default) -- write to vmg.conf
 			return default, false -- return default value
 		end
 	end
 end
 
-local function define_num(flag, default, write_to_config)
+local function define_num(flag, default, config_name)
 	local value = vmg.settings:get(flag)
 	if value then -- This flag exists in vmg.conf, return its value
 		return tonumber(value), true
 	else
-		local on_config = minetest.settings:get("vmg_" .. flag) -- get this flag in minetest.conf
+		local on_config = minetest.settings:get(config_name or "vmg_" .. flag) -- get this flag in minetest.conf
 		if on_config then -- This flag exists in minetest.conf, so return its value
 			vmg.settings:set(flag, on_config)
 			return tonumber(on_config), false
 		else -- Flag don't exist anywhere, so the default value will be written in settings and returned
-			if write_to_config then
-				minetest.settings:set("vmg_" .. flag, default) -- write to minetest.conf if write_to_config is enabled (usually disabled)
-			end
 			vmg.settings:set(flag, default) -- write to vmg.conf
 			return tonumber(default), false -- return default value
 		end
 	end
 end
 
-local function define_bool(flag, default, write_to_config)
+local function define_bool(flag, default, config_name)
 	local value = vmg.settings:get_bool(flag)
 	if value then -- This flag exists in vmg.conf, return its value
 		return value, true
 	else
-		local on_config = minetest.settings:get_bool("vmg_" .. flag) -- get this flag in minetest.conf
+		local on_config = minetest.settings:get_bool(config_name or "vmg_" .. flag) -- get this flag in minetest.conf
 		if on_config then -- This flag exists in minetest.conf, so return its value
 			vmg.settings:set_bool(flag, on_config)
 			return on_config, false
 		else -- Flag don't exist anywhere, so the default value will be written in settings and returned
-			if write_to_config then
-				minetest.settings:set_bool("vmg_" .. flag, default) -- write to minetest.conf if write_to_config is enabled (usually disabled)
-			end
 			vmg.settings:set_bool(flag, default) -- write to vmg.conf
 			return default, false -- return default value
 		end
 	end
 end
 
-local function define_noise(flag, default, write_to_config)
+local function define_noise(flag, default, config_name)
 	local value = vmg.settings:get_np_group(flag)
 	if value then -- This flag exists in vmg.conf, return its value
 		return value, true
 	else
-		local on_config = minetest.settings:get_np_group("vmg_" .. flag) -- get this flag in minetest.conf
+		local on_config = minetest.settings:get_np_group(config_name or "vmg_" .. flag) -- get this flag in minetest.conf
 		if on_config then -- This flag exists in minetest.conf, so return its value
 			vmg.settings:set_np_group(flag, on_config)
 			return on_config, false
 		else -- Flag don't exist anywhere, so the default value will be written in settings and returned
-			if write_to_config then
-				minetest.settings:set_np_group("vmg_" .. flag, default) -- write to minetest.conf if write_to_config is enabled (usually disabled)
-			end
 			vmg.settings:set_np_group(flag, default) -- write to vmg.conf
 			return default, false -- return default value
 		end
@@ -83,11 +71,11 @@ local definefunc = {
 	table = define_noise,
 }
 
-function vmg.define(flag, default, write_to_config)
+function vmg.define(flag, default, config_name)
 	local typeval = type(default) -- Select function from the type of the default value
 	local f = definefunc[typeval] -- Choose the appropriate function
 	if f then
-		return f(flag, default, write_to_config)
+		return f(flag, default, config_name)
 	end
 end
 

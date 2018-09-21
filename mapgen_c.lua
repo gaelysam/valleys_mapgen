@@ -4,25 +4,7 @@ print("*** using 2.3c")
 
 -- Read the noise parameters from the actual mapgen.
 local function getCppSettingNoise(name, default)
-	local noise
-	local n = minetest.setting_get(name)
-
-	if n then
-		local parse = {spread = {}}
-		local n1, n2, n3, n4, n5, n6, n7, n8, n9
-
-		n1, n2, n3, n4, n5, n6, n7, n8, n9 = string.match(n, '([%d%.%-]+), ([%d%.%-]+), %(([%d%.%-]+), ([%d%.%-]+), ([%d%.%-]+)%), ([%d%.%-]+), ([%d%.%-]+), ([%d%.%-]+), ([%d%.%-]+)')
-		if n9 then
-			noise = {offset = tonumber(n1), scale = tonumber(n2), seed = tonumber(n6), spread = {x = tonumber(n3), y = tonumber(n4), z = tonumber(n5)}, octaves = tonumber(n7), persist = tonumber(n8), lacunarity = tonumber(n9)}
-		end
-	end
-
-	-- Use the default otherwise.
-	if not noise then
-		noise = default
-	end
-
-	return noise
+	return noise = minetest.settings:get_np_group(name) or default
 end
 
 
@@ -30,7 +12,7 @@ end
 vmg.noises = {}
 
 -- Noise 2 : Valleys (River where around zero)				2D
-vmg.noises[2] = getCppSettingNoise('mg_valleys_np_rivers', {offset = 0, scale = 1, seed = -6050, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.6, lacunarity = 2})
+vmg.noises[2] = getCppSettingNoise('mg_valleys_np_rivers', {offset = 0, scale = 1, seed = -6050, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.6, lacunarity = 2, flags="eased"})
 
 -- Noise 13 : Clayey dirt noise						2D
 vmg.noises[13] = {offset = 0, scale = 1, seed = 2835, spread = {x = 256, y = 256, z = 256}, octaves = 5, persist = 0.5, lacunarity = 4}
@@ -77,15 +59,8 @@ function vmg.execute_after_mapgen()
 end
 
 local function getCppSettingNumeric(name, default)
-	local setting = minetest.setting_get(name) 
-
-	if setting and tonumber(setting) then
-		setting = tonumber(setting)
-	else
-		setting = default
-	end
-
-	return setting
+	local setting = minetest.settings:get(name) 
+	return setting and tonumber(setting) or default
 end
 
 -- Mapgen time stats
@@ -98,15 +73,15 @@ local mapgen_times = {
 }
 
 -- Define parameters
-local river_size = vmg.define("river_size", 5) / 100
-local do_cave_stuff = vmg.define("cave_stuff", false)
-local dry_dirt_threshold = vmg.define("dry_dirt_threshold", 0.6)
+local river_size = vmg.define("river_size", "mgvalleys_river_size", 5) / 100
+local do_cave_stuff = vmg.define("cave_stuff", nil, false)
+local dry_dirt_threshold = vmg.define("dry_dirt_threshold", nil, 0.6)
 
-local clay_threshold = vmg.define("clay_threshold", 1)
-local silt_threshold = vmg.define("silt_threshold", 1)
-local sand_threshold = vmg.define("sand_threshold", 0.75)
-local dirt_threshold = vmg.define("dirt_threshold", 0.5)
-local average_snow_level = vmg.define("average_snow_level", 100)
+local clay_threshold = vmg.define("clay_threshold", nil, 1)
+local silt_threshold = vmg.define("silt_threshold", nil, 1)
+local sand_threshold = vmg.define("sand_threshold", nil, 0.75)
+local dirt_threshold = vmg.define("dirt_threshold", nil, 0.5)
+local average_snow_level = vmg.define("average_snow_level", nil, 100)
 local altitude_chill = getCppSettingNumeric('mg_valleys_altitude_chill', 90) 
 local heat_multiplier = tonumber(getCppSettingNoise('mg_biome_np_heat', {offset=50}).offset) / 25
 local snow_threshold = heat_multiplier * 0.5 ^ (average_snow_level / altitude_chill)
@@ -125,7 +100,7 @@ local soil_translate = {}
 --  two available already. Sandstone forms in layers. Desert stone...
 --  doesn't exist, but let's assume it's another sedementary rock
 --  and place it similarly.
-if vmg.define("stone_ores", true) then
+if vmg.define("stone_ores", nil, true) then
 	minetest.register_ore({ore_type="sheet", ore="default:sandstone", wherein="default:stone", clust_num_ores=250, clust_scarcity=60, clust_size=10, y_min=-1000, y_max=31000, noise_threshhold=0.1, noise_params={offset=0, scale=1, spread={x=256, y=256, z=256}, seed=4130293965, octaves=5, persist=0.60}, random_factor=1.0})
 	minetest.register_ore({ore_type="sheet", ore="default:desert_stone", wherein="default:stone", clust_num_ores=250, clust_scarcity=60, clust_size=10, y_min=-1000, y_max=31000, noise_threshhold=0.1, noise_params={offset=0, scale=1, spread={x=256, y=256, z=256}, seed=163281090, octaves=5, persist=0.60}, random_factor=1.0})
 end

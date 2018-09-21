@@ -3,7 +3,7 @@ vmg.version = "2.3"
 
 vmg.path = minetest.get_modpath("valleys_mapgen")
 
-vmg.loglevel = tonumber(minetest.setting_get("vmg_log_level") or 0)
+vmg.loglevel = tonumber(minetest.settings:get("vmg_log_level") or 0)
 
 if vmg.loglevel >= 2 then
 	print("[Valleys Mapgen] Loading basic functions ...")
