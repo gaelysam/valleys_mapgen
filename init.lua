@@ -53,7 +53,7 @@ function pos3d(pos, alt)
 	if type(pos) == "number" then
 		return {x = pos, y = pos, z = pos}
 	elseif pos.z then
-		return {x = pos.x, y = pos.z, z = pos.z}
+		return {x = pos.x, y = pos.y, z = pos.z}
 	else
 		return {x = pos.x, y = alt, z = pos.y}
 	end

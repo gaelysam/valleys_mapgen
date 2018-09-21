@@ -152,6 +152,7 @@ end
 --   river: whether there is a river here
 -- This function is executed for every vertical row in the case of 2D noise rivers, and for every node for 3D noise rivers. It allows 
 local function calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
+	v2 = math.abs(v2) - river_size -- v2 is distance from a river, so I'd like a positive value.
 	local river = v2 < 0 -- the rivers are placed where v2 is negative, so where the original v2 value is close to zero.
 	local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 changes the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4). This variable represents the height of the terrain, from the rivers.
 	local mountain_ground = base_ground + valleys -- approximate height of the terrain at this point (could be slightly modified by the 3D noise #6)
@@ -165,7 +166,7 @@ local function calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
 		slopes = 0 -- noise #6 has not any influence on rivers
 	end
 
-	return mountain_ground, slopes, river
+	return mountain_ground, slopes, river, v2
 end
 
 local data = {}
@@ -326,8 +327,8 @@ function vmg.generate(minp, maxp, seed)
 
 			local v2, mountain_ground, slopes, river
 			if not use_3d_rivers then
-				v2 = math.abs(n2[i2d]) - river_size -- v2 is distance from a river, so I'd like a positive value.
-				mountain_ground, slopes, river = calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
+				v2 = n2[i2d]
+				mountain_ground, slopes, river, v2 = calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
 			end
 
 			-- Choose biome, by default normal dirt
@@ -394,8 +395,8 @@ function vmg.generate(minp, maxp, seed)
 				local v8, v9, v10, v11, v12
 
 				if use_3d_rivers then
-					v2 = math.abs(n2[i3d_sup]) - river_size
-					mountain_ground, slopes, river = calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
+					v2 = n2[i3d_sup]
+					mountain_ground, slopes, river, v2 = calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
 				end
 
 				local in_ground = v6 * slopes > y - mountain_ground
@@ -753,33 +754,44 @@ end
 
 function vmg.get_elevation(pos)
 	local v1 = vmg.get_noise(pos, 1) -- base ground
-	local v2 = math.abs(vmg.get_noise(pos, 2)) - river_size -- valleys
+	local v2, mountain_ground, slopes, river
 	local v3 = vmg.get_noise(pos, 3) ^ 2 -- valleys depth
-	local base_ground = v1 + v3
-	if v2 < 0 then -- river
-		return math.ceil(base_ground), true
-	end
 	local v4 = vmg.get_noise(pos, 4) -- valleys profile
 	local v5 = vmg.get_noise(pos, 5) -- inter-valleys slopes
-	-- Same calculation than in vmg.generate
+
 	local base_ground = v1 + v3
-	local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2))
-	local mountain_ground = base_ground + valleys
-	local pos = pos3d(pos, round(mountain_ground)) -- For now we don't know the elevation. We will test some y values. Set the position to montain_ground which is the most probable value.
-	local slopes = v5 * valleys
-	if vmg.get_noise(pos, 6) * slopes > pos.y - mountain_ground then -- Position is in the ground, so look for air higher
-		pos.y = pos.y + 1
-		while vmg.get_noise(pos, 6) * slopes > pos.y - mountain_ground do
-			pos.y = pos.y + 1
-		end -- End of the loop when there is air
-		return pos.y, false -- Return position of the first air node, and false because that's not a river
+	local epos = pos3d(pos, math.ceil(base_ground)) -- Position with elevation (3D)
+	v2 = vmg.get_noise(use_3d_rivers and epos or pos, 2) -- Use 2D or 3D position according to use_3d_rivers
+
+	mountain_ground, slopes, river = calculate_terrain_at_point(base_ground, v2, v3, v4, v5) -- Calculate terrain parameters
+	if river then
+		return math.ceil(base_ground), true
+	end
+
+	epos = pos3d(pos, math.ceil(mountain_ground)) -- set epos to mountain_ground (most probable ground level) to optimize
+	if use_3d_rivers then
+		v2 = vmg.get_noise(epos, 2)
+		mountain_ground, slopes, river = calculate_terrain_at_point(base_ground, v2, v3, v4, v5) -- Recalculate
+	end
+
+	if vmg.get_noise(epos, 6) * slopes > epos.y - mountain_ground then -- Position is in the ground, so look for air higher
+		repeat
+			epos.y = epos.y + 1
+			if use_3d_rivers then
+				v2 = vmg.get_noise(epos, 2)
+				mountain_ground, slopes, river = calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
+			end
+		until vmg.get_noise(epos, 6) * slopes <= epos.y - mountain_ground -- End of the loop when there is air
+		return epos.y, river -- Return position of the first air node
 	else -- Position is not in the ground, so look for dirt lower
-		pos.y = pos.y - 1
-		while vmg.get_noise(pos, 6) * slopes <= pos.y - mountain_ground do
-			pos.y = pos.y - 1
-		end -- End of the loop when there is dirt (or any ground)
-		pos.y = pos.y + 1 -- We have the latest dirt node and we want the first air node that is just above
-		return pos.y, false -- Return position of the first air node, and false because that's not a river
+		repeat
+			epos.y = epos.y - 1
+			if use_3d_rivers then
+				v2 = vmg.get_noise(epos, 2)
+				mountain_ground, slopes, river = calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
+			end
+		until vmg.get_noise(epos, 6) * slopes > epos.y - mountain_ground -- End of the loop when there is dirt (or any ground)
+		return epos.y+1, river -- Return position of the first air node
 	end
 end
 
