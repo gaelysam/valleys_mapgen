@@ -127,8 +127,8 @@ if vmg.valleys_c then
 	dofile(vmg.path .. "/mapgen_c.lua")
 elseif version == vmg.version then
 	dofile(vmg.path .. "/mapgen.lua")
-else
-	dofile(vmg.path .. "/old_mapgens/" .. version .. ".lua")
+elseif not pcall(dofile, vmg.path .. "/old_mapgens/" .. version .. ".lua") then
+	print("[Valleys Mapgen] Missing compatibility mapgen for version " .. version .. ". Using latest version, you may see artifacts.")
 end
 
 -- Write settings after loading
