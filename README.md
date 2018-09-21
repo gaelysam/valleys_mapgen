@@ -174,17 +174,21 @@ end,
 * Added support for darkage ores
 * Adapted sapling growth to new minetest_game API
 
-### 2.2 ~> Latest
+### 2.2 ~> 2.3 (Friday September 21, 2018)
+Version of March 2016 initially considered as a developement version, and finally released after a 2 years long hiatus
 * Added plants API to allow external mods registering plants for VMG
-* Added dry dirt
+* Added dry dirt and dry grass
 * Transform dirt into dirt with grass, dry grass or snow according to the climate
 * Added willow tree
 * Added optional 5 leaves colors for default tree
 * Slimmer trunks for banana, cherry and birch tree
-* Added simple caves for quicker mapgen (optional, disabled by default)
+* Added simple caves for quicker mapgen (optional, disabled by default), or no caves option for even quicker mapgen
 * Made ores optional
 * Included dirt thickness in humidity calculation
 * Changed `vmg.conf.example` to `settingtypes.txt` to be compatible with settings API (for recent builds)
 * Fixed function `vmg.get_noise`. Humidity calculation is now correct after mapgen.
 * Added mapgen time statistics in logs
+* Added C helper mapgen to generate VMG's supplementary features if the core Valleys mapgen is enabled
+* Added `mod.conf`
+* Added dry riverbeds in dry regions
 

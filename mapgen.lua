@@ -1,5 +1,5 @@
--- Mapgen 2.3-dev
--- Saturday September 26, 2015
+-- Mapgen 2.3
+-- Thursday March 3, 2016
 
 -- Define perlin noises used in this mapgen by default
 vmg.noises = {
