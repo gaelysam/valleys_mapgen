@@ -144,6 +144,10 @@ vmg_plant_density (Plants density for VMG < 2.3) float 32.0 0.0 100.0
 vmg_leaves_colors (Leaves colors) bool true
 
 [*Noises]
+#    Use a 3D noise for rivers
+#    This allows overhangs on canyons
+#    May slow down the mapgen a bit
+vmg_3d_rivers (3D noise rivers) bool false
 
 [**Base ground noises #1-6]
 #    Base ground height
@@ -153,7 +157,7 @@ vmg_noise_1 (#1: Base ground height) noise_params_2d -10, 50, (1024,1024,1024), 
 
 #    Valleys noise
 #    place a river where around zero
-#    3D noise
+#    2D or 3D noise, see 3D noise rivers
 vmg_noise_2 (#2: Valleys) noise_params_3d 0, 1, (256,256,256), -6050, 5, 0.6, 2
 
 #    Valleys depth

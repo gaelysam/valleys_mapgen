@@ -105,6 +105,7 @@ local mapgen_times = {
 }
 
 -- Define parameters
+local use_3d_rivers = vmg.define("3d_rivers", false)
 local river_depth = vmg.define("river_depth", 3) + 1
 local river_size = vmg.define("river_size", 5) / 100
 local caves_size = vmg.define("caves_size", 7) / 100
@@ -144,6 +145,28 @@ if vmg.define("stone_ores", true) then
 	minetest.register_ore({ore_type="sheet", ore="default:desert_stone", wherein="default:stone", clust_num_ores=250, clust_scarcity=60, clust_size=10, y_min=-1000, y_max=31000, noise_threshhold=0.1, noise_params={offset=0, scale=1, spread={x=256, y=256, z=256}, seed=163281090, octaves=5, persist=0.60}, random_factor=1.0})
 end
 
+-- TERRAIN SHAPE ACCORDING TO NOISE VALUES
+-- Reurns 3 parameters:
+--   mountain_ground: Height of the mountains where v5 = 0. v5 makes the ground level vary around this value.
+--   slopes: Intensity of the variations around mountain_ground, basically how chaotic the terrain will be.
+--   river: whether there is a river here
+-- This function is executed for every vertical row in the case of 2D noise rivers, and for every node for 3D noise rivers. It allows 
+local function calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
+	local river = v2 < 0 -- the rivers are placed where v2 is negative, so where the original v2 value is close to zero.
+	local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 changes the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4). This variable represents the height of the terrain, from the rivers.
+	local mountain_ground = base_ground + valleys -- approximate height of the terrain at this point (could be slightly modified by the 3D noise #6)
+	local slopes = v5 * valleys -- This variable represents the maximal influence of the noise #6 on the elevation. v5 is the rate of the height from rivers (variable "valleys") that is concerned.
+
+	if river then
+		local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1−x²) which modelizes a circle.
+		mountain_ground = math.min(math.max(base_ground - depth, water_level - 6), mountain_ground)
+			-- base_ground - depth : height of the bottom of the river
+			-- water_level - 6 : don't make rivers below 6 nodes under the surface
+		slopes = 0 -- noise #6 has not any influence on rivers
+	end
+
+	return mountain_ground, slopes, river
+end
 
 local data = {}
 
@@ -238,7 +261,7 @@ function vmg.generate(minp, maxp, seed)
 
 	-- Calculate the noise values
 	local n1 = vmg.noisemap(1, minp2d, chulens)
-	local n2 = vmg.noisemap(2, minp, chulens_sup)
+	local n2 = use_3d_rivers and vmg.noisemap(2, minp, chulens_sup) or vmg.noisemap(2, minp2d, chulens) -- Select parameters according to 3d_rivers
 	local n3 = vmg.noisemap(3, minp2d, chulens)
 	local n4 = vmg.noisemap(4, minp2d, chulens)
 	local n5 = vmg.noisemap(5, minp2d, chulens)
@@ -301,6 +324,12 @@ function vmg.generate(minp, maxp, seed)
 			v3 = v3 ^ 2 -- The square function changes the behaviour of this noise : very often small, and sometimes very high.
 			local base_ground = v1 + v3 -- v3 is here because terrain is generally higher where valleys are deep (mountains). base_ground represents the height of the rivers, most of the surface is above.
 
+			local v2, mountain_ground, slopes, river
+			if not use_3d_rivers then
+				v2 = math.abs(n2[i2d]) - river_size -- v2 is distance from a river, so I'd like a positive value.
+				mountain_ground, slopes, river = calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
+			end
+
 			-- Choose biome, by default normal dirt
 			local dirt = c_dirt
 			local lawn = c_lawn
@@ -361,19 +390,12 @@ function vmg.generate(minp, maxp, seed)
 			local column = {}
 			for y = maxp.y + 6, minp.y, -1 do -- for each node in vertical line
 				local ivm = a:index(x, y, z) -- index of the data array, matching the position {x, y, z}
-				local v2, v6, v8, v9, v10, v11, v12 = n2[i3d_sup], n6[i3d_sup], -1, -1, -1, -1, -1 -- take the noise values for 3D noises
-				v2 = math.abs(v2) - river_size -- v2 represents the distance from the river, in arbitrary units.
-				local river = v2 < 0 -- the rivers are placed where v2 is negative, so where the original v2 value is close to zero.
-				local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 changes the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4). This variable represents the height of the terrain, from the rivers.
-				local mountain_ground = base_ground + valleys -- approximate height of the terrain at this point (could be slightly modified by the 3D noise #6)
-				local slopes = v5 * valleys -- This variable represents the maximal influence of the noise #6 on the elevation. v5 is the rate of the height from rivers (variable "valleys") that is concerned.
+				local v6 = n6[i3d_sup] -- take the noise values for 3D noises
+				local v8, v9, v10, v11, v12
 
-				if river then
-					local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1−x²) which modelizes a circle.
-					mountain_ground = math.min(math.max(base_ground - depth, water_level - 6), mountain_ground)
-						-- base_ground - depth : height of the bottom of the river
-						-- water_level - 6 : don't make rivers below 6 nodes under the surface
-					slopes = 0 -- noise #6 has not any influence on rivers
+				if use_3d_rivers then
+					v2 = math.abs(n2[i3d_sup]) - river_size
+					mountain_ground, slopes, river = calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
 				end
 
 				local in_ground = v6 * slopes > y - mountain_ground
