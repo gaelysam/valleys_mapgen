@@ -154,18 +154,17 @@ end
 local function calculate_terrain_at_point(base_ground, v2, v3, v4, v5)
 	v2 = math.abs(v2) - river_size -- v2 is distance from a river, so I'd like a positive value.
 	local river = v2 < 0 -- the rivers are placed where v2 is negative, so where the original v2 value is close to zero.
+	if river then
+		local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1−x²) which modelizes a circle.
+		local mountain_ground = math.min(math.max(base_ground - depth, water_level - 6), base_ground)
+			-- base_ground - depth : height of the bottom of the river
+			-- water_level - 6 : don't make rivers below 6 nodes under the surface
+		return mountain_ground, 0, river, v2 -- slopes = 0 because noise #6 has not any influence on rivers
+	end
+
 	local valleys = v3 * (1 - math.exp(- (v2 / v4) ^ 2)) -- use the curve of the function 1−exp(−(x/a)²) to modelise valleys. Making "a" varying 0 < a ≤ 1 changes the shape of the valleys. Try it with a geometry software ! (here x = v2 and a = v4). This variable represents the height of the terrain, from the rivers.
 	local mountain_ground = base_ground + valleys -- approximate height of the terrain at this point (could be slightly modified by the 3D noise #6)
 	local slopes = v5 * valleys -- This variable represents the maximal influence of the noise #6 on the elevation. v5 is the rate of the height from rivers (variable "valleys") that is concerned.
-
-	if river then
-		local depth = river_depth * math.sqrt(1 - (v2 / river_size + 1) ^ 2) -- use the curve of the function −sqrt(1−x²) which modelizes a circle.
-		mountain_ground = math.min(math.max(base_ground - depth, water_level - 6), mountain_ground)
-			-- base_ground - depth : height of the bottom of the river
-			-- water_level - 6 : don't make rivers below 6 nodes under the surface
-		slopes = 0 -- noise #6 has not any influence on rivers
-	end
-
 	return mountain_ground, slopes, river, v2
 end
 
